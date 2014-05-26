@@ -1,0 +1,145 @@
+% \newtoggle{extended}
+% \togglefalse{extended}
+\newcommand{\sem}[1]{\mbox{$[\![#1]\!]$}}
+\newcommand{\resp}{resp.,~}
+\newcommand{\ie}{i.e.,~}
+\newcommand{\set}[1]{{\{#1\}}}
+\newcommand{\mset}[1]{{\{\!|{#1}|\!\}}}
+\newcommand{\ab}{\allowbreak}
+\newcommand{\lang}{{\mathcal L}}
+\newcommand{\assume}{{\tt assume}}
+\newcommand{\shwrite}{{shared write}}
+\newcommand{\shwrites}{{shared writes}}
+\newcommand{\simple}{{canonical}}
+\newcommand{\assert}{{\tt assert}}
+\newcommand{\spawn}{{\tt spawn}}
+
+\newcommand{\Writes}[1]{{\sf Wr}({#1})}
+\newcommand{\yield}{{\tt yield}}
+\newcommand{\open}[2]{{\tt open[{\mathit{#1}}][{#2}]}}
+\newcommand{\done}[2]{{\tt done[{\mathit{#1}}][{#2}]}}
+\newcommand{\openm}[2]{{\tt open[}{#1}{\tt ][}{#2}{\tt ]}}
+\newcommand{\donem}[2]{{\tt done[}{#1}{\tt ][}{#2}{\tt ]}}
+
+\newcommand{\sprogs}{{\mathcal C}{\mathcal P}}
+
+\newcommand{\oper}[3]{{{#1}[{#2},{#3}]}}
+
+\newcommand{\meths}[1]{{\mathbb M({#1})}}
+
+\newcommand{\opent}[3]{\Pi({#1})({#2}[{#3}])}
+\newcommand{\donet}[3]{\Pi({#1})({#2}[{#3}])}
+
+\newcommand{\pclass}{{\mathcal P} }
+
+\newcommand{\abs}{A}
+\newcommand{\concr}{C}
+\newcommand{\osys}{OS}
+\newcommand{\tid}{t}
+\newcommand{\obj}{o}
+\newcommand{\lib}{L}
+\newcommand{\libq}{{\overline L}}
+\newcommand{\mgc}[1]{{\sf{MGC}}_{#1}}
+\newcommand{\mgcb}[3]{{\sf{MGC}}_{#1}^{{#2},{#3}}}
+\newcommand{\spec}{S}
+\newcommand{\meth}{f}
+\newcommand{\cval}{n}
+\newcommand{\rval}{m}
+
+
+\newcommand{\callCom}[2]{{#1}({#2})}
+\newcommand{\assumeCom}[1]{{\sf assume}({#1})}
+
+\newcommand{\callAct}[3]{{\sf call}({#1},{#2},{#3})}
+\newcommand{\retAct}[3]{{\sf ret}({#1},{#2},{#3})}
+\newcommand{\objAct}{\psi}
+\newcommand{\cliAct}{\varphi}
+\newcommand{\libAct}{l}
+\newcommand{\act}{a}
+
+\newcommand{\equivalent}{equivalent}
+\newcommand{\equivSymb}{\cong}
+
+\newcommand{\bijection}{\gamma}
+\newcommand{\length}[1]{|{#1}|}
+\newcommand{\hist}{h}
+\newcommand{\histp}{\overline {h}}
+\newcommand{\histpp}{\tilde{h}}
+\newcommand{\getHist}[1]{{\sf hist}({#1})}
+\newcommand{\trace}{{\tau}}
+\newcommand{\phase}{{\pi}}
+\newcommand{\tracep}{\overline {\tau}}
+
+\newcommand{\pos}[2]{{#1}_{#2}}
+\newcommand{\hb}{\leq_H}
+
+\newcommand{\linearizable}{linearizable}
+\newcommand{\precisely}{precisely linearizable}
+\newcommand{\lin}{\sqsubseteq}
+\newcommand{\plin}{\sqsubseteq_{tid}}
+\newcommand{\linchoice}[1]{\sqsubseteq^{#1}}
+\newcommand{\plinchoice}[1]{\sqsubseteq_{tid}^{#1}}
+
+\newcommand{\barriers}{B}
+\newcommand{\barrier}{b}
+\newcommand{\separated}[2]{\prec_{{#2}}^{#1}}
+
+\newcommand{\maxbar}[2]{{#1}[{#2}]}
+
+\newcommand{\wfTraces}{WTraces}
+\newcommand{\wfHists}{WHists}
+
+\newcommand{\getTid}[1]{{\sf getTid}({#1})}
+\newcommand{\isCall}[1]{{\sf isCall}({#1})}
+\newcommand{\isRet}[1]{{\sf isRet}({#1})}
+\newcommand{\pred}[1]{\prec_{#1}}
+
+\newcommand{\prog}{P}
+\newcommand{\progC}{P^C}
+\newcommand{\instr}[1]{\Xi({#1})}
+\newcommand{\state}{q}
+\newcommand{\States}{{\mathcal Q}}
+\newcommand{\InitStates}{{\mathcal I}}
+\newcommand{\semantic}[1]{T({#1})}
+\newcommand{\toTrace}[2]{{\tt Tr}[{#1}]({#2})}
+\newcommand{\toTraceFinal}[1]{{\tt Tr}[{#1}]}
+\newcommand{\eval}[2]{{\sf eval}({#1},{#2})}
+\newcommand{\evalSymb}{{\sf eval}}
+
+\newcommand{\comp}[2]{[{#1}]({#2})}
+\newcommand{\traces}[2]{{\tt Tr}[{#1}]({#2})}
+\newcommand{\tracesExec}[2]{{\tt TrEx}[{#1}]({#2})}
+\newcommand{\states}[2]{{\tt States}[{{#1}}]({#2})}
+\newcommand{\reach}[3]{{\tt St}[{{#1}}]({#2})({#3})}
+\newcommand{\reachws}[2]{{\tt St}[{{#1}}]({#2})}
+\newcommand{\stCnt}{\mbox{\tt St$\downarrow$Cnt}}
+\newcommand{\reachCount}[3]{\Pi(\reach{{#1}}{{#2}}{{#3}})}
+\newcommand{\reachCountws}[2]{\Pi(\reachws{{#1}}{{#2}})}
+\newcommand{\reachMGC}[1]{\reachCountws{\instr{\mgc{#1}}}{#1}}
+%{\tt ReachC}[\mgc{#1}]}
+\newcommand{\reachMGCb}[3]{\reachCountws{\instr{\mgcb{#1}{#2}{#3}}}{#1}}
+
+\newcommand{\projReach}[4]{{\tt Reach}[{{#1}}]({#2})({#3})[{#4}]}
+\newcommand{\counters}[2]{\Pi(\tracesExec{#1}{#2})}
+
+\newcommand{\pending}{{?}}
+\newcommand{\comment}[1]{\textcolor{blue}{#1}}
+
+\newcommand{\interfaceInd}[2]{{Sum_{#1}({#2})}}
+
+\newcommand{\command}{c}
+\newcommand{\commands}{C}
+\newcommand{\programs}{P}
+\newcommand{\pcommands}{{\sf PComm}}
+\newcommand{\clientop}{{\sf COp}}
+\newcommand{\expr}{{\sf Expr}}
+\newcommand{\domain}{\mathbb{D}}
+\renewcommand{\interleave}{{\sf interleave}}
+\newcommand{\means}[1]{[[#1]]}
+
+\semanticdomain{%
+  Data[\mathbb{D}],
+  Control[\mathbb{C}],
+  Vars[\mathbb{V}],
+  Ops[\mathcal{O}ps],
+}

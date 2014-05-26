@@ -1,0 +1,125 @@
+\section{Definitions} 
+
+
+Given a history $\hist$, we denote by $\pred{\hist}$ the \emph{precedence
+relation} over object action indexes of $\hist$ defined as follows:
+\begin{align*}
+i \pred{\hist} j \Leftrightarrow 
+&\exists i',j'.\ i \leq i' < j' \leq j \land
+\isRet{\hist_{i'}} \land \isCall{\hist_{j'}} \land \\
+& \getTid{\hist_i} = \getTid{\hist_{i'}} \land 
+\getTid{\hist_j} = \getTid{\hist_{j'}}
+\end{align*}
+
+Let $\hist$ and $\hist'$ be two histories. We say that $\hist$ is 
+\emph{\linearizable} with regard to $\hist'$, noted $\hist \lin \hist'$
+if there is a bijection 
+$\bijection: \set{1,\dots,\length{\hist}} \rightarrow
+\set{1,\dots,\length{\hist'}}$ such that:
+\[
+(\forall i. \pos{\hist}{i} \equivSymb \pos{\hist'}{\bijection(i)}) \land
+(\forall i,j.\ i \pred{\hist} j \implies
+              \bijection(i) \pred{\hist} \bijection(j)) 
+\]
+
+It is said to be \emph{\precisely} with regard to $\hist'$, noted 
+$\hist \plin \hist'$ if it satisfies the
+same constraint but with $=$ instead of $\equivSymb$, that is, the 
+bijection needs to respect the thread-ids.
+
+Given a history $\hist$, we denote by $\separated{\barrier}{\hist}$ the 
+relation over object action indexes of $\hist$ defined as follows:
+\begin{align*}
+i \separated{\barrier}{\hist} j \Leftrightarrow 
+&\exists i',j'.\ i \leq i' < \barrier \leq j' \leq j \land
+\isRet{\hist_{i'}} \land \isCall{\hist_{j'}} \land \\
+& \getTid{\hist_i} = \getTid{\hist_{i'}} \land 
+\getTid{\hist_j} = \getTid{\hist_{j'}}
+\end{align*}
+
+Given a set of integers $\barriers$, the relation 
+$\separated{\barriers}{\hist}$ is the union of the relations 
+$\separated{\barrier}{\hist}$ for $\barrier \in \barriers$.
+% $\barrier \in \barriers$ such that $i \separated{\barrier} j$.
+
+We say that $\hist$ is \emph{\linearizable{} for $\barriers$} with regard to 
+$\hist'$, noted $\hist \linchoice{\barriers} \hist'$
+if there is a bijection $\bijection: \set{1,\dots,\length{\hist}} \rightarrow
+\set{1,\dots,\length{\hist'}}$ such that:
+\[
+(\forall i. \pos{\hist}{i} \equivSymb \pos{\hist'}{\bijection(i)}) \land
+(\forall i,j.\ i \separated{\barriers}{\hist} j \implies
+              \bijection(i) < \bijection(j))
+\]
+and likewise for \emph{\precisely{} for $\barriers$}, noted 
+$\hist \plinchoice{\barriers} \hist'$.
+
+In a history, a \emph{barrier} is the index of a call action which follows a 
+return action. We denote by $\maxbar{\osys}{k}$ the subset of histories with $k$ 
+barriers or less.
+
+We use the same syntax as \citet{concurrentobjets} for sequential commands 
+$\commands$ and complete programs $\programs$:
+\begin{align*}
+\commands \coloncolonequals &\command\ |\ 
+x \colonequals \callCom{\obj}{\meth}{y}\ |\ 
+\commands; \commands\ |\
+\commands + \commands\ |\ 
+\commands^*\\
+\programs \coloncolonequals &\commands \| \dots \| \commands
+\end{align*}
+where $\command$ ranges over an unspecified set $\pcommands$ of primitive 
+commands.
+\begin{figure} 
+\begin{align*}
+\semantic{\tid,\command}&\text{ is an action }(\tid,\act)\\
+\semantic{\tid,x \colonequals \callCom{\obj}{\meth}{y}}&
+= \set{ \callAct{\tid}{\obj}{\meth}{y}; 
+\retAct{\tid}{\obj}{\meth}{\rval}; \trace\ |\
+\rval \in \domain \land \trace \in \semantic{\tid,x \colonequals \rval}}\\
+\semantic{\tid,\commands_1;\commands_2}& = 
+  \set{\trace_1\trace_2\ |\ \trace_i \in \semantic{\tid,\commands_i}}\\
+\semantic{\tid,\commands_1 + \commands_2}& = 
+  \semantic{\tid,\commands_1} \cup \semantic{\tid,\commands_2}\\
+\semantic{\tid,\commands^*}& = \semantic{\tid,\commands}^*\\
+\semantic{\tid,\commands_1\|\dots\|\commands_n}& =
+  \set{\interleave(\trace_1,\dots,\trace_n\ |\ 
+    \trace_i \in \semantic{\tid,\commands_i}}
+% T (C1+C2 )t = T (C1 )t ∪ T (C2)t
+% T (C )t = (T (C)t)
+% T (C1 · · · Cn) =
+%  { interleave(τ1, ..., τn) | τi ∈ T (Ci )i ∧ 1 ≤ i ≤ n }
+\end{align*}
+\caption{Action Trade Model}
+\end{figure}
+
+\begin{figure}
+\begin{align*}
+\evalSymb &: \States \times \wfTraces \rightarrow \mathcal{P}(\States)\\
+\eval{\trace;\callAct{\tid}{\obj}{\meth}{y}}{\state} &= 
+  \eval{\trace}{\state}\\
+\eval{\trace;\retAct{\tid}{\obj}{\meth}{\rval}}{\state} &= 
+  \eval{\trace}{\state}\\
+\eval{\trace;(\tid,\act)}{\state} &=
+  \cup_{\state' \in \eval{\trace}{\state}} \set{\state''\ |\
+    (\state',\state'') \in \means{\act}}\\
+\eval{\epsilon}{\state} &= \set{\state}
+% evaleval(s, τ ; (t, call o.f (n)))eval(s, τ ; (t, ret(n) o.f ))eval(s, τ ; (t, a))eval(s, ):===
+% =States × WTraces → P(States)
+% eval(s, τ )
+% eval(s, τ )
+% s ∈eval(s,τ ) {s | (s , s ) ∈ [[a]]}
+% {s}
+\end{align*}
+\caption{Trace evaluation}
+\end{figure}
+ 
+We define the composition $\comp{\programs}{\osys}$ of a program 
+$\programs$ with 
+an object system $\osys$ as follows:
+\begin{align*}
+\comp{\programs}{\osys} &: \States \rightarrow \mathcal{P}(\States)\\
+\comp{\programs}{\osys}{\state} &=
+ \cup \set{\eval{\trace}{\state}\ |\ \trace \in \semantic{\programs} \land
+  \getHist{\trace} \in \osys}
+\end{align*}

@@ -1,0 +1,273 @@
+\section{Bounded-Barrier Linearizability}
+
+% \begin{theorem}[Bounded-Barrier Linearizability Characterization]
+% Let $\osys_\concr$ be a quiescent object system and $\osys_\abs$ a 
+% thread-isomorphic quiescent object system. The following statements are 
+% equivalent.
+% \begin{enumerate}
+% % \item \label{bbl}
+% %   $ \forall \hist_\concr \in \maxbar{\osys_\concr}{k}.\ 
+% %       \exists \hist_\abs \in \osys_\abs.\ \hist_\concr \lin \hist_\abs$
+% % \item \label{bbl-tid}
+% %   $ \forall \hist_\concr \in \maxbar{\osys_\concr}{k}.\ 
+% %       \exists \hist_\abs \in \osys_\abs.\ \hist_\concr \plin \hist_\abs$
+% % \item \label{ebbl}
+% %   $ \forall \hist_\concr \in \osys_\concr.\ 
+% %       \forall \barriers \subseteq \set{1,\dots,\length{\hist}}.\ 
+% %         |\barriers| \leq k \implies
+% %           \exists \hist_\abs \in \osys_\abs.\ 
+% %             \hist_\concr \linchoice{\barriers} \hist_\abs$
+% \item \label{ebbl-tid}
+%   $ \forall \hist_\concr \in \osys_\concr.\ 
+%       \forall \barriers \subseteq \set{1,\dots,\length{\hist_\concr}}.\ 
+%         |\barriers| \leq k \implies
+%           \exists \hist_\abs \in \osys_\abs.\ 
+%             \hist_\concr \plinchoice{\barriers} \hist_\abs$
+% % \item \label{or-one}
+% %   $ \osys_\concr$ observationally refines $\osys_\abs$ for clients with 
+% %   at most one method per thread, and at most $k$ global writes
+% \item \label{or-many}
+%   $ \osys_\concr$ observationally refines $\osys_\abs$ for clients with 
+%   no local reads, except possibly at the end of each thread, and at most $k$
+%   global writes 
+% \end{enumerate}
+% 
+% 
+% \end{theorem}
+
+
+\begin{theorem}[Bounded-Barrier Linearizability Characterization]
+Let $\osys_\concr$ be a quiescent object system and $\osys_\abs$ a 
+thread-isomorphic quiescent object system. For $k \in \mathbb{N}$, the 
+following statements are equivalent:
+\begin{enumerate}
+% \item \label{bbl}
+%   $ \forall \hist_\concr \in \maxbar{\osys_\concr}{k}.\ 
+%       \exists \hist_\abs \in \osys_\abs.\ \hist_\concr \lin \hist_\abs$
+% \item \label{bbl-tid}
+%   $ \forall \hist_\concr \in \maxbar{\osys_\concr}{k}.\ 
+%       \exists \hist_\abs \in \osys_\abs.\ \hist_\concr \plin \hist_\abs$
+\item \label{ebbl}
+  $ \forall \hist_\concr \in \osys_\concr.\ 
+      \forall \barriers \subseteq \set{1,\dots,\length{\hist}}.\ 
+        |\barriers| \leq k \implies
+          \exists \hist_\abs \in \osys_\abs.\ 
+            \hist_\concr \linchoice{\barriers} \hist_\abs$
+% \item \label{ebbl-tid}
+%   $ \forall \hist_\concr \in \osys_\concr.\ 
+%       \forall \barriers \subseteq \set{1,\dots,\length{\hist_\concr}}.\ 
+%         |\barriers| \leq k \implies
+%           \exists \hist_\abs \in \osys_\abs.\ 
+%             \hist_\concr \plinchoice{\barriers} \hist_\abs$
+\item \label{or-one}
+  $ \osys_\concr$ observationally refines $\osys_\abs$ for clients with 
+  at most one method per thread, and at most $k$ global writes
+% \item \label{or-many}
+%   $ \osys_\concr$ observationally refines $\osys_\abs$ for clients with 
+%   no local reads, except at the end of each thread, and at most $k$ global 
+%   writes 
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\newcommand{\npairs}{{p}}
+\newcommand{\nbars}{k'}
+\newcommand{\ticker}{b}
+
+$(\ref{or-one} \Rightarrow \ref{ebbl})$ Let 
+$\hist_\concr \in \osys_\concr$, 
+$\barriers \subseteq \set{1,\dots,\length{\hist_\concr}}$ with 
+$|\barriers| \leq k$. Let $\barrier_1,\dots,\barrier_k$ be the values of 
+$\barriers$ sorted in increasing order. We define a program 
+$\prog_{\hist_\concr,\barriers}$ with one method per thread and at most $k$ 
+global writes. Let $(c_1,r_1),\dots,\ab (c_\npairs,r_\npairs)$ the pairs 
+of matching call and return actions from $\hist_\concr$. 
+
+Let $j_{c_i}$ (\resp $j_{r_i}$) be the largest integer such that 
+$\barrier_{j_{c_i}}$ is smaller or equal than the index of $c_i$ 
+(\resp $r_i$) in $\hist_\concr$, if it exists, or $0$ otherwise.
+Let $\callAct{\tid}{\obj_i}{\meth_i}{\cval_i} = c_i$ and 
+$\retAct{\tid}{\obj_i}{\meth_i}{\rval_i} = r_i$.
+
+Let $\commands_i$ be the following sequence of commands:
+\begin{flalign*}
+&x_i \colonequals \cval_i;\text{  \comment{// local write}}&\\
+&\assumeCom{\ticker = \barrier_{c_i}};\text{  \comment{// global read}} 
+&\\
+&y_i \colonequals \callCom{\obj_i}{\meth_i}{x_i};
+  \text{  \comment{// local write}}&\\
+&\assumeCom{\ticker = \barrier_{r_i}};\text{  \comment{// global read}}&\\
+&\assumeCom{y_i = \rval_i};\text{  \comment{// local read}}&
+\end{flalign*}
+
+The program $\prog_{\hist_\concr,\barriers}$ then executes the commands
+$\commands_1,\dots,\commands_\npairs$ in a parallel composition.
+We also add a new thread in $\prog_{\hist_\concr,\barriers}$ 
+which has $k$ increments of the global variable $\ticker$.
+In $\prog_{\hist_\concr,\barriers}$, we have at most one method call per 
+thread, as well as (at most) $k$ global writes.
+
+Let $n_0$ be a value which doesn't appear in $\hist_\concr$ and $\state_0$ be 
+an initial state where all the local variables are initialized to $n_0$ and 
+the global variable $\ticker$ is initialized to $0$.
+
+There is a trace $\trace_\concr$ in $\semantic{\prog_{\hist_\concr,\barriers}}$
+whose history is $\hist_\concr$ and which reaches a state $\state_f$ where 
+$x_i = \cval_i$ and $y_i = \rval_i$ for all $\tid$ and 
+$i \in \set{1,\dots,\npairs}$. Since we have $\state_f \in 
+\comp{\prog_{\hist_\concr,\barriers}}{\osys_\concr}(\state_0)$ and 
+$\osys_\concr$ observationally refines $\osys_\abs$, we also have
+$\state_f \in \comp{\prog_{\hist_\concr,\barriers}}{\osys_\abs}(\state_0)$.
+This entails the existence of a trace $\trace_\abs$ in 
+$\semantic{\prog_{\hist_\concr,\barriers}}$ and such that 
+$\state_f \in \eval{\trace_\abs}{\state_0}$. Let 
+$\hist_\abs = \getHist{\trace_\abs}$.
+
+We can now show $\hist_\concr \linchoice{\barriers} \hist_\abs$. First, we 
+define the bijection $\bijection$ as expected. For each thread $\tid$, 
+$\bijection$ maps (the index of) $c_i$ (\resp $r_i$) to (the index of) the call
+action (\resp the return action) in $\hist_\abs$ corresponding to the command 
+$C_i$.
+
+Let $i,j \in \set{1,\dots,\length{\hist_\concr}}$ and 
+$\barrier_{i,j} \in \barriers$, such that 
+$i \separated{\barrier_{i,j}}{\hist_\concr} j$. By construction of 
+$\prog_{\hist_\concr,\barriers}$, action ${\hist_\abs}_{\bijection(i)}$ is 
+followed by a return action (or is itself a return action) which is followed 
+by $\assumeCom{b = b'}$ in $\trace_\abs$ for some 
+$\barrier' < \barrier_{i,j}$, while ${\hist_\abs}_{\bijection(j)}$ follows a
+call action (or is itself a call action) which follows
+$\assumeCom{b = b''}$ in $\trace_\abs$ for some 
+$\barrier'' \geq \barrier_{i,j}$. This shows that 
+${\hist_\abs}_{\bijection(i)}$ comes before ${\hist_\abs}_{\bijection(j)}$
+in $\hist_\abs$, and thus that $\bijection(i) < \bijection(j)$, which ends the 
+proof.
+
+$(\ref{ebbl} \Rightarrow \ref{or-one})$
+Let $\trace_\concr \in \semantic{\programs}$ be a trace with at most one 
+method per thread, at most $k$ global writes and 
+whose history $\hist_\concr$ is in $\osys_\concr$. Let $\state,\state'$ be two
+states such that $\state' \in \eval{\trace_\concr}{\state}$.
+
+We decompose $\trace_\concr$ into 
+$\trace_\concr^0 w_0 \trace_\concr^1 \dots w_{k-1} \trace_\concr^{k}$ where 
+$w_0,\dots,w_{k-1}$ are the (at most) $k$ global writes of $\trace_\concr$.
+
+This induces a splitting
+$\hist_\concr = \hist_\concr^0 \dots \hist_\concr^k$ where 
+$\getHist{\trace_\concr^i} = \hist_\concr^i$. For $\i \in \set{1,\dots,k}$
+let $\barrier_i$ be the index of the first action of $\hist_\concr^k$ in 
+$\hist_\concr$, and let 
+$\barriers = \set{\barrier_i\ |\ 1 \leq i \leq k}$.
+
+By applying~\ref{ebbl}, there is a history $\hist_\abs \in \osys_\abs$
+such that $\hist_\concr \plinchoice{\barriers} \hist_\abs$. We now derive a 
+trace $\trace_\abs \in \semantic{\programs}$ from $\trace_\concr$, whose 
+history is $\hist_\abs$ and such that $\state' \in \eval{\trace_\abs}{\state}$.
+
+\end{proof}
+
+% \begin{proof}
+% \newcommand{\npairs}{{p_\tid}}
+% \newcommand{\nbars}{k'}
+% \newcommand{\ticker}{b}
+% 
+% $(\ref{or-one} \Rightarrow \ref{ebbl})$ Let 
+% $\hist_\concr \in \osys_\concr$, 
+% $\barriers \subseteq \set{1,\dots,\length{\hist_\concr}}$ with 
+% $|\barriers| \leq k$. We define a program 
+% $\prog_{\hist_\concr,\barriers}$ with no local reads excepted at the end of
+% each thread, and at most $k$ global writes.
+% Let $t$ be a thread-id appearing in $\hist_\concr$.
+% Let $(c_1^\tid,r_1^\tid),\dots,\ab (c_\npairs^\tid,r_\npairs^\tid)$ the pairs 
+% of matching call and return actions from $\hist_\concr$. 
+% 
+% Let $j_{c_i^\tid}$ and $j_{r_i^\tid}$ be the indexes of $c_i^\tid$ and 
+% $r_i^\tid$ in $\hist_\concr$. Let $\barrier_{c_i^\tid}$ be the largest element 
+% of $\barriers$ such that $\barrier_{c_i^\tid} \leq j_{c_i^\tid}$ if it exists,
+% and $0$ otherwise. 
+% We define $\barrier_{r_i^\tid}$ similarly. Let 
+% $\callAct{\tid}{\obj_i^\tid}{\meth_i^\tid}{\cval_i^\tid} = c_i^\tid$ and 
+% $\retAct{\tid}{\obj_i^\tid}{\meth_i^\tid}{\rval_i^\tid} = r_i^\tid$.
+% 
+% Let $C_i^\tid$ be the following sequence of commands:
+% \begin{flalign*}
+% &x_i^\tid \colonequals \cval_i^\tid;\text{  \comment{// local write}}&\\
+% &\assumeCom{\ticker = \barrier_{c_i^\tid}};\text{  \comment{// global read}} 
+% &\\
+% &y_i^\tid \colonequals \callCom{\obj_i^\tid}{\meth_i^\tid}{x_i^\tid};
+%   \text{  \comment{// local write}}&\\
+% &\assumeCom{\ticker = \barrier_{r_i^\tid}};\text{  \comment{// global read}}&
+% \end{flalign*}
+% and $D_i^\tid$ be the command:
+% \begin{flalign*}
+% &\assumeCom{y_i^\tid = \rval_i^\tid};\text{  \comment{// local read}}&
+% \end{flalign*}
+% 
+% The program of thread $t$ in $\prog_{\hist_\concr,\barriers}$ is then
+% $C_1^\tid;\dots;C_\npairs^\tid;D_1^\tid;\dots;D_\npairs^\tid$. All the local 
+% reads are executed at the end, and there are no global writes.
+% We also add a new thread $\tid_\ticker$ in $\prog_{\hist_\concr,\barriers}$ 
+% which has $k$ increments of the global variable $\ticker$.
+% 
+% Let $n_0$ be a value which doesn't appear in $\hist_\concr$ and $\state_0$ be 
+% an initial state where all the local variables are initialized to $n_0$ and 
+% the global variable $\ticker$ is initialized to $0$.
+% 
+% There is a trace $\trace_\concr$ in $\semantic{\prog_{\hist_\concr,\barriers}}$
+% whose history is $\hist_\concr$ and which reaches a state $\state_f$ where 
+% $x_i^\tid = \cval_i^\tid$ and $y_i^\tid = \rval_i^\tid$ for all $\tid$ and 
+% $i \in \set{1,\dots,\npairs}$. Since we have $\state_f \in 
+% \comp{\prog_{\hist_\concr,\barriers}}{\osys_\concr}(\state_0)$ and 
+% $\osys_\concr$ observationally refines $\osys_\abs$, we also have
+% $\state_f \in \comp{\prog_{\hist_\concr,\barriers}}{\osys_\abs}(\state_0)$.
+% This entails the existence of a trace $\trace_\abs$ in 
+% $\semantic{\prog_{\hist_\concr,\barriers}}$ and such that 
+% $\state_f \in \eval{\trace_\abs}{\state_0}$. Let 
+% $\hist_\abs = \getHist{\trace_\abs}$. Up to thread renaming, and without loss
+% of generality, we can assume that thread $\tid$ in $\trace_\abs$ executed the
+% command sequence $C_1^\tid;\dots;C_\npairs^\tid;D_1^\tid;\dots;D_\npairs^\tid$.
+% 
+% We can now show $\hist_\concr \plinchoice{\barriers} \hist_\abs$. First, we 
+% define the bijection $\bijection$ as expected. For each thread $\tid$, 
+% $\bijection$ maps $c_i^\tid$ (\resp $r_i^\tid$) to the call action (\resp the
+% return action) in $\hist_\abs$ corresponding to the command $C_i^\tid$.
+% 
+% Let $i,j \in 
+% \set{1,\dots,\length{\hist_\concr}}$ and $\barrier_{i,j} \in \barriers$, 
+% such that $i \separated{\barrier_{i,j}} j$.
+% By construction of $\prog_{\hist_\concr,\barriers}$, action 
+% ${\hist_\abs}_\bijection{i}$ is followed by $\assumeCom{b = b'}$ in 
+% $\trace_\abs$ for some $\barrier' < \barrier_{i,j}$, while 
+% ${\hist_\abs}_\bijection{j}$ follows $\assumeCom{b = b''}$ in $\trace_\abs$
+% for some $\barrier'' \geq \barrier_{i,j}$. This shows that 
+% ${\hist_\abs}_\bijection{i}$ comes before ${\hist_\abs}_\bijection{j}$
+% in $\hist_\abs$, and thus that $\bijection{i} < \bijection{j}$, which ends the 
+% proof.
+% 
+% $(\ref{ebbl-tid} \Rightarrow \ref{or-many})$ 
+% Let $\trace_\concr \in \semantic{\programs}$ be a trace with no local reads, 
+% except possibly at the end of each thread, and at most $k$ global writes and 
+% whose history $\hist_\concr$ is in $\osys_\concr$. Let $\state,\state'$ be
+% states such that $\state' \in \eval{\trace_\concr}{\state}$.
+% 
+% We decompose $\trace_\concr$ into 
+% $\trace_\concr^0 w_0 \trace_\concr^1 \dots w_{k-1} \trace_\concr^{k}$ where 
+% $w_1,\dots,w_{k-1}$ are the (at most) $k$ global writes of $\trace_\concr$.
+% 
+% This induces a splitting
+% $\hist_\concr = \hist_\concr^0 \dots \hist_\concr^k$ where 
+% $\getHist{\trace_\concr^i} = \hist_\concr^i$. For $\i \in \set{1,\dots,k}$
+% let $\barrier_i$ be the index of the first action of $\hist_\concr^k$ in 
+% $\hist_\concr$, and let 
+% $\barriers = \set{\barrier_i\ |\ 1 \leq i \leq k}$.
+% 
+% By applying~\ref{ebbl-tid}, there is a history $\hist_\abs \in \osys_\abs$
+% such that $\hist_\concr \plinchoice{\barriers} \hist_\abs$. We now derive a 
+% trace $\trace_\abs \in \semantic{\programs}$ from $\trace_\concr$, whose 
+% history is $\hist_\abs$ and such that $\state' \in \eval{\trace_\abs}{\state}$.
+% 
+% \end{proof}
+% 
+
+

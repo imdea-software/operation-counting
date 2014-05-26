@@ -1,0 +1,324 @@
+%%% PACKAGE DECLARATIONS %%%
+% \usepackage{etoolbox,multicol}
+\usepackage[numbers]{natbib}
+% \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ifthen}
+% \usepackage{algorithm,algpseudocode}
+\usepackage{microtype}
+\usepackage{balance}
+\usepackage{xspace}
+\usepackage{hyperref}
+\usepackage{breakurl}
+\def\ttat{\mtt{@}} % the at package clobbers this
+\usepackage{at}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{wasysym} % causing problems with llncs's bold vectors
+\usepackage{stmaryrd}
+\usepackage[figure,lined]{algorithm2e}
+\usepackage[ligature,reserved,inference]{semantic}
+% \usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{mathpartir}
+\usepackage{graphicx}
+% \usepackage[all]{xypic}
+% \usepackage[usenames]{color}
+% \usepackage{gastex}
+\usepackage{array}
+\usepackage[flushmargin]{footmisc}
+
+%%% NATBIB + LLNCS FIX %%%
+\makeatletter
+\renewcommand\bibsection%
+{
+  \section*{\refname
+    \@mkboth{\MakeUppercase{\refname}}{\MakeUppercase{\refname}}}
+}
+% \makeatother
+
+%%% FONT DECLARATIONS %%%
+
+\newenvironment{frcseries}{\fontfamily{frc}\selectfont}{}
+\newcommand{\textfrc}[1]{{\frcseries#1}}
+\newcommand{\mathfrc}[1]{\text{\textfrc{#1}}}
+
+%%% STYLE DECLARATIONS %%%
+
+\newcommand{\acronymstyle}[1]{\textsc{#1}\xspace}
+\reservestyle{\acronym}{\acronymstyle} %
+
+\newcommand{\complexityclassstyle}[1]{\textrm{#1}}
+\reservestyle{\complexityclass}{\complexityclassstyle} %
+
+\newcommand{\mathfnstyle}[1]{\ensuremath{\mathrm{#1}}}
+\reservestyle{\mathfn}{\mathfnstyle}
+
+\newcommand{\metalangkeywordstyle}[1]{\ensuremath{\mathsf{#1}}}
+\reservestyle{\metalangkeyword}{\metalangkeywordstyle}
+
+\newcommand{\semanticdomainstyle}[1]{%
+  \ensuremath{\mathchoice%
+    {\mbox{\normalfont\ensuremath{#1}}}%
+    {\mbox{\normalfont\ensuremath{#1}}}%
+    {\mbox{\normalfont\scriptsize\ensuremath{#1}}}%
+    {\mbox{\normalfont\tiny\ensuremath{#1}}}}}
+\reservestyle{\semanticdomain}{\semanticdomainstyle} 
+
+\newcommand{\rulenamestyle}[1]{\textsc{#1}}
+\reservestyle{\rulename}{\rulenamestyle}
+
+%%% ANNOTATION COMMANDS %%%
+
+% \newcommand{\note}[2][]{%
+%   \begin{quote}
+%     \textbf{*** #1 \ifthenelse{\equal{}{#1}}{}{:} }
+%     \textit{#2}
+%     \textbf{***}
+%   \end{quote}
+% }
+
+% \ifthenelse{\boolean{HideComments}}{
+%   \newcommand{\todo}[1]{}
+% }{
+  \newcommand{\todo}[1]{
+    \begin{quote}
+      \textbf{ToDo: #1}
+    \end{quote}
+  }
+% }
+
+%%% THEOREM DECLARATIONS %%%
+
+\newenvironment{reptheorem}[1]%
+  {\renewcommand{\thetheorem}{\ref{#1}}\begin{theorem}}%
+  {\end{theorem}\addtocounter{theorem}{-1}}
+
+\newenvironment{replemma}[1]%
+  {\renewcommand{\thelemma}{\ref{#1}}\begin{lemma}}%
+  {\end{lemma}\addtocounter{lemma}{-1}}
+
+% \newtheorem{openproblem}{Open Problem}
+% 
+% \ifthenelse{\boolean{lncs}}{
+%  \spnewtheorem*{remark*}{Remark}{\bfseries}{\rmfamily}
+% }{
+  % \usepackage{amsthm}
+  % \newtheorem{problem}{Problem}
+  % \newtheorem{lemma}{Lemma}
+  % \newtheorem{theorem}{Theorem}
+  % \newtheorem{proposition}{Proposition}
+  % \newtheorem{corollary}{Corollary}
+  % \newtheorem{property}{Property}
+  % \theoremstyle{definition}
+  % \newtheorem{definition}{Definition}
+  % \newtheorem{example}{Example}
+  % \theoremstyle{definition}
+  % \newtheorem{remark}{Remark}
+  % \newtheorem*{remark*}{Remark}
+  % \theoremstyle{theorem}
+% }
+
+%%% COMMON ABBREVIATIONS %%%
+
+% \newcommand{\ie}{i.e.,~}
+\newcommand{\eg}{e.g.,~}
+% \newcommand{\resp}{resp.,~}
+\newcommand{\wrt}{w.r.t.~}
+\newcommand{\WLOG}{w.l.o.g.,~}
+\newcommand{\etc}{etc.}
+% \newcommand{\st}{s.t. }
+\renewcommand{\th}{\textsuperscript{th}\xspace}
+\newcommand{\st}{\textsuperscript{st}\xspace}
+\let\origae=\ae
+\renewcommand{\ae}{\origae\xspace}
+
+%%% MATH LIGATURES %%%
+
+\mathlig{,.,}{,\ldots,}
+\mathlig{,..}{,\ldots}
+\mathlig{..,}{\ldots,}
+% \mathlig{-->}{\longrightarrow}
+% \mathlig{<=>}{\Leftrightarrow}
+% \mathlig{==>}{\implies}
+\mathlig{|->}{\mapsto}
+% % \mathlig{->}{\hookrightarrow}
+% \mathlig{::=}{::=}
+% \mathlig{<-}{\gets}
+\mathlig{->}{\rightarrow}
+% \mathlig{-`}{\rightharpoonup}
+% \mathlig{~>}{\leadsto}
+\mathlig{..}{\ldots}
+% \mathlig{/|}{\land}
+% \mathlig{|/}{\lor}
+% \mathlig{=>}{\Rightarrow}
+% \mathlig{==}{\equiv}
+% \mathlig{~=}{\approx}
+% \mathlig{!=}{\neq}
+% \mathlig{|-}{\vdash}
+\mathlig{|=}{\models}
+% \mathlig{|>}{\rhd}
+% \mathlig{<|}{\lhd}
+% \mathlig{:=}{:=}
+% \mathlig{!}{\lnot}
+% \mathlig{~}{\sim}
+
+%%% MATH NOTATION %%%
+
+\newcommand{\stacklabel}[1]{\stackrel{\smash{\scriptscriptstyle \mathrm{#1}}}}
+\newcommand{\Def}{\stacklabel{def}}
+\newcommand{\db}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\parens}[1]{\ensuremath{\left( {#1} \right)}}
+\newcommand{\brackets}[1]{\ensuremath{\left[ {#1} \right]}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle {#1} \right\rangle}}
+\newcommand{\fangles}[1]{\ensuremath{\langle {#1} \rangle}}
+\newcommand{\lines}[1]{\ensuremath{\left| {#1} \right|}}
+\newcommand{\A}[1]{\forall{#1}.\ }
+\newcommand{\E}[1]{\exists{#1}.\ }
+\newcommand{\n}{\cap}
+\let\oldu=\u
+\renewcommand{\u}{\cup}
+\newcommand{\U}{\bigcup}
+\newcommand{\x}{\times}
+\newcommand{\intv}[2]{[{#1},{#2}]}
+% \newcommand{\set}[1]{{\{ #1 \}}}
+\newcommand{\tuple}[1]{\angles{#1}}
+\newcommand{\ftuple}[1]{\fangles{#1}}
+\newcommand{\card}[1]{\lines{#1}}
+% \newcommand{\abs}[1]{\lines{#1}}
+\newcommand{\len}[1]{\lines{#1}}
+\newcommand{\ceil}[1]{\lceil{#1}\rceil}
+\newcommand{\proj}[2]{{{#1}\mid{#2}}}
+\newcommand{\order}[1]{\mathcal{O}(#1)}
+% \newcommand{\log}{\mathrm{log}}
+% \newcommand{\max}[0]{\mathrm{max}}
+\newcommand{\pow}[1]{\wp({#1})}
+\newcommand{\bottom}{\perp}
+\newcommand{\ucl}[1]{{#1}\!\!\uparrow}
+\newcommand{\map}[2]{\parens{#1 |-> #2}}
+\newcommand{\multisets}[2]{\mathbb{M}_{#1}[#2]}
+\newcommand{\alt}{\ \mid\ }
+\newcommand{\gram}{::=\ }
+\newcommand{\chole}{\diamond}
+\newcommand{\ctx}[1]{\!\brackets{#1}}
+
+%%% ARROWS %%%
+
+\newcommand{\tx}[2][{}]{%
+  \mathchoice%
+%   {\buildrel{\mathrm{#1}}\over{\rightarrow}}
+  {\xrightarrow[{#1}]{#2}}
+  {\rightarrow_{#1}^{#2}}
+  {\buildrel{{#1}}\over{\rightarrow}}
+  {\buildrel{{#1}}\over{\rightarrow}}
+}
+
+% a variable-length hooked right arrow.
+\newcommand{\hra}[1]{%
+  \ensuremath{%
+    \lhook%
+    \count0=#1 %
+    \loop %
+      \ifnum\count0>0 %
+        \advance\count0 by -1 %
+      \joinrel\relbar%
+      \repeat
+    \joinrel\rightarrow
+  }
+}
+
+\newcommand{\longhookrightarrow}{\hra{2}}
+\newcommand{\longerhookrightarrow}{\hra{3}}
+
+%%% GREEK LETTERS %%%
+
+\newcommand{\asgreekstyle}{\mathrm} % overridde when greek letters are italic
+\newcommand{\greek}[1]{\ensuremath{#1}\xspace}
+\newatcommand a {\greek{\alpha}}
+\newatcommand b {\greek{\beta}}
+\newatcommand c {\greek{\xi}}
+\newatcommand C {\greek{\Xi}}
+\newatcommand d {\greek{\delta}}
+\newatcommand D {\greek{\Delta}}
+\newatcommand e {\greek{\varepsilon}}
+\newatcommand E {\greek{\asgreekstyle{E}}}
+\newatcommand f {\greek{\phi}}
+\newatcommand F {\greek{\Phi}}
+\newatcommand g {\greek{\gamma}}
+\newatcommand G {\greek{\Gamma}}
+\newatcommand h {\greek{\varrho}}
+% \newatcommand i {\ensuremath{\iota}} % conflicts with something
+\newatcommand j {\greek{\iota}}
+\newatcommand k {\greek{\kappa}}
+\newatcommand l {\greek{\ell}\xspace}
+\newatcommand ll {\greek{\lambda}}
+\newatcommand L {\greek{\Lambda}}
+\newatcommand m {\greek{\mu}}
+\newatcommand n {\greek{\eta}}
+\newatcommand o {\greek{\theta}}
+\newatcommand oo {\greek{\vartheta}}
+\newatcommand O {\greek{\Theta}}
+\newatcommand p {\greek{\varphi}}
+\newatcommand P {\greek{\Pi}}
+\newatcommand q {\greek{\epsilon}}
+\newatcommand Q {\greek{\Phi}} % duplicate
+\newatcommand r {\greek{\rho}}
+\newatcommand s {\greek{\sigma}}
+\newatcommand ss {\greek{\sigma}}
+\newatcommand S {\greek{\Sigma}}
+\newatcommand t {\greek{\tau}}
+\newatcommand u {\greek{\upsilon}}
+\newatcommand U {\greek{\Upsilon}}
+\newatcommand v {\greek{\nu}}
+\newatcommand w {\greek{\omega}}
+\newatcommand W {\greek{\Omega}}
+\newatcommand x {\greek{\chi}}
+\newatcommand y {\greek{\psi}}
+\newatcommand Y {\greek{\Psi}}
+\newatcommand z {\greek{\zeta}}
+
+\newatcommand 0 {\emptyset}
+\newatcommand \ {\setminus}
+
+%%% SYMBOLS, NAMES, CLASSES, ACRONYMS, ETC. %%%
+
+\mathfn{%
+  min, max, log, dom, range, pre, cpost[post], src, tgt, minor, major, %
+}
+
+\metalangkeyword{%
+  assume, assert, if, then, else, while, begin, commit, read, write,true,false,call,return,spawn,do,od,fi,void,begin,end,
+  push, pop, popall[pop^\ast], eval, stack, next, yield,procedure,returns,thread,method,
+  give, take, empty, delay, dequeue, enqueue, 
+  stash, spost[post], blocked, %
+}
+
+\semanticdomain{%
+  Bools[\ensuremath{\mathbb{B}}],
+  Dom[\ensuremath{\mathbb{D}}],
+  Nats[\ensuremath{\mathbb{N}}],
+  PNats[\ensuremath{\mathbb{N}^{>0}}],
+  Ints[\ensuremath{\mathbb{Z}}],
+  Units[\ensuremath{\mathbb{U}}],
+  Bags[\ensuremath{\mathsf{Bags}}],
+  Stacks[\ensuremath{\mathsf{Stacks}}],
+  Queues[\ensuremath{\mathsf{Queues}}],
+  Multisets[\mathbb{M}],
+}
+
+\complexityclass{%
+  ptime[PTIME], np[NP], pspace[PSPACE], exptime[EXPTIME],
+  expspace[EXPSPACE], %
+}
+
+\acronym{%
+  blast[Blast], slam[SLAM], havoc[Havoc], chess[CHESS], havoc[HAVOC],
+  storm[Storm], boogie[Boogie], boogiepl[Boogie], zthree[Z3], clang[C],
+  kiss[KISS], ajax[AJAX], http[HTTP], contest[ConTest], calfuzzer[CalFuzzer],
+  pct[PCT], verisoft[VeriSoft], %
+}
+

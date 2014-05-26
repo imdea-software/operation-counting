@@ -1,0 +1,44 @@
+\subsection{Related Work}
+\label{sec:related}
+
+Existing work on automated verification of concurrent library implementations
+have focused on the criterion of
+\emph{linearizability}~\citep{journals/toplas/HerlihyW90}, which has recently
+been shown to coincide with observational
+refinement~\citep{journals/tcs/FilipovicORY10}. By definition, an execution
+involving concurrent operations is \emph{linearizable} with respect to a
+sequential specification $S$ if there exists some linear order $\sigma$ of
+those operations (consistent with the partial order defined by the concurrent execution), 
+which is executable by $S$. This criterion leads to automation
+either by determining the \emph{linearization
+point}~\citep{journals/toplas/HerlihyW90} of each operation, thus determining
+the linear order of operations by that in which their linearization points were
+executed, or by exhausting every possible linearization. While, on the one
+hand, considering linearization points has led to several semi-automated
+approaches for proving observational refinement~\citep{DBLP:conf/cav/AmitRRSY07,conf/fm/LiuCLS09, conf/podc/OHearnRVYY10,
+conf/cav/Vafeiadis10, conf/icse/Zhang11a, conf/pldi/LiangF13,
+conf/cav/DragoiGH13}, manual human effort is often necessary in annotating
+methods with their linearization point. On the other hand, while additional
+automation can be had for detecting violations of observational refinement 
+by exhaustively considering all possible linearizations,
+for instance via the testing-based tools LineUp~\citep{conf/pldi/BurckhardtDMT10} and COLT~\citep{DBLP:conf/oopsla/ShachamBASVY11}, exponential
+explosion in the number of linearizations severely limits the number of
+executed operations for which exploration is possible.
+
+Others have considered the theoretical limits in verifying linearizability.
+\citet{journals/siamcomp/GibbonsK97} showed that the linearizability of a
+single execution is NP-complete, while \citet{journals/iandc/AlurMP00} showed
+that determining linearizability of a library implementation with respect to a
+given regular sequential specification is in EXPSPACE, so long as the number of
+concurrent operations is bounded. \citet{conf/esop/BouajjaniEEH13} has shown that the same
+problem becomes undecidable once the number of concurrent operations becomes
+unbounded. The same work has introduced a decidable variant of linearizability, which
+considers only executions where the number of temporal separations between non-overlapping 
+operations is bounded.
+%
+% The proof of this undecidability
+%ultimately led us to a decidable variant, by leveraging operation counting,
+%where the number of shared-memory writes is bounded. Whereas the aim of this
+%previous work was to establish theoretical boundaries, the goal of the current
+%work is to establish operation counting as an effective means of automating
+%observational refinement.

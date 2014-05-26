@@ -1,0 +1,147 @@
+\section{Decidability}
+
+%\todo{Include somewhere the boundedness of the library's alphabet}
+
+%\todo{}
+
+% \vspace{-1mm}
+% \begin{definition}[\cite{conf/esop/BouajjaniEEH13}]
+% A barrier is the index $0<B<|@t|$ of a $\<call>$ action such that the nearest preceding non-internal action of $@t$ is a return action.
+% For any $K\in\<Nats>$, a \emph{$K$-barrier execution} is an execution with at most $K$ barriers. 
+% \vspace{-1mm}
+% \end{definition}
+
+% For example, 
+Fig.~\ref{fig:no-barrier}(b) illustrates an execution with only one barrier, the action $\tuple{\mathrm{call}\ \mathrm{pop}(\epsilon),t_1}$ of thread $t_1$.
+
+Given an arbitrary but fixed $K$, the linearizability of a $K$-barrier execution can be decided by, roughly, counting the operation summaries in that execution and checking if the obtained values satisfy some quantifier-free Presburger formula, defined from the specification and the integer $K$. Thus, the code-to-code translation we propose for checking \emph{bounded-barrier linearizability} (\ie linearizability for $K$-barrier executions) instruments clients and libraries with a finite set of integer variables. % (and assignments/assertions over them).
+
+\vspace{-2mm}
+
+
+
+
+%We prove that the complexity of checking the linearizability of a $K$-barrier execution, for an arbitrary but fixed $K$, is polynomial time modulo an oracle for computing Parikh images of specifications (we assume that specifications are context-free languages). In general, these Parikh images must be computed once for all implementations of a 
+%given specification~\footnote{When the specification is defined as the set of all sequential executions of a library containing abstract implementations for the methods in $L$, (an over-approximation of) the Parikh image of the specification viewed as a language over $\overline{@S_L}$ can be obtained as an invariant on the most-general sequential client of the abstract library annotated with counters that count the number of operations with a given summary.}. Based on this result, we define the code-to-code translation that instrument clients and libraries with a finite set of counters (and assignments/assertions over them). 
+% in order to reduce the problem of checking the linearizability of $K$-executions (called also $K$-linearizability), for an arbitrary but fixed $K$, to a reachability problem. 
+%In particular, the instrumentation uses additional counters/{\tt assume} statements in order to restrict the set of feasible executions to $(I,K)$-executions (e.g., the set of interfaces is restricted using {\tt assume} statements over the methods' arguments and return values).
+%This is an instance of search prioritization because as $I$ and $K$ are increased ($I$ can be increased by relaxing the constraints in the corresponding {\tt assume} statements), this reduction can be used to check linearizability of more executions and in the limit, all the executions can be checked. 
+%Note that the size of the instrumentation, \ie the number of counters (assignments/assertions over them), doesn't grow with the number of operations executed by the client (it depends only on the size of the library's alphabet and $K$), which is important for analyses that crucially depend on the number of program variables.
+
+%Note that the instrumentation we define is independent of the number of threads created by the client, \ie, the number of counters depends only on the library's alphabet and $K$. 
+%
+%One of the benefits of this reduction is that any under-approximation symbolic analysis for reachability in the instrumented program becomes an under-approximation symbolic analysis for $(I,K)$-linearizability.
+%Usually, the symbolic analysis for reachability requires other bounding parameters such as the number of delays \cite{conf/popl/EmmiQR11}, loop unrollings, etc. In Sec.~\ref{}, we show that the bounding parameters $I$ and $K$ we consider are relevant in the sense that many linearizability bugs occur in executions with few operation interfaces and barriers.
+
+%A more efficient instrumentation has been defined for a particular class of libraries, 
+%\emph{with fixed linearization points} \cite{}. A linearization point 
+%of an operation in an execution is a point in time where the operation is conceptually effectuated; 
+%given the linearization points of each operation, the only valid serial permutation is the one which takes
+%operations in order of their linearization points. A library is called with fixed linearization points if, 
+%for any method, the linearization points of all the $M$-operations in all executions are fixed to specific 
+%implementation actions of $M$.
+
+
+
+\subsection{Bounded barrier linearizability as a counting problem}\label{sec:barriers}
+
+We begin by considering executions where all operations overlap, \ie executions without barriers. Such executions are linearizable iff there exists a permutation of their operations, which is allowed by the specification. Furthermore, the latter holds iff there exists a sequence of operations allowed by the specification which contains the same number of invocations of any given method $M$ with any given inputs and outputs as the considered execution. 
+%Let us first consider the case of $0$-barrier executions, \ie executions without barriers. 
+%By definition, such an execution $e$ is linearizable iff there exists a permutation $\pi$ of 
+%its trace $@t$ such that $\proj{\pi}{@S_L}\in S$. Thus, in order to check the linearizability of 
+%$e$ one needs just to count the occurrences of each operation summary $M[\vec{\imath},\vec{o}]$ in $e$ and then, to check if there exists a word in the specification which has the same number of $M[\vec{\imath},\vec{o}]$ symbols, for each $M[\vec{\imath},\vec{o}]\in @S_L$. 
+Fig.~\ref{fig:no-barrier}(a) illustrates a linearizable execution of a concurrent stack, \eg Treiber's stack. Note that the usual specification of a stack allows for a sequence of operations with two occurrences of $\mathrm{push}[a,\epsilon]$ and two occurrences of $\mathrm{pop}[\epsilon,\mathrm{true}]$ ($\epsilon$ denotes no return value). In practice, assuming a finite library alphabet, the number of symbol occurrences in a specification sequence can be characterized by a quantifier-free Presburger formula. For example, the formula describing a stack specification with only one data value $a$ is: 
+%($\#M[\vec{\imath},\vec{o}]$ is a variable that denotes the number of symbols $M[\vec{\imath},\vec{o}]$):
+$
+\#\mathrm{pop}[\epsilon,\mathrm{true}]\leq  \#\mathrm{push}[a,\epsilon] +  \#\mathrm{push}[a,\pending]
+$ ($\#\mathrm{pop}[\epsilon,\mathrm{true}]$ denotes the number of symbols $\mathrm{pop}[\epsilon,\mathrm{true}]$). Then, an execution without barriers is linearizable iff its image satisfies the formula describing the number of symbols in the specification.
+
+
+Now, let us consider the class of executions that contain only one barrier (they contain at least two non-overlapping operations). Such executions are linearizable iff there exists a permutation of their operations, which is allowed by the specification and which preserves the order between the operations that ended before the barrier and the operations that began after the barrier. As in the previous case, it is required that there exists a sequence of operations allowed by the specification which contains the same number of invocations of any given method $M$ with any given inputs and outputs as the considered execution. However, in order to be complete, it is also required that the specification sequence $w$ can be split into two subsequences $w_1\cdot w_2$ such that $w_1$ contains all the operations that end before the barrier and $w_2$ contains all the operations that begin after the barrier. Fig.~\ref{fig:no-barrier}(b) illustrates 
+an execution of a concurrent stack with one barrier which is linearizable because there exists a sequence allowed by the specification $\<push>[a,\<true>]\cdot \<pop>[\epsilon,\<true>]\cdot \<pop>[\epsilon,\<false>]\cdot \<push>[a,\<true>]\cdot \<push>[a,\pending]$, where the sub-sequence formed of the first 2 symbols contains all the operations that end before the barrier, \ie $\<push>[a,\<true>]$, and the sub-sequence formed of the last 3 symbols contains all the operations that begin after the barrier, \ie $\<pop>[\epsilon,\<false>]$ and $\<push>[a,\<true>]$. Given a specification $S$, we define $S[1]$ as the set of all sequences of $S$ where some symbols are labeled by ``before the barrier'' and some other symbols by ``after the barrier'' such that all the ``before the barrier'' symbols precede the ``after the barrier'' symbols. Then, an execution with one barrier is linearizable iff its image where operations ending before the barrier are counted separately from operations beginning after the barrier satisfies the formula describing $S[1]$.
+
+%For example, consider a library $L_{stack}$ implementing a two-element 
+%stack that contains an (abstract) value $a$ and let $S_{stack}$ be its specification (see Fig.~\ref{fig:stackspec_pending} in Appendix~\ref{sec:specs}). 
+%$L_{stack}$ without barriers, which is linearizable according to the specification $S_{stack}$. Note that there exists a word in $S_{stack}$ having exactly two occurrences of $\mathrm{push}[a,\mathrm{true}]$ and two occurrences of $\mathrm{pop}[\epsilon,\mathrm{true}]$. 
+
+\begin{figure}[t]
+  \scriptsize
+  \begin{minipage}{0.5\linewidth}
+    \hspace{-13mm}
+    \input pics/no-barrier.tex
+    {\footnotesize (a)}~Image:
+    $2\times\mathrm{push}[a,\mathrm{true}]$,
+    $2\times\mathrm{pop}[\epsilon,\mathrm{true}]$
+  \end{minipage}
+  \begin{minipage}{0.5\linewidth}
+    \hspace{-10mm}
+    \input pics/one-barrier.tex
+    {\footnotesize (b)}~Image:\\
+    before barrier: $1\times\mathrm{push}[a,\mathrm{true}]$ \\
+    spanning: $1\times\mathrm{pop}[\epsilon,\mathrm{true}]$, 
+      $1\times\mathrm{push}[a,?]$ \\
+    after barrier: $1\times\mathrm{pop}[\epsilon,\mathrm{false}]$, 
+      $1\times\mathrm{push}[a,\mathrm{true}]$
+  \end{minipage}
+%   \iftoggle{squeeze}{\vspace{-2mm}}{}
+  \caption{(a) The visualization of an execution without barriers and with four 
+    threads $t_1$, $t_2$, $t_3$, and $t_4$ executing four completed operations;
+    (b) The visualization of an execution with one barrier and four threads 
+    $t_1$, $t_2$, $t_3$, and $t_4$ executing four completed and one pending 
+    operation.}
+  \label{fig:no-barrier}
+%   \iftoggle{squeeze}{\vspace{-6mm}}{}
+\end{figure}
+
+%A $1$-barrier execution $e$ is linearizable iff there exists a  
+%permutation $\pi$ of its trace $@t$ with $\proj{\pi}{@S_L}\in S$, that preserves the order 
+%between operations that ended before the barrier and operations that began after the barrier.
+%Contrary to the previous case, $\interface{@t}\in \Pi(S)$ does not imply the linearizability of $e$.
+%%However, as in the previous case, we can reduce the linearizability of $e$ to the membership of a tuple of 
+%%integers to the Parikh image of a language but, the reduction is more intricate. Roughly, 
+%One needs to 
+%(1) count separately the summaries of the operations ending before, \resp beginning after, the barrier and then, (2) to check if the tuple of obtained values belongs
+%to the Parikh image of a language, denoted by $S[1]$. The latter is defined as the output language of a one-way transducer that reads words from $S$ and \emph{non-deterministically} adds labels to symbols in $@S_L$ in \emph{two} phases:
+%first, it adds only ``before the barrier'' labels and then, only ``after the barrier'' labels. 
+%Fig.~\ref{fig:no-barrier}(b) illustrates 
+%an execution of $L_{stack}$ with one barrier, linearizable w.r.t. the specification $S_{stack}$, whose multiset of summaries belongs to the Parikh image of $S_{stack}[1]$ (see Appendix~\ref{app:linear} for a formula that describes this Parikh  image).
+
+This counting argument can be formally stated using the notion of Parikh image. We recall that the \emph{Parikh image} of a sequence $@s \in
+@S^\ast$ is the multiset $\Pi(@s) : @S -> \<Nats>$ mapping each $a \in
+@S$ to the number of occurrences of $a$ in $@s$. The \emph{Parikh image} of a
+language $L \subseteq @S^\ast$ is the set of images $\Pi(L) \Def= \set{ \Pi(@s) : @s
+\in L }$ of sequences in $L$.
+
+
+%The principle exemplified above can be extended to $K$-executions, for any $K$, as follows. 
+Formally, let $e$ be a $K$-barrier execution of trace $@t$. We assume that the $K$ barriers are 
+numbered from $1$ to $K$ as they appear in $e$. The 
+\emph{$K$-bounded interval-annotated language}
+$@S_L[K]=@S_L\times[0,K]\times ([0,K]\cup\{\omega\})$ attaches numbers to symbols in $@S_L$. For any trace $@t$, $\interfaceInd{K}{@t}$ maps each symbol $M[\vec{\imath},\vec{o}][i_1,i_2]$ in $@S_L[K]$ to the number of 
+occurrences of $M[\vec{\imath},\vec{o}]$-operations in $@t$ that (1) start before the first barrier when $i_1=0$ or 
+between barriers $i_1$ and $i_1+1$ when $0<i_1<K$ or 
+after the last barrier when $i_1=K$ and (2) end before the first barrier when $i_2=0$ or between barriers $i_2$ and $i_2+1$ when $0<i_2<K$ or after the last barrier when $i_2=K$ or are pending when $i_2=\omega$.
+
+Given a specification $S$, the \emph{$K$-bounded interval-annotated specification} $S[K]\subseteq (@S_L[K])^*$ is defined as the output language of a one-way transducer that reads words from $S$ and adds labels of the form $[i_1,i_2]$ to symbols of $S$ in $K+1$ phases: in phase $0\leq j\leq K$, it adds to every symbol of $S$ a label  $[i_1,i_2]$ with $i_1\leq j$ and $i_2\geq j$.
+
+The next result implies that the complexity of checking the linearizability of a $K$-barrier execution is polynomial time 
+assuming a  finite library alphabet and a context-free specification. 
+%modulo an oracle for computing 
+In this case, the Parikh image of $S[K]$ can be represented by a 
+quantifier-free Presburger formula (if $S$ is context-free then so is $S[K]$ and consequently, the Parikh image of $S[K]$ is semi-linear). 
+Note that, in general, these formulas are computed once for all implementations of a given specification~\footnote{When the specification is defined as the set of all sequential executions of a library containing abstract implementations for the methods in $L$, (an over-approximation of) the Parikh image of the specification viewed as a language over $@S_L$ can be obtained as an invariant on the most-general sequential client of the abstract library annotated with a set of counters that count the number of operations with a given summary.} Appendix~\ref{app:linear} contains a Presburger formula describing the Parikh image of an  interval-annotated stack specification.
+
+\vspace{-1mm}
+\begin{proposition}\label{prop:lin}
+Let $e$ be a $K$-barrier execution of trace $@t$. The execution $e$ is $S$-linearizable iff $\interfaceInd{K}{@t}\in\Pi(S[K])$.
+\vspace{-1mm}
+\end{proposition}
+
+%Note that, for any $K$, if $S$ is a context-free language then so is $S[K]$. Consequently, the Parikh image of $S[K]$ is semi-linear and it can be represented by a quantifier-free Presburger formula.
+%We have adapted our reduction of Section~\ref{sec:barriers} as a crucial step
+%in a technique to detect linearizability violations. For any given class of
+%concurrent programs implementing a library (\eg whether finite or infinite
+%data domain), we reduce the problem of bounded-barrier linearizability to the
+%problem of assertion validity in the same class of concurrent programs. Thus
+%our technique applies equally to programs with finite- or infinite-domain
+%shared memories.

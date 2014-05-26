@@ -1,0 +1,635 @@
+%!TEX root = draft.tex
+% \section{Under-approximation symbolic analyses for linearizability}
+\section{Detecting Barrier-Bounded Linearizability Violations}
+\label{sec:objs}
+
+We define 
+%set the basis for defining (symbolic) analyses for checking the linearizability of a client (library) through a reduction to the reachability problem. This reduction is defined by 
+a code-to-code translation that reduces the problem of checking the linearizability of a client (library) to the reachability problem (assertion checking). 
+%for checking the linearizability of a client (library) that constructs a product between the (most-general) client and a monitor detecting linearizability bugs.
+%One naive implementation for such a monitor would be to record the $\<call>$ and $\<return>$ actions of an execution and to non-deterministically check 
+%if there exists a strict, quasi-serial permutation of the execution whose $\overline{@S_L}$-projection belongs to the
+%specification. The main drawbacks of this implementation are the following: (1) the use of dynamic data structures in order to record $\<call>$ and $\<return>$ actions (because the number of operations in an execution is in general unbounded) and (2) the additional steps needed by the monitor in order to check the linearizability of an execution is in general exponential in the length of the execution itself (because checking the linearizability of an execution is NP-complete). While the first drawback may limit the set of available analyses for reachability in the instrumented program, the second may induce an exponential overhead for exploring the executions of the instrumented program with respect to the original one (this is true for example in reachability analyses based on exploring bounded-length paths).
+%
+%because the number of concurrent operations is in general unbounded it needs to manipulate dynamic data structures in order to record $\<call>$ and $\<return>$ actions, which complicates the task of checking reachability on the instrumented program (reduces the number of available analyses for reachability in the instrumented program) and (2) because the complexity of checking if one execution
+%is linearizable is NP-complete .
+In order to define an efficient reduction, we under-approximate the set of executions to be checked, i.e., we consider sets of executions with a bounded number of \emph{barriers}. We also assume that the library alphabet is of fixed size; in general, this could also be considered as a bounding parameter for executions~\footnote{This doesn't imply that the internal variables of a library come from a bounded data domain.}. 
+% We recall the concept of barrier introduced in \cite{conf/esop/BouajjaniEEH13}.
+
+\subsection{A code-to-code translation for checking bounded-barrier linearizability}
+
+The instrumentation we define for reducing the $K$-barrier linearizability of a client $C$ of a library $L$ with 
+specification $S$ to reachability (assertion checking) is described in Figure~\ref{fig:program}. 
+The resulting program is denoted by $\prog(L,C,S,K)$.
+%For simplicity, we consider a client $C$ that 
+%invokes an arbitrary number of instances of each method in a library $L$ concurrently (each method
+%is executed by a different thread).
+
+
+%      assume $\vec{\imath}\in In$; `\label{pgm:intf:first}'
+%  assume $\vec{out}\in Out$; `\label{pgm:intf:second}'
+\begin{figure}[t] %call $L$.Init();
+	\scriptsize
+  \begin{minipage}[t]{38mm}
+    \lstset{numbers=left, 
+            numberstyle=\tiny\tt, 
+            stepnumber=1, 
+            firstnumber=1,
+            % numberfirstline=true,
+            numbersep=4pt}
+    \begin{program}
+// instrumentation vars
+var finished: $\<Bools>$
+var time: $K$
+var open[$L\!\x\!In$][$K$]: $\<Nats>$
+var done[$L\!\x\!In\!\x\!Out$]
+  [$K\!\x\!K$]: $\<Nats>$
+
+void Tick()
+  while $\ast$ do
+    assume time < $K$;
+    yield;
+    if finished then
+        time++;
+        finished := false;
+  return;
+    \end{program}
+  \end{minipage}
+  %
+  \begin{minipage}[t]{40mm}
+    \lstset{numbers=left, 
+            numberstyle=\tiny\tt, 
+            stepnumber=1, 
+            firstnumber=last,
+            % numberfirstline=true,
+            numbersep=4pt}
+    \begin{program}
+// client code
+time := 0;
+finished := false;
+
+// initialization
+foreach $M\in L$, $\vec{\imath}\in In$, 
+    $\vec{o} \in Out$, $t_1, t_2 \in K$ do
+  open[$M,\vec{\imath}$][$t_1$] := 0;
+  done[$M,\vec{\imath},\vec{o}$][$t_1,t_2$] := 0;
+spawn call Tick ();
+
+//replace `call $\vec{y}$ := $M(\vec{\imath})$' `\label{pgm:harness:begin}'
+t := $\star$;
+open[$M$,$\vec{\imath}$][t]++;
+call $\vec{y}$ := $M$($\vec{\imath}$, t); `\label{pgm:harness:end}'
+    \end{program}
+    \end{minipage}
+    %
+    \begin{minipage}[t]{42mm}
+    \lstset{numbers=left, 
+            numberstyle=\tiny\tt, 
+            stepnumber=1, 
+            firstnumber=last,
+            % numberfirstline=true,
+            numbersep=4pt}
+    \begin{program}
+// for each method
+method $M$( $\vec{in}$, t0: int ) 
+  returns $\vec{out}$
+begin
+  assume t0 $\ge$ time; `\label{pgm:method:start}'
+  // body of method $M$...
+
+  // for each `return'
+  finished := true; `\label{pgm:method:ret:begin}'
+  open[$M$,$\vec{in}$][t0]--;
+  done[$M$,$\vec{in}$,$\vec{out}$][t0,time]++;
+  assert $\varphi$; `\label{pgm:method:assert}'
+  return; `\label{pgm:method:ret:end}'
+end
+    \end{program}
+  \end{minipage}
+%   \iftoggle{squeeze}{\vspace{-3mm}}{}
+  \caption{The concurrent program $\prog(L,C,S,K)$ which encodes all concurrent 
+		behaviors of a client $C$ of $L$, with at most $K$
+		barriers. %in which clients call at most $N$ of each method. 
+		The 
+		formula $@p$ is the quantifier-free Presburger formula representing the Parikh image 
+		of the specification $S[K]$, according to our construction of 
+		Section~\ref{sec:barriers}; the cells of the \texttt{open} and 
+		\texttt{done} arrays map to the free variables of $@p$.
+	}
+  \label{fig:program}
+\vspace{-5mm}
+\end{figure}
+
+
+Essentially, given a specification $S$
+of $L$, and a barrier bound $K \in \<Nats>$, we instrument the
+methods of $L$ to count the number of called and
+completed methods between each barrier, with their call and return arguments,
+\resp using the \emph{bounded-size} arrays \texttt{open} and \texttt{done}. The set of arguments (\resp return values) used
+in the $L$'s alphabet $@S_L$ is denoted by $In$ (\resp $Out$). 
+%They are enforced
+%by the $\<assume>$ statements at Lines~\ref{pgm:intf:first} and~\ref{pgm:intf:second}.
+The variables
+\texttt{finished} and \texttt{time}, \resp keep track of whether a method has
+returned since the last encountered barrier, and the index of the last
+encountered barrier; the procedure \texttt{Tick} is responsible for
+incrementing \texttt{time} at some point after some method has returned. 
+When the client invokes a method (see Lines~\ref{pgm:harness:begin}--\ref{pgm:harness:end}),
+it specifies after which barrier the method is to be called; the assumption on
+Line~\ref{pgm:method:start} ensures no method begins until after that
+specified barrier. When a method returns, the code of
+Lines~\ref{pgm:method:ret:begin}--\ref{pgm:method:ret:end} raises the
+\texttt{finished} flag, updates the counters of called and completed methods, and
+asserts the specification formula $@p$---\ie the quantifier-free Presburger formula encoding
+the Parikh image of $S[K]$. 
+
+The following theorem states the correctness of the instrumentation (a proof sketch can be found in Appendix~\ref{app:linear}). Note that the size of the instrumentation doesn't grow with the number of operations executed by the client (it depends only on the size of the library's alphabet and $K$), which is important for analyses that crucially depend on the number of program variables.
+
+\vspace{-1mm}
+\begin{theorem}\label{th:transl_linear}
+Given a library $L$ of specification $S$ and $C$ a client of $L$, the program $\prog(L,C,S,K)$ violates the assertion on Line~\ref{pgm:method:assert} if and only if there exists a $K$-barrier execution of $C$, which is not $S$-linearizable.
+\vspace{-1mm}
+\end{theorem}
+
+Assertion violation in $\prog(L,C,S,K)$ implies the non-linearizability of $C$ even if the formula $@p$ is replaced by an over-approximation of the Presburger formula encoding the Parikh image of $S[K]$. 
+
+%Informally,  Note that this
+%encoding is not constrained to programs with finite data-domains, or programs
+%without recursion, a priori; however, our method can only construct the
+%specification formula $@p$ when the domains of method arguments and return
+%values is finite.
+
+\subsection{Prioritized Exploration of Possible Clients by Ranking}
+\label{sec:clients}
+
+While the reductions of Sections~\ref{sec:txs} and~\ref{sec:objs} have lessened
+the burden of computing possible serializations, the burden of discovering a
+collection of concurrent operations which induces a
+serializability/linearizability violation remains. Even though the executions
+of the most general client $C^\ast$ do induce every possible violation, we have
+found algorithmic exploration of $C^\ast$ to be too costly, due to the vast
+amount of nondeterminism it uses.
+
+As an alternative, we propose a prioritized exploration of very simple clients
+which do not use nondeterministic control statements---though data values are
+generally left unspecified, and of course, nondeterminism in thread scheduling
+is still possible. Formally, a \emph{client family} $F$ of a library $L$ is a
+set of clients of $L$. We say a client family $F$ is \emph{complete for
+serializability/linearizability} when for any library $L$ which is not
+serializable/linearizable, there exists a client $C \in F$ such that $L[C]$ is
+not serializable/linearizable. Exploration order within a client family $F$ is
+lower-rank-first, according to a \emph{ranking function} $R : F -> \<Nats>$.
+
+\subsubsection{Ranking Transactional Clients}
+
+\begin{definition}
+  The \emph{transactional client family} is the integer-triple indexed 
+  set $F_T = \set{ C_T(i,j,k) : i,j,k \in \<Nats> }$ whose elements are defined by  
+  Figure~\ref{fig:clients}. 
+\end{definition}
+
+\begin{figure}[t]
+  \begin{minipage}[b]{0.3\linewidth}
+    \centering
+    \scriptsize
+    \begin{program}
+thread T begin
+  while $\choice$ do
+    if $\choice$ then
+      $\vec{\mathtt{y}}_1$ := $M_1$($\vec{\mathtt{z}}_1$)
+    else if $\choice$ then
+      $\vec{\mathtt{y}}_2$ := $M_2$($\vec{\mathtt{z}}_2$)
+    ...
+    else 
+      $\vec{\mathtt{y}}_n$ := $M_n$($\vec{\mathtt{z}}_n$)
+end
+
+while $\choice$ do
+  spawn T
+    \end{program}    
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.3\linewidth}
+    \centering
+    \scriptsize
+    \begin{program}
+thread T begin
+  repeat $j$+1 times
+    call begin();
+    call _ := read($\choice$);
+    repeat $k$ times
+      if $\ast$ do
+        call _ := read($\choice$);
+      else
+        call write($\choice$,$\choice$);
+    call write($\choice$,$\choice$);
+    call c := commit()
+end  
+repeat $i$+2 times
+  spawn T
+    \end{program}
+  \end{minipage}  
+  \hfill
+  \begin{minipage}[b]{0.3\linewidth}
+    \centering
+    \scriptsize
+    \begin{program}
+thread T$_\mathtt{1}$ begin
+  call $M_1$($\choice$);
+end      
+thread T$_\mathtt{2}$ begin
+  call _, c := $M_2$($\choice$);
+  assume c
+end      
+thread T$_\mathtt{3}$ begin
+  call _, c := $M_3$($\choice$);
+  assume !c
+end  
+spawn T$_\mathtt{1}$;
+spawn T$_\mathtt{2}$;
+spawn T$_\mathtt{3}$
+    \end{program}
+  \end{minipage}
+%   \iftoggle{squeeze}{\vspace{-5mm}}{}
+  \caption{({\sc Left})~The most general client $C^\ast$ spawns an arbitrary 
+    number of threads invoking methods in an arbitrary order.
+    ({\sc Center})~The transactional client $C_T(i,j,k)$ creates $i\!+\!2$ 
+    identical threads, each which execute $j\!+\!1$ transactions, containing 
+    $k\!+\!2$ memory operations.
+    ({\sc Right})~A shared-object client $C_O(\tilde{I})$, which creates 
+    $|\tilde{I}|$ threads, each calling a single method; shown here for the 
+    image $\tilde{I} = \set{ M_1[*], M_2[*,*,\protect\<true>], 
+    M_3[*,*,\protect\<false>] }$.}
+  \label{fig:clients}
+  \vspace{-5mm}
+\end{figure}
+
+$C_T(0,0,0)$ is the smallest client which can induce serializability
+violations: any violation requires at least 2 threads, each running at least
+one writing transaction. The \emph{transactional client ranking function} $R_T(
+C_T(i,j,k) ) = i+j+k$ assigns clients the sum of their parameters. While in
+theory, even small cycles may require high-ranking clients to materialize, in
+practice we find very small ranks suffice---see Section~\ref{sec:exp}.
+
+\begin{lemma}
+  The transactional client family is complete.
+\end{lemma}
+
+\subsubsection{Ranking Shared-Object Clients}
+
+Contrary to transactional clients, which are ranked solely by their
+size/simplicity, we prioritize shared-object clients by (1)~avoiding clients
+whose operations can be serialized to a sequence permitted by a given
+specification, since such clients cannot induce linearizability violations, and
+(2)~preferring clients whose operations are ``near'' some which can be
+serialized to an allowed sequence. For example, while one
+$\mathrm{push}[a]$-operation concurrent with two
+$\mathrm{pop}[a,\<true>]$-operations cannot be linearized, an execution with
+one of each operation can; we thus assign a low rank to the client concurrently
+invoking these three operations. The relevance of this heuristic is based on
+the hypothesis that programming errors are more likely to surface within a
+certain proximity of the intended behavior. Plus, by prioritizing
+according to specification proximity, and client size, we favor small
+manifestations of linearizability violations for any given programming error.
+
+In what follows, we develop our clients and ranking function assuming only
+zero-barrier executions; these definitions generalize to any fixed number of
+barriers, by annotating alphabets with intervals, as in Section~\ref{sec:objs},
+and enforcing the client-specified intervals in the instrumented program.
+
+Rather than a single domain $\<Data>$ of program values, we suppose values are
+split into two domains, a finite \emph{control domain} $\<Control>$, consisting
+of values from small enumeration types, including Boolean values, and, \eg
+control flags used in method parameters, and an infinite \emph{data domain}
+$\<Data>$, consisting of, \eg integers. Let $\mathrm{abs} : \<Control> \u
+\<Data> -> \<Control> \u \set{ \ast }$ be the homomorphism mapping each $d \in
+\<Data>$ to the symbol $\ast$, and $c \in \<Control>$ to itself. The
+\emph{control alphabet} of a library with alphabet $@S$ is the alphabet of
+\emph{abstract summaries}:
+\begin{align*}
+  \tilde{@S} = \set{ M[\mathrm{abs}(\vec{\imath}),\mathrm{abs}(\vec{o})] :
+    M[\vec{\imath},\vec{o}] \in @S },
+\end{align*}
+in which data values are abstracted to $\ast$. An operation summary
+$M_1[\vec{\imath}_1, \vec{o}_1] \in @S$ \emph{is matched by} the control
+summary $M_2[\vec{\imath}_2, \vec{o}_2] \in \tilde{@S}$, written
+$M_1[\vec{\imath}_1,\vec{o}_1] |= M_2[\vec{\imath}_2,\vec{o}_2]$, when $M_1 =
+M_2$, $\mathrm{abs}(\vec{\imath}_1) = \vec{\imath}_2$, and
+$\mathrm{abs}(\vec{o}_1) = \vec{o}_2$; this definition extends naturally to 
+summary multisets, \ie \emph{images}, via bijections relating matched 
+summaries.
+
+\begin{definition}
+  The \emph{shared-object client family} is control-image indexed set 
+  $F_O = \{$ $C_O(\tilde{I})$ : $\tilde{I} \in \<Multisets>[\tilde{@S}]$ $\}$ 
+  whose elements are defined, by example, in Figure~\ref{fig:clients}.
+\end{definition}
+
+We base our ranking of the shared-object client family on a measure of
+similarity to sets of concurrent operations included in a library
+specification. For the remainder of this section, we fix a specification $S$
+with alphabet $@S$. The \emph{distance} $@D(I_1,I_2)$ between images $I_1, I_2
+\in \<Multisets>[@S]$ is the sum of element differences:
+\begin{align*}
+  @D(I_1, I_2) = 
+    \sum_{a \in @S} \bigl| I_1(a) - I_2(a) \bigr|.
+\end{align*}
+The \emph{distance} $@D(I,S)$ between an image $I \in \<Multisets>[@S]$ and the
+specification $S$ is the minimal distance $\<min>\set{ @D(I,\Pi(w)) : w \in S}$
+between $I$ and the Parikh image of a word $w \in S$, or $1$ when $S$ is empty.
+The \emph{distance} $@D(\tilde{I},S)$ between an abstract image $\tilde{I} \in
+\<Multisets>[\tilde{@S}]$ and the specification $S$ is the minimal non-zero
+distance $\<min>\set{ @D(I,S) : I |= \tilde{I} \text{ and } @D(I,S) > 0 }$
+between an image matching $\tilde{I}$, and $S$, or $0$ is no such
+non-zero-distance image exists.
+
+The \emph{shared-object client ranking function} $R_O(S)$ assigns each client
+the sum of its size and distance from the specification $S$, or $@w$ when that
+distance is zero:
+\begin{align*}
+  R_O(S)( C(\tilde{I}) ) = \left\{
+  \begin{array}{ll}
+    @D(\tilde{I},S) + |\tilde{I}| - 2
+    & \text{ when } @D(\tilde{I},S) > 0 \\
+    @w 
+    & \text{ otherwise. }
+  \end{array}
+  \right.
+\end{align*}
+The simplest violation-inducing clients (\ie size and distance $1$) have rank
+$0$. Note that rank-$@w$ clients cannot witness a linearizability violation,
+since their zero-distance images are included in the Parikh image of the
+specification. Furthermore, all clients are rank @w (\resp their size plus $1$)
+when $S$ permits all (\resp none) concurrent operations.
+
+
+\begin{lemma}
+  The set of finite-rank clients of the shared-object family is complete.
+\end{lemma}
+
+Figure~\ref{fig:client:dist} illustrates a ranking calculation for clients of a
+stack specification, \eg of Figure~\ref{fig:stackspec}. Taking, for instance,
+the image $\tilde{I} = \set{ \mathrm{push}[\ast]^2,
+\mathrm{pop}[\ast,\<true>]^2 }$ of two push operations concurrent with two
+successful pop operations, we calculate that $\tilde{I}$ matches the
+zero-distance image $\set{ \mathrm{push}[d_1]^2, \mathrm{pop}[d_1,\<true>]^2}$,
+the distance-one image $\{$ $\mathrm{push}[d_1]$, $\mathrm{push}[d_2]$,
+$\mathrm{pop}[d_1,\<true>]^2$ $\}$, and the distance-two image $\set{
+\mathrm{push}[d_1]^2, \mathrm{pop}[d_2,\<true>]^2}$, for $d_1 \neq d_2 \in
+\<Data>$. Thus $R_O(S)(C_O(\tilde{I})) = @D(\tilde{I},S) + |\tilde{I}| - 2 = 1
++ 4 - 2 = 3$. As we discuss in Section~\ref{sec:exp}, we find that
+linearizability violations surface in low-rank clients.
+
+% according to our ranking, the first three rounds ..
+% \begin{align*}
+%   \text{ round 1: } \quad
+%   & \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>], 
+%     \quad \mathrm{pop}[\ast,\<true>] \big\| \mathrm{pop}[\ast,\<false>] \\
+%   \text{ round 2: } \quad
+%   & \mathrm{pop}[\ast,\<true>]^2,
+%     \quad \mathrm{push}[\ast]^2 \big\| \mathrm{pop}[\ast,\<true>],
+%     \quad \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>]^2, \\
+%   & \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>] \big\| 
+%       \mathrm{pop}[\ast,\<false>],
+%     \quad \mathrm{pop}[\ast,\<true>] \big\| \mathrm{pop}[\ast,\<false>]^2 \\
+%   \text{ round 3: } \quad
+%   & \mathrm{pop}[\ast,\<true>]^2 \big\| \mathrm{pop}[\ast,\<false>],
+%   \quad \mathrm{push}[\ast]^3 \big\| \mathrm{pop}[\ast,\<true>], \ldots
+% \end{align*}
+
+\begin{figure}[t]
+  \centering
+  \scriptsize
+  \begin{tabular}{|l|p{4mm}p{6mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    & \multicolumn{6}{c|}{2 operations} \\
+    \hline
+    $\#\mathrm{push}[\ast]$ 
+    & 2 & 1 & 1 & 0 & 0 & 0 \\
+    $\#\mathrm{pop}[\ast,\<true>]$ 
+    & 0 & 1 & 0 & 2 & 1 & 0 \\
+    $\#\mathrm{pop}[\ast,\<false>]$
+    & 0 & 0 & 1 & 0 & 1 & 2 \\
+    \hline
+    % $\Delta$ (1 val) 
+    % & 0 & 0 & 0 & 2 & 1 & 0 \\
+    $\Delta(\cdot,S)$ % (abs) 
+    & 0 & 0,\underline{1} & 0 & 2 & 1 & 0 \\
+    $R_O(\cdot)$
+    & @w & 1 & @w & 2 & 1 & @w \\
+    \hline
+  \end{tabular}
+  \begin{tabular}{%
+    |p{4mm}p{6mm}p{4mm}p{6mm}p{6mm}p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    \multicolumn{10}{|c|}{3 operations} \\
+    \hline
+    3 & 2 & 2 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 \\
+    0 & 0 & 1 & 0 & 1 & 2 & 0 & 1 & 2 & 3 \\
+    \hline
+    % 0 & 0 & 0 & 1 & 0 & 0 & 3 & 2 & 1 & 0 \\
+    0 & 0,\underline{1} & 0 & \underline{1},2 & 0,\underline{1} & 0 & 3 & 2 & 1 & 0 \\
+    @w & 2 & @w & 2 & 2 & @w & 4 & 3 & 2 & @w \\
+    \hline
+  \end{tabular}
+  \\[1mm]
+  \begin{tabular}{|l|p{4mm}p{6mm}p{4mm}p{8mm}p{6mm}p{4mm}p{6mm}p{6mm}p{6mm}%
+    p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    & \multicolumn{15}{c|}{4 operations} \\
+    \hline
+    $\#\mathrm{push}[\ast]$ 
+    & 4 & 3 & 3 & 2 & 2 & 2 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    $\#\mathrm{pop}[\ast,\<true>]$ 
+    & 0 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $\#\mathrm{pop}[\ast,\<false>]$
+    & 0 & 0 & 1 & 0 & 1 & 2 & 0 & 1 & 2 & 3 & 0 & 1 & 2 & 3 & 4 \\
+    \hline
+    % $\Delta$ (1 val) 
+    % & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 1 & 0 & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $\Delta(\cdot,S)$ % (abs) 
+    & 0 & 0,\underline{1} & 0 & 0,\underline{1},2 & 0,\underline{1} & 0 & \underline{2},3 & \underline{1},2 & 0,\underline{1} & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $R_O(\cdot)$
+    & @w & 3 & @w & 3 & 3 & @w & 4 & 3 & 3 & @w & 6 & 5 & 4 & 3 & @w \\
+    \hline
+  \end{tabular}
+  \caption{The calculation of the shared-object client ranking function for
+    a stack specification (see Figure~\ref{fig:stackspec} of 
+    Appendix~\ref{sec:specs}) in zero-barrier executions.  All distances for 
+    matching images are listed, with the minimal non-zero distance underlined.}
+  \label{fig:client:dist}
+  \vspace{-5mm}
+\end{figure}
+
+
+\subsection{Case Studies}
+\label{sec:exp}
+
+As a proof of concept we have implemented our techniques to analyze algorithms
+appearing in the research literature; our prototype, composed entirely of
+freely-available components, discovers bugs either injected into these
+algorithms, or due to ambiguities in their pseudocode listings. Given library
+code written in the Boogie language---either automatically translated from the
+source C/C++ code, or manually translated---we execute the following workflow:
+\begin{enumerate}
+  \item Add client and instrumentation to library code, given bounds on 
+    barriers, or conflict-cycle length, resulting in a closed concurrent 
+    program, annotated with assertions.
+  \item Perform delay-bounded sequentialization~\citep{ conf/popl/EmmiQR11},
+    for a given delay bound, translating the concurrent library and client 
+    code to sequential code; in many cases, we manually limit the number of 
+    program points where threads can yield control.
+  \item Search for assertion violations, using existing sequential program
+    analysis engines; in our case, we use Corral~\citep{ conf/cav/LalQL12},
+    typically bounding recursion and loop-unrolling.
+\end{enumerate}
+The Clang-to-Boogie and concurrent-to-sequential translations are available in
+the {\tt SMACK}\footnote{The {\tt SMACK} Project :
+\url{http://github.com/smackers/smack}} and {\tt c2s}\footnote{The {\tt c2s}
+Project : \url{http://github.com/michael-emmi/c2s}} projects; Corral's
+sequential program analysis is available in Boogie\footnote{Boogie :
+\url{http://boogie.codeplex.com}} using the {\tt\small /stratifiedInline:1}
+switch.
+
+Figure~\ref{fig:exps:lin} and~\ref{fig:exps:ser} lists the results of running
+our methodology on several textbook and research algorithms implementing
+concurrent data structures and transactional memories in which we have injected
+subtle programming errors. Generally speaking, we discover bugs with
+low-ranking clients (normally $2$--$3$ for linearizability, $0$ for
+serializability), few barriers ($0$--$1$), small cycles ($2$), and few delays
+($1$--$4$). In the case of the mod-2 incrementer example, the injected bug
+involves a ``lost update,'' where two concurrent increments write the same
+counter value. Without barriers, every execution is linearizable, since all
+invocations to the ZERO method can be serialized to occur after an even number
+of INC methods; to manifest a linearizability violation, an odd number of INC
+methods must be separated by a barrier from a subsequent ZERO method.
+
+\begin{figure}[t]
+  \centering
+%   \begin{minipage}[b]{60mm}
+    \centering
+    \small
+    \begin{tabular}{|l|l|ccc|l|}
+      \hline
+      Example / Bug & Client & $R$ & $B$ & $D$ & Time \\
+      \hline
+      2-Lock Queue / DEQ 
+      & 1xENQ, 2xDEQ
+      & 2 & 0 & 1 & 2.80s \\
+      Lock-cpl. Set / REM
+      & 1xADD, 2xREM
+      & 2 & 0 & 1 & 3.47s \\
+      Mod-2 Incr. / INC
+      & 3xINC ; 1xZERO
+      & 3 & 1 & 4 & 10.27s \\
+      Treiber Stack / POP 
+      & 1xPUSH, 2xPOP
+      & 2 & 0 & 1 & 2.18s \\
+      Treiber Stack / PUSH
+      & 2xPUSH, 2xPOP
+      & 3 & 0 & 2 & 3.15s \\ % 1xPUSH(v1), 1xPUSH(v2), 2xPOP(v2)
+      Treiber Stack / ``ABA''
+      & 3xPUSH, 4xPOP
+      & 6 & 0 & 3 & 426.82s \\
+      \hline
+      \hline
+      Elim. Stack / ``empty''
+      & 3xPUSH, 1xPOP
+      & 3 & 1 & 4 & 441s \\
+      Elim. Stack / ``brace''
+      & 4xPUSH, 2xPOP
+      & 5 & 0 & 8 & 1496 s \\
+      \hline
+    \end{tabular}
+    \caption{Discovering linearizability violations in textbook algorithms; 
+      the bug-injected method is noted, with ``ABA'' denoting the
+      infamous ABA bug.  In client listings, the semicolon separates method
+      intervals. $R$ denotes client rank, $B$ the number of linearization 
+      barriers, and $D$ delays.}
+    \label{fig:exps:lin}
+%   \end{minipage}
+  \hfill
+  
+%   \begin{minipage}[b]{60mm}
+    \centering
+    \small
+    \begin{tabular}{|l|l|ccc|l|}
+      \hline
+      Example / Style, Lang. & Client & $R$ & $C$ & $D$ & Time \\
+      \hline
+      2-Phase Lock / direct, C
+      & $C_T(0,0,0)$
+      & 0 & 2 & 2 & 29.28s \\
+      DSTM-model / deferred, C
+      & $C_T(0,0,0)$
+      & 0 & 2 & 2 & 364s \\
+      \hline
+      \hline
+      NOrec STM / deferred, C++
+      & $C_T(0,0,0)$
+      & 0 & 2 & 2 & 29.90s \\
+      RingSTM / deferred, C
+      & $C_T(0,0,0)$
+      & 0 & 2 & 2 & 778s \\
+      \hline
+    \end{tabular}
+    \caption{Discovering serializability violations in textbook transactional
+      memory algorithms.
+      The 2-phase locking and DSTM-model algorithms are very simple versions
+      of the popular algorithms, written in C.
+      NOrec and RingSTM are taken from their research papers.
+      $R$ denotes client rank, $C$ the cycle length, and $D$ delays.}
+    \label{fig:exps:ser}
+%   \end{minipage}
+\vspace{-5mm}
+\end{figure}
+
+\paragraph{\bf The Elimination Stack.}
+
+Hendler et al.'s Elimination Stack \cite{conf/spaa/HendlerSY04} augments Treiber's stack with a ``collision
+array,'' used in case an optimistic push or pop detects a conflicting
+operation; the collision array pairs together concurrent push and pop
+operations to ``eliminate'' them without affecting the underlying data
+structure. In writing the Elimination Stack pseudocode in Boogie, we have
+inadvertently introduced (at least!) two bugs, both leading to linearizability
+violations.
+
+The first bug is due to the modeling of a {\tt cell}~field, which stores either
+the value returned by a pop operation, or the special value {\tt Empty}, in the
+case of empty stack. Due to the limited expressivity of typing in Boogie, we
+have modeled the {\tt cell}~field with two fields: a value-typed {\tt
+cell}~field, and a Boolean {\tt empty} field, to be set to true only when {\tt
+cell} is to be set to {\tt Empty}. While we had been careful to always
+initialize {\tt empty} to false, and to set {\tt empty} to true whenever the
+{\tt cell}~field is assigned {\tt Empty}, we had not set {\tt empty} to false
+each time the {\tt cell}~field is assigned a non-{\tt Empty} value. This
+mistake surfaces as a linearizability violation in executions where: (1)~an
+initial push operation completes before two more pushes, concurrent with a pop
+operation, begin; (2)~the pop operation, detecting a conflicting push, sets its
+{\tt cell} field to {\tt Empty}, and is put on the collision array; (3)~the
+third push operation pairs with the pop on the collision array, and sets its
+{\tt cell} field to the pushed value, and returns. As our Boogie-coded
+version would set pop's {\tt empty} to true before entering the collision
+array, and never subsequently set {\tt empty} to false, the pop operation is
+observed to return empty; since a barrier insists that the pop must observe the
+first push operation, this execution violates the stack specification. We have
+detected this violation in $441$ seconds, in a single-barrier $4$-delay
+execution, with the rank $3$ client of the $4$ operations described above.
+
+The second bug is due to a typographical error in the Elimination Stack
+pseudocode: a missing closing brace. The indentation suggests three possible
+positions; while one leads to a non-termination bug (beyond the scope of this
+work), another leads to a bug where a pop operation prematurely returns without
+having read a valid pushed value---thus returning an uninitialized value. This
+bug is induced by a rank $5$ client with $4$ push operations concurrent with
+$2$ pops, in which: (1)~the first push operation succeeds leaving the stack
+non-empty; (2)~the second push operation sends a third push, and both pop
+operations, to the collision array; (3)~the third push pairs with one pop, both
+return; (4)~the remaining pop leaves the collision array, trying again to
+perform a stack operation; (5)~the fourth push operation intervenes, making the
+pop detect another conflict; (6)~because of the misplaced brace, the pop
+operation prematurely returns, rather than repeating the entire process again.
+This violation surfaces in a zero-barrier execution with $8$ delays, in $1496$
+seconds.
+

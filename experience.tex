@@ -1,0 +1,155 @@
+%!TEX root = draft.tex
+\section{Experimental Evidence}
+\label{sec:exp}
+
+As a proof of concept we have implemented our techniques to analyze algorithms
+appearing in the research literature; our prototype, composed entirely of
+freely-available components, discovers bugs either injected into these
+algorithms, or due to ambiguities in their pseudocode listings. Given library
+code written in the Boogie language---either automatically translated from the
+source C/C++ code, or manually translated---we execute the following workflow:
+\vspace{-1eX}
+\begin{enumerate}
+  \item Add client and instrumentation to library code, given a bound on
+    the number of client shared-memory writes, resulting in a closed concurrent 
+    program, annotated with assertions.
+  \item Perform delay-bounded sequentialization~\citep{ conf/popl/EmmiQR11},
+    for a given delay bound, translating the concurrent library and client 
+    code to sequential code; in many cases, we manually limit the number of 
+    program points where threads can yield control.
+  \item Search for assertion violations, using existing sequential program
+    analysis engines; in our case, we use Corral~\citep{ conf/cav/LalQL12},
+    typically bounding recursion and loop-unrolling.
+    \vspace{-1eX}
+\end{enumerate}
+The Clang-to-Boogie and concurrent-to-sequential translations are available in
+the {\tt SMACK}\footnote{The {\tt SMACK} Project :
+\url{http://github.com/smackers/smack}} and {\tt c2s}\footnote{The {\tt c2s}
+Project : \url{http://github.com/michael-emmi/c2s}} projects; Corral's
+sequential program analysis is available in Boogie\footnote{Boogie :
+\url{http://boogie.codeplex.com}} using the {\tt\small /stratifiedInline:1}
+switch.
+
+Figure~\ref{fig:exps:lin} lists the results of running our methodology on
+several textbook and research algorithms implementing concurrent data
+structures %and transactional memories 
+in which we have injected subtle
+programming errors. Generally speaking, we discover bugs with low-ranking
+clients (normally $2$--$3$), few shared-memory writes ($0$--$1$), and few
+delays ($1$--$4$). In the case of the mod-2 incrementer example, the injected
+bug involves a ``lost update,'' where two concurrent increments write the same
+counter value. Without shared-memory writes, all counter valuations are
+included in the specification, since the concurrent invocations to the ZERO
+method can be ordered to occur after an even number of INC methods; to manifest
+a violation, an odd number of INC methods must be separated by a shared-memory
+write from a subsequent ZERO method.
+
+\begin{figure}[t]
+  \centering
+  \scriptsize
+  \begin{tabular}{|l|l|ccc|l|}
+    \hline
+    Example / Bug & Client & $R$ & $W$ & $D$ & Time \\
+    \hline
+    2-Lock Queue / DEQ 
+    & 1xENQ, 2xDEQ
+    & 2 & 0 & 1 & 2.80s \\
+    Lock-cpl. Set / REM
+    & 1xADD, 2xREM
+    & 2 & 0 & 1 & 3.47s \\
+    Mod-2 Incr. / INC
+    & 3xINC ; 1xZERO
+    & 3 & 1 & 4 & 10.27s \\
+    Treiber Stack / POP 
+    & 1xPUSH, 2xPOP
+    & 2 & 0 & 1 & 2.18s \\
+    Treiber Stack / PUSH
+    & 2xPUSH, 2xPOP
+    & 3 & 0 & 2 & 3.15s \\ % 1xPUSH(v1), 1xPUSH(v2), 2xPOP(v2)
+    Treiber Stack / ``ABA''
+    & 3xPUSH, 4xPOP
+    & 6 & 0 & 3 & 426.82s \\
+    \hline
+    \hline
+    Elim. Stack / ``empty''
+    & 3xPUSH, 1xPOP
+    & 3 & 1 & 4 & 441s \\
+    Elim. Stack / ``brace''
+    & 4xPUSH, 2xPOP
+    & 5 & 0 & 8 & 1496 s \\
+    \hline
+  \end{tabular}
+  \caption{Discovering observational refinement violations in textbook algorithms; 
+    the bug-injected method is noted, with ``ABA'' denoting the
+    infamous ABA bug.  In client listings, the semicolon separates method
+    intervals. $R$ denotes client rank, $W$ the number of shared-memory writes,
+    and $D$ delays.}
+  \label{fig:exps:lin}
+  \vspace{-3eX}
+\end{figure}
+
+\vspace{1mm}
+\noindent
+{\bf The Elimination Stack.}
+Hendler et al.'s Elimination Stack~\cite{conf/spaa/HendlerSY04} augments
+Treiber's stack with a ``collision array,'' used in case an optimistic push or
+pop detects a conflicting operation; the collision array pairs together
+concurrent push and pop operations to ``eliminate'' them without affecting the
+underlying data structure. In writing the Elimination Stack pseudocode in
+Boogie, we have inadvertently introduced (at least!) two bugs, both leading to
+observational refinement violations.
+
+The first bug is due to the modeling of a {\tt cell}~field, which stores either
+the value returned by a pop operation, or the special value {\tt Empty}, in the
+case of empty stack. Due to the limited expressivity of typing in Boogie, we
+have modeled the {\tt cell}~field with two fields: a value-typed {\tt
+cell}~field, and a Boolean {\tt empty} field, to be set to true only when {\tt
+cell} is to be set to {\tt Empty}. While we had been careful to always
+initialize {\tt empty} to false, and to set {\tt empty} to true whenever the
+{\tt cell}~field is assigned {\tt Empty}, we had not set {\tt empty} to false
+each time the {\tt cell}~field is assigned a non-{\tt Empty} value. This
+mistake surfaces as a violation in executions where: (1)~an
+initial push operation completes before two more pushes, concurrent with a pop
+operation, begin; (2)~the pop operation, detecting a conflicting push, sets its
+{\tt cell} field to {\tt Empty}, and is put on the collision array; (3)~the
+third push operation pairs with the pop on the collision array, and sets its
+{\tt cell} field to the pushed value, and returns. As our Boogie-coded
+version would set pop's {\tt empty} to true before entering the collision
+array, and never subsequently set {\tt empty} to false, the pop operation is
+observed to return empty; an execution with a shared write 
+after the first push operation violates the stack specification because it imposes that 
+the pop starts after this push operation. We have
+detected this violation in $441$ seconds, in a single-{\shwrite} $4$-delay
+execution, with the rank $3$ client of the $4$ operations described above.
+
+The second bug is due to a typographical error in the Elimination Stack
+pseudocode: a missing closing brace. The indentation suggests three possible
+positions; while one leads to a non-termination bug (beyond the scope of this
+work), another leads to a bug where a pop operation prematurely returns without
+having read a valid pushed value---thus returning an uninitialized value. This
+bug is induced by a rank $5$ client with $4$ push operations concurrent with
+$2$ pops, in which: (1)~the first push operation succeeds leaving the stack
+non-empty; (2)~the second push operation sends a third push, and both pop
+operations, to the collision array; (3)~the third push pairs with one pop, both
+return; (4)~the remaining pop leaves the collision array, trying again to
+perform a stack operation; (5)~the fourth push operation intervenes, making the
+pop detect another conflict; (6)~because of the misplaced brace, the pop
+operation prematurely returns, rather than repeating the entire process again.
+This violation surfaces in a zero-{\shwrite} execution with $8$ delays. % in $1496$ seconds.
+
+\vspace{1mm}
+\noindent
+{\bf Comparison with testing-based tools.} Comparing our running times with those reported for 
+testing-based tools that detect violations to linearizability, we have found that they are in the same 
+order of magnitude although our prototype is based on a symbolic analysis and it explores a much larger 
+set of program behaviors (without having to fix the methods input values).
+For instance, Line-Up takes in average around 40 minutes for checking the linearizability of one 
+concrete library client with 9 method invocations (in average, libraries have 900 loc, around 2 times bigger 
+than our implementation of Elimination Stack). Our tool takes at most 24 minutes to check 
+operation counting refinement for a client (where the method inputs are not fixed) with 6 method invocations.
+
+%randomly samples concrete library clients 
+%(finite collections of method invocations with concrete inputs), 
+%with at most 3 threads, where each thread executes at most 3 methods. 
+%Line-Up takes in average around 40 minutes for checking the linearizability of one concrete library client with 9 method invocations (in average, libraries have 900 loc, around 2 times bigger than our implementation of Elimination Stack). Our tool takes at most 24 minutes to check (bounded-barrier) linearizability of a client (where the method inputs are not fixed) with 6 method invocations. Consequently, checking linearizability of a concrete client in Line-Up is of the same order of magnitude as checking the linearizability of a client in our prototype. But, differently from Line-Up, our prototype finds the input values needed in order to exposed a bug.
+

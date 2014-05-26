@@ -1,0 +1,15 @@
+Section~\ref{sec:prelim} presents the required background notions and notation.
+Section~\ref{sec:counting} introduces \emph{operation-counting refinement}, and
+Section~\ref{sec:state} defines a program instrumentation scheme which reduces this refinement to a
+reachable-state inclusion check, over all possible library-client programs.
+Section~\ref{sec:equiv} establishes an equivalence between operation counting
+refinement and observational refinement, while Section~\ref{sec:client} shows
+that it is sufficient to perform the reachable-state inclusion check for one
+particular most-general library client. Section~\ref{sec:reach} then
+demonstrates how this reachable-state inclusion check can be further reduced to
+state reachability in the most-general client program. In order to reduce
+the high degree of nondeterminism in this program, Section~\ref{sec:ranking} presents
+a complete exploration scheme of simpler library clients.
+Finally,
+Section~\ref{sec:exp} describes our experience with a prototype implementation
+of our operation-counting refinement check.

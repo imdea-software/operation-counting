@@ -1,0 +1,119 @@
+%!TEX root = draft.tex
+\section{Detection of Violations to Operation Counting Refinement}
+\label{sec:reach}
+
+In this section, we consider the problem of detecting violations to operation counting refinement or equivalently, to observational refinement, between a library $\lib$ and an \emph{atomic} library $\spec$. Intuitively, a library is atomic if the body of each method in its concrete implementation consists in a single atomic section. 
+Following the canon of bounded program exploration, we consider an approach 
+where we bound \emph{the class of library clients} for which operation counting refinement is checked. We prove that operation counting refinement w.r.t. the class of programs with at most $K$ {\shwrites}, for some fixed parameter $K$, and which uses a fixed set $D$ of parameter and return values, is effectively reducible to a reachability problem. This gives a new approach for using the  existing verification technology for detecting violations to observational refinement.
+
+We first define a \emph{bounded} most general client of $\lib$, \resp $\spec$, denoted by $\mgcb{\lib}{D}{K}$, \resp $\mgcb{\spec}{D}{K}$, which represents the set of reachable operation counts in all bounded clients of $\lib$, \resp $\spec$. Since these clients contain a bounded number of {\shwrites}, the domains of the maps {\tt open} and {\tt done} in the instrumentation of $\mgcb{\lib}{D}{K}$ and $\mgcb{\spec}{D}{K}$ are of bounded size and thus, the two instrumented programs operate over a bounded set of counters.
+Next, we show that for a specific class of atomic libraries $\spec$, there exists an effectively computable Presburger formula $\varphi$ which represents the reachable counter valuations in $\instr{\mgcb{\spec}{D}{K}}$. 
+By Corollary~\ref{th:mgc_count}, if we consider the program $\instr{\mgcb{\lib}{D}{K}}$ to which we add the statement ${\tt assert}\ \varphi$, any violation of operation counting refinement w.r.t. the class of bounded library clients corresponds to  an assertion failure in this program.
+%Therefore, if we add a command ${\tt assert}\ \varphi$ to $\instr{\mgcb{\lib}{D}{K}}$, a reachable state where this assume statement fails 
+%corresponds to a violation of operation counting refinement. % w.r.t. the class of bounded library clients corresponds to  
+%(this is a consequence of Corollary~\ref{th:mgc_count}). 
+In practice, one could also replace $\varphi$ by a weaker formula because assertion failure still implies that there exists a violation of operation counting refinement.
+
+%The reduction to reachability is the statement in Corollary~\ref{th:mgc_count}, which shows that operation counting refinement is equivalent to an inclusion between the sets of reachable counter valuations in the two programs $\instr{\mgc{\lib}}$ and $\instr{\mgc{\spec}}$ composed with $\lib$ and \resp $\spec$. 
+%We show that for a particular class of atomic libraries $\spec$, there exists an effectively computable Presburger formula which represents the reachable counter valuations in $\mgc{\spec}$ composed with $\spec$.
+
+
+Formally, let $D$ be a finite set of values in $\<Nats>$ and $K\in\<Nats>$. The class of {\simple} programs with at most $K$ shared writes and method calls that receive and output only values from $D$ is denoted by $\sprogs[D,K]$. The bounded most general client of a library $\lib$, denoted by $\mgcb{\lib}{D}{K}$, is obtained from $\mgc{\lib}$ by (1) replacing the loop $(sh\colonequals \star)^*$ by a sequential composition of $K$ commands $sh\colonequals \star$ and (2) adding a command ${\tt assume}\ x\in D$ after every assignment to a variable $x$. 
+Note that the domains of the maps {\tt open} and {\tt done} in $\instr{\mgcb{\lib}{D}{K}}$ are bounded. % \ie $\instr{\mgcb{\lib}{D}{K}}$ is a client of $\lib$ that uses a bounded number of counters.
+The following result states that $\instr{\mgcb{\lib}{D}{K}}$ represents all the reachable operation counts in a client of $\sprogs[D,K]$.
+
+%that represents all the reachable operation counts in a client from $\sprogs[D,K]$. Therefore, $\mgcb{\lib}{D}{K}$ is obtained from $\mgc{\lib}$ by adding a command ${\tt assume\ shWr}\leq K$ after every increment on {\tt shWr} and a command ${\tt assume}\ x\in D$ after every assignment to a variable $x$. 
+ 
+\begin{proposition}
+Let $L$ be a library, $D$ a finite set of values in $\<Nats>$, and $K\in\<Nats>$. Then,
+\[
+\reachMGCb{\lib}{D}{K}=
+\hspace{-2mm}\bigcup_{\prog\in\sprogs[D,K],\state_0\in\InitStates}
+\hspace{-2mm}\reachCount{\instr{\prog}}{\lib}{\state_0}.
+\]%\in\InitStates
+\end{proposition}
+
+A history is called \emph{atomic} if every return action $\retAct{\tid}{\meth}{\rval}$ is immediately preceded by a matching call action 
+ $\callAct{\tid}{\meth}{\cval}$. Notice that, if we ignore the pending operations, such a history is sequential.
+A library $\spec$ is called \emph{atomic} iff there exists a set of atomic histories $\spec_0$ such that $\spec$ is the smallest set of histories, which is prefix closed and quiescent permutation closed and which contains $\spec_0$.
+% every history in $\spec$ is a quiescent permutation of an atomic history in $\spec$.
+
+The following result states that there exists an effectively computable Presburger formula that represents the reachable counter valuations in $\mgcb{\spec}{D}{K}$, for every atomic library $\spec$ such that the set of atomic histories in $\spec$ forms a regular language. There are many examples of libraries that satisfy this property and which are useful in practice. For instance, any atomic library that implements common data structures such as stacks, queues, sets, or hash-maps of bounded size satisfies this property.
+%if we consider an atomic library $\spec$ such that the set of sequential histories in $\spec$ forms a regular language, then there exists an effectively computable Presburger formula that represents the reachable counter valuations in $\mgcb{\lib}{D}{K}$.
+
+\begin{theorem}
+Let $\spec$ be an atomic thread-independent library. If the set of atomic histories in $\spec$ forms a regular language, then there exists an effectively computable Presburger formula that represents $\reachMGCb{\spec}{D}{K}$.
+\end{theorem}
+\begin{proof}
+Given an alphabet $\Sigma$, we recall that the \emph{Parikh image} of a sequence $\sigma\in\Sigma^*$ is a mapping 
+$\Pi(\sigma):\Sigma->\<Nats>$ such that for each symbol $a\in\Sigma$, $\Pi(\sigma)(a)$ is the number of occurrences of $a$ in $\sigma$.
+The Parikh image of a language $\lang\subseteq\Sigma$ are the images $\Pi(\lang)=\{\Pi(\sigma)\mid \sigma\in \lang\}$
+of sequences in $\lang$. 
+
+We prove that $\reachMGCb{\spec}{D}{K}$ is the Parikh image of a \emph{regular} language $\lang[\spec,D,K]$, which is enough to
+conclude that the claim of the theorem holds (the Parikh image of any regular language is definable by an effectively computable Presburger formula). 
+
+%Let $\Sigma[S,D]$ be the set of all symbols $\oper{f}{n}{*}$ or $\oper{f}{n}{m}$ with $f\in\meths{\spec}$ and $n,m\in D$. Also, 
+%Let $\Sigma[S,D,K]$ be the set of symbols $\oper{f}{n}{*}[k]$ or $\oper{f}{n}{m}[k_1,k_2]$ with $f\in\meths{\spec}$, $n,m\in D$, $0\leq k\leq K$, and
+%$0\leq k_1\leq k_2\leq K$.
+The language $\lang[\spec,D,K]$ is defined starting from the set of atomic histories in $\spec$ by applying the following sequence of transformations: %, denoted by ${\mathcal At}(\spec)$,
+%\vspace{-1eX}
+\begin{enumerate}
+	\item remove all histories that contain an action $\callAct{\tid}{\meth}{\cval}$ with $n\not\in D$ or an action $\retAct{\tid}{\meth}{\rval}$ with 
+$m\not\in D$,
+	\item replace each pending operation $\callAct{\tid}{\meth}{\cval}$ by $\oper{f}{n}{*}$ and each completed
+operation $\callAct{\tid}{\meth}{\cval}\cdot \retAct{\tid}{\meth}{\rval}$ by $\oper{f}{n}{m}$.
+	\item replace each symbol $\oper{\meth}{\cval}{*}$ by $\oper{\meth}{\cval}{*}[k]$, for some $0\leq k\leq K$, and each symbol 
+$\oper{\meth}{\cval}{\rval}$ by $\oper{\meth}{\cval}{\rval}[k_1,k_2]$, for some $0\leq k_1\leq k_2\leq K$, s.t. every sequence $\sigma$ obtained in this way can be written as $\sigma_0\cdot\ldots\sigma_K$,
+where for every $0\leq i\leq K$, $\sigma_i$ contains only symbols $\oper{\meth}{\cval}{*}[k]$ or $\oper{\meth}{\cval}{\rval}[k_1,k_2]$ with $k\leq i$ and $k_1\leq i\leq k_2$. 
+%\vspace{-1eX}
+\end{enumerate}
+
+We prove that for every $q\in \reachws{\instr{\mgcb{\spec}{D}{K}}}{\spec}$, there exists a sequence $\sigma$ in $\lang[\spec,D,K]$ such that $\Pi(q)=\Pi(\sigma)$ 
+%for every $\meth\in\meths{\spec}$, $\cval, \rval\in D$, $0\leq k\leq K$, $0\leq k_1\leq k_2\leq K$, 
+%\begin{equation}\label{eq:spec}
+%\begin{array}{c}
+%\opent{\state}{\oper{f}{\cval}{*}}{k}=\Pi(\sigma)(\oper{\meth}{n}{*}[k])\mbox{ and } \\[1mm]
+%\donet{\state}{\oper{f}{\cval}{\rval}}{k_1,k_2}=\Pi(\sigma)(\oper{\meth}{\cval}{\rval}[k_1,k_2])
+%\end{array}
+%\end{equation}
+and vice-versa.
+
+Assume that $q$ is reachable by a trace $\trace$. %Since $\spec$ is an atomic library, the history $\hist$ of $\trace$ is a quiescent permutation of an atomic history $\hist'$.
+Since $\spec$ is an atomic library, by shifting call actions of $\trace$ to the right and return actions of $\trace$ to the left (without crossing actions of the same thread), we can define a trace $\trace'$ equivalent to $\trace$ such that $\hist'=\getHist{\trace'}$ is atomic. 
+%For each $\oper{\meth}{\cval}{\rval}$-operation,\resp $\oper{\meth}{\cval}{*}$-operation, of $\trace'$ 
+Let $\sigma'$ be the sequence obtained from $\hist'$ by applying the second transformation in the definition of $\lang[\spec,D,K]$.
+Also, for each symbol $\alpha$ of $\sigma'$, let $\gamma(\alpha)$ be the thread id $t$ in the operation of $\hist'$ that is replaced by $\alpha$.
+Now, let $\sigma$ be the sequence obtained from $\sigma'$ as follows:
+\begin{itemize}
+	\item replace each symbol $\oper{\meth}{\cval}{*}$ by $\oper{\meth}{\cval}{*}[k]$ s.t. the update on the mapping {\tt open} performed by the thread $\gamma(\oper{\meth}{\cval}{*})$ occurs in between the $k$th and the $(k+1)$th {\shwrite} of $\trace'$, and 
+	\item replace each symbol $\oper{\meth}{\cval}{\rval}$ by $\oper{\meth}{\cval}{\rval}[k_1,k_2]$ s.t. the update on the mapping {\tt open}, \resp {\tt done}, performed by the thread $\gamma(\oper{\meth}{\cval}{\rval})$ occurs in between the $k_1$th and the $(k_1+1)$th {\shwrite} of $\trace'$, \resp the $k_2$th and the $(k_2+1)$th {\shwrite} of $\trace'$.
+\end{itemize}
+The sequence $\sigma$ belongs to $\lang[\spec,D,K]$ and $\Pi(q)=\Pi(\sigma')$.
+
+For the other direction, let $\sigma$ be a sequence in $\lang[\spec,D,K]$. By the definition of $\sigma$, 
+we can define an executable trace $\trace$ in the composition of $\instr{\mgcb{\spec}{D}{K}}$ with $\spec$ 
+such that $\eval{\trace}{\state_0}$, for some initial state $\state_0$, contains a state $\state$ with $\Pi(q)=\Pi(\sigma)$.
+\hfill$\Box$
+\end{proof}
+
+%\todo{Say that if we consider for example data structures like queues, stacks, and sets of bounded size (which doesn't mean that executions are bounded)
+%the atomic histories form a regular language.}
+
+%Checking the inclusion in Th.~\ref{th:mgc_count} can be reduced to assertion checking if one can 
+%find an assertion that describes $\reachMGC{\spec}$.
+%
+%In the following we describe some conditions for which this is possible.
+%
+%First,
+%\begin{enumerate} 
+%	\item we consider executions in which the interface of the library is bounded, \ie the number of possible 
+%input/output values is bounded. This is a mild restriction because in general, the libraries that
+%implement concurrent data structures are data-independent. 
+%	\item we consider the problem of observational refinement w.r.t. the class of programs with a bounded 
+%number of writes.
+%\end{enumerate}
+%These two conditions imply that the domains of the maps ${\tt open}$ and ${\tt done}$ are bounded.
+%
+%Second, we consider libraries $S$ for which the set of histories forms a context-free language. This last condition implies that
+%$\reachMGC{\spec}$ can be described precisely by a Presburger formula.

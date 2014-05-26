@@ -1,0 +1,241 @@
+%!TEX root = draft.tex
+
+\section{Operation Counting Refinement}
+\label{sec:ct_ref}
+\label{sec:counting}
+
+In this section, we define the notion of \emph{operation counting refinement}. 
+According to this notion, a library $L$ refines  $S$ if for every trace $\trace$ executed by a client of $L$ there exists a trace $\trace'$ executed by a client of $S$ such that 
+%\begin{itemize}
+%	\item $\trace$ and $\trace'$ 
+the two traces have the same number of {\shwrites}, and between every two consecutive {\shwrites}, we have the same number of operations that begin, \resp finish, in $\trace$ and $\trace'$. 
+The operations are counted separately for each method $f$, input value $\cval$, and output value $\rval$.
+Two possible instances of $\trace$ and $\trace'$ are pictured in Figure~\ref{fig:counting}.
+Note that there exist operations which don't overlap in $\trace$ (\ie the return action of an operation occurs before the call action of the other operation) but which overlap in $\trace'$ and vice-versa.
+%	between the $k_1$th and $k_2$th {\shwrite} of $\trace$ equals the number of method calls that begin, \resp finish, in between the $k_1$th and $k_2$th {\shwrite} of $\trace'$
+%\end{itemize}
+Actually, this will be called \emph{trace-based} operation counting refinement. In the next section, we will also define a \emph{state-based} operation counting refinement.
+
+
+\begin{figure}
+\input one-barrier.tex
+\caption{Two traces satisfying the operation counting constraints. We picture only the operations in the trace and the shared writes. Each operation is pictured by a line whose end points mark the locations of the call and return actions (the $push[4,*]$-operation is pending and thus, it has no return action). The variable $x$ is a shared variable and thus, all the assignments on $x$ are shared writes. For readability, we have drawn a vertical dotted line in the location of the shared writes.}
+\label{fig:counting}
+\end{figure}
+
+
+
+Formally, given a trace $\trace$ in the composition of a program $\prog$ with a library $\lib$, we define a mapping $\Pi(\trace)$, called the \emph{operation count of $\trace$}, which counts the operations performed in $\trace$ as follows:
+%two mappings
+%\[
+%{\tt open}[\trace]:\meths{L}\times\<Dom>\times\<Nats>->\<Nats> \mbox{, } {\tt done}[\trace]:\meths{L}\times\<Dom>\times\<Dom>\times\<Nats>\times\<Nats>->\<Nats>,
+%\]
+%which count the number of operations performed in $\trace$ as follows:
+\begin{itemize}
+	\item $\opent{\trace}{\oper{f}{\cval}{*}}{k}$ is the number of pending $\oper{f}{\cval}{*}$-operations called between the $k$th and $(k+1)$th {\shwrite} (\ie the call action of each of these operations occurs in $\trace$ between these two shared writes). By convention, the $0$th {\shwrite} is the beginning of $\trace$. Also, if $K$ is the total number of {\shwrites} in $\trace$, the $(K+1)$th {\shwrite} is the end of $\trace$.
+	\item $\donet{\trace}{\oper{f}{\cval}{\rval}}{k_1,k_2}$ is the number of completed $\oper{f}{\cval}{\rval}$-operations,
+	%of $f$ with input $i$ and return value $o$, 
+	which begin in between the $k_1$th and $(k_1+1)$th {\shwrite} (\ie their call action is located between these two writes) 
+	and finish in between the $k_2$th and $(k_2+1)$th {\shwrite} (\ie their return action is located between these two writes)
+\end{itemize}
+
+The mapping $\Pi$ is extended to sets of traces as usual. Also, the equality between two mappings $\Pi(\trace)$ and $\Pi(\trace')$ is defined component-wise.
+
+%The set of all mappings $\Pi(\trace)$, where $\trace$ 
+%%valuations for ${\tt open}$ and ${\tt done}$ corresponding 
+%is an executable trace in the composition of a program $\prog$ with a library $\lib$, is denoted by $\counters{\prog}{\lib}.$
+%%, \ie
+%%\[
+%%\counters{\prog}{\lib}=\set{({\tt open}[\trace],{\tt done}[\trace])\mid \trace\in\traces{\prog}{\lib}}.
+%%\]
+
+
+\begin{definition}[\bf (Trace-based) operation counting refinement] %\label{def:count}
+Let $L$ and $S$ be two libraries, % such that $L$ observationally refines $S$. 
+and $\pclass$ a class of programs.
+We say that \emph{trace-based operation counting refinement} (or more simply, operation counting refinement) 
+holds from $\lib$ to $\spec$ w.r.t. $\pclass$ iff
+%There exists a \emph{method counting refinement from $\lib$ to $\spec$} iff
+%for any program $\prog$ and state $\state_0$,
+\begin{equation}\label{eq:def_count1}
+%\forall \prog\in\sprogs.\ 
+%\comp{\prog}{\lib}\state_0\subseteq \comp{\prog}{\spec}\state_0\mbox{ iff }
+\bigcup_{\prog\in\pclass}\counters{\prog}{\lib}\subseteq \bigcup_{\prog\in\pclass}\counters{\prog}{\spec}.
+\end{equation}
+\vspace{-2eX}
+\end{definition}
+
+In Section~\ref{sec:state}--\ref{sec:client}, we prove that operation counting refinement is equivalent to observational refinement (see Theorem~\ref{prop:count}) and we give an effective reduction of operation counting refinement to an inclusion problem between the reachable states of two programs. % (that contain an unbounded set of counters). 
+The latter is done in two steps. First, in Section~\ref{sec:state}, we define a program instrumentation that stores the operation count of a trace using an unbounded set of counters. This allows to define a variant of operation counting refinement, called \emph{state-based}, in which the inclusion between operation counts of traces is replaced by an inclusion between reachable states (projected on the counters of the instrumentation). This variant still preserves the infinite union over all library clients $P$. Second, in Section~\ref{sec:client}, we define a most general client for a library $\lib$, denoted by $\mgc{\lib}$, that allows to reduce state-based operation counting refinement from $\lib$ to $\spec$ to an inclusion between the reachable counter valuations in the instrumentation of $\mgc{\lib}$ and \resp $\mgc{\spec}$ (see Corollary~\ref{th:mgc_count}).
+
+%In Section~\ref{sec:equiv} we prove that operation counting refinement is equivalent to observational refinement. Subsequently, we describe a methodology for finding violations of operation counting refinement, which is based on a variation of it, called \emph{state-based} operation counting refinement. The state-based version is based on 
+%%For the verification of operation counting refinement, we will also consider a state-based version, where we 
+%instrumenting  library clients in order to count the executed operations.
+
+\section{Trace vs State-based Operation Counting Refinement}\label{sec:state}
+
+Given a program $\prog$, we define the instrumented program $\instr{\prog}$ that uses an unbounded set of counters, represented by two integer mappings {\tt open} and {\tt done}, in order to store operation counts of traces. %besides the statements of $\prog$, updates two mappings ${\tt open}$ and ${\tt done}$ that count the number of (pending, and resp., complete) operations executed by $\prog$.
+Therefore, $\instr{\prog}$ is obtained from $\prog$ by: 
+%an instrumentation of $P$, denoted $\progC$, which contains the two mappings described above
+%by  
+\begin{itemize}
+	\item rewriting any primitive command $c$, which is a {\shwrite}, into
+%	\[
+%	\begin{array}{l}
+	{\tt atomic}\ \{ \ c\,; \mbox{{\tt shWr++}}; \},
+%	\end{array}
+%	\]
+	where ${\tt shWr}$ is a shared variable and ${\tt atomic} \{\ldots\}$ denotes a sequence of assignments executed atomically;
+	
+	\item rewriting any command $c$ of the form $y \colonequals \callCom{\meth}{x}$ into %in a maximal sequential command $C$ of $P$ into
+%	\begin{equation}\label{eq:instr}
+	\[
+	\begin{array}{l}
+	{\tt atomic}\ \{ \\
+	\hspace{3mm}\open{f,x}{shWr}\mbox{\tt ++;}\\
+	\hspace{3mm}{\tt shWr0_c}\colonequals {\tt shWr;}\\
+	\}\\[.5mm]
+	y \colonequals \callCom{\meth}{x}{\tt ;} \\[.5mm]
+	{\tt atomic}\ \{\\ 
+	\hspace{3mm}\open{f,x}{shWr0_c}\mbox{\tt --;} \\
+	\hspace{3mm} \done{f,x,y}{shWr0_c,shWr}\mbox{\tt ++;}\\
+	\}\\
+	\end{array}
+%	\end{equation}
+	\]
+	where ${\tt shWr0_c}$ is a local variable associated to the command $c$.
+	
+%	\item $\instr{\prog}$ begins with a primitive command $Init$ that initializes ${\tt shWr}$ and 
+%all the elements of the maps ${\tt open}$ and ${\tt done}$ to 0.
+\end{itemize}
+
+%Note that the set of reachable states in the composition of $\mgc{\lib}$ with $\lib$ does not depend on the initial state. 
+Given a state $\state$ of a program $\instr{P}$ (\ie a valuation for the variables of $\instr{P}$), we define the mapping $\Pi(\state)$ by:
+\begin{itemize}
+	\item $\opent{\state}{\oper{f}{\cval}{*}}{k}=\state(\openm{f,\cval}{k})$, and
+	\item $\donet{\state}{\oper{f}{\cval}{\rval}}{k_1,k_2}=\state(\donem{f,\cval,\rval}{k_1,k_2})$.
+\end{itemize}
+The mapping $\Pi$ is extended to sets of states as usual. 
+
+Let $\InitStates$ be the set of states where all the variables introduced by the instrumentation, \eg the elements of the mappings {\tt open} and {\tt done}, are set to 0. % the values of all the elements of the mappings {\tt open} and {\tt done} are set to 0.
+
+%To denote sets of reachable states projected on the mappings ${\tt open}$ and ${\tt done}$, that  count the executed operations, we use the function \stCnt. 
+%That is, the set of reachable states in the composition of $\instr{\prog}$ with a library $\lib$ starting from some state $\state_0$, projected on the mappings ${\tt open}$ and ${\tt done}$, is denoted by 
+%$\reachCount{\instr{\prog}}{\lib}{\state_0}$.
+%%, \ie
+%%\[
+%%\reachCount{\instr{P}}{\lib}{\state_0}=\projReach{\instr{P}}{\lib}{\state_0}{{\tt open},{\tt done}}
+%%\]
+
+\begin{definition}[\bf State-based operation counting refinement] %\label{def:count}
+Let $L$ and $S$ be two libraries, % such that $L$ observationally refines $S$. 
+and $\pclass$ a class of programs.
+We say that \emph{state-based operation counting refinement} 
+holds from $\lib$ to $\spec$ w.r.t. $\pclass$ iff
+%There exists a \emph{method counting refinement from $\lib$ to $\spec$} iff
+%for any program $\prog$ and state $\state_0$,
+%\begin{equation}\label{eq:def_count1}
+%\forall \prog\in\sprogs.\ 
+%\comp{\prog}{\lib}\state_0\subseteq \comp{\prog}{\spec}\state_0\mbox{ iff }
+\[
+\bigcup_{\prog\in\pclass,\state_0\in \InitStates}\reachCount{\instr{\prog}}{\lib}{\state_0}\subseteq \bigcup_{\prog\in\pclass,\state_0\in \InitStates}\reachCount{\instr{\prog}}{\spec}{\state_0}.
+\] 
+%\end{equation}
+\end{definition}
+
+The following proposition states that trace-based and state-based operation counting refinement
+are equivalent. It is based on the fact that the instrumentation defined above is precise, \ie  
+the reachable counter valuations in $\instr{P}$ correspond to operation counts in executable traces 
+of $\prog$ and vice-versa. The more difficult direction is to prove 
+that every reachable counter valuation $\Pi(\state)$ in $\instr{P}$ equals
+an operation count $\Pi(\tau)$ in a trace $\tau$ of $\prog$. The difficulty comes from the fact that  
+the updates on the mappings {\tt open} and {\tt done} may not be immediately followed or preceded by the 
+operation they are supposed to count. 
+%library 
+%actions corresponding to the method call they are attached to. 
+Therefore, there may exist interleavings where
+other shared writes are executed between the updates on {\tt open} and {\tt done} and the corresponding operations.
+%in between the updates on these mappings and the library actions the
+Here, we use the fact that the libraries are quiescent permutation closed sets of histories.
+
+\begin{proposition}\label{prop:trace_state}
+Let $L$ and $S$ be two libraries, % such that $L$ observationally refines $S$. 
+and $\pclass$ a class of programs. 
+Then, trace-based operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\pclass$
+iff state-based operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\pclass$.
+\end{proposition}
+\begin{proof}
+We prove that for any program $\prog$ and any library $\libq$, 
+%for any client $\prog$ of a library $\lib$, 
+\[
+\counters{\prog}{\libq}=
+\bigcup_{\state_0\in\InitStates}\ \reachCount{\instr{\prog}}{\libq}{\state_0}.
+\]
+This immediately implies the claim of the proposition.
+
+To prove the inclusion from left to right, for every trace $\trace\in \tracesExec{\prog}{\libq}$, we define a trace $\trace'\in\tracesExec{\instr{\prog}}{\libq}$ as follows:
+\begin{itemize}
+	\item we add immediately before each call action $\callAct{\tid}{\meth}{\cval}$ of $\trace$ in between the $k$th and the $(k+1)$th {\shwrite},  a client action for incrementing $\openm{\meth,\cval}{k}$ and a client action that updates ${\tt shWr0_c}$ to $k$,
+	\item we add immediately after each return action $\retAct{\tid}{\meth}{\rval}$ of $\trace$ in between the $k_2$th and the $(k_2+1)$th {\shwrite}, which matches the call action $\callAct{\tid}{\meth}{\cval}$ located between the $k_1$th and the $(k_1+1)$th {\shwrite}, a client action for decrementing $\openm{\meth,\cval}{k_1}$ and a client action for incrementing $\donem{f,\cval,\rval}{k_1,k_2}$.
+\end{itemize}
+
+Since $\trace\in \tracesExec{\prog}{\libq}$ there exists a state $\state_0\in\InitStates$ 
+such that $\eval{\trace}{\state_0}$ is non-empty. By the definition of $\trace'$, we obtain that, for any state $\state\in\eval{\trace'}{\state_0}$, $\Pi(\state)=\Pi(\trace)$, which concludes the proof of this direction.
+
+\begin{figure*}[t]
+{\footnotesize
+A trace $\tau$ in the composition of $\instr{\prog}$ with $\libq$ that reaches a state $\state$ with $\Pi(\state)\neq\Pi(\trace)$
+(for instance, $\donet{\state}{\oper{\meth_1}{\cval_1}{\rval_1}}{0,2}=1$ although there exists no $\oper{\meth_1}{\cval_1}{\rval_1}$-operation,
+that begins before the first {\shwrite} and ends after the second):
+\[
+\begin{array}{l}
+\openm{\meth_1,\cval_1}{0}=1
+\hspace{5.2cm}\callAct{\tid_1}{\meth_1}{\cval_1},
+\retAct{\tid_1}{\meth}{\rval_1}
+\hspace{.7cm}\openm{\meth_1,\cval_1}{0}=0,\donem{\meth_1,\cval_1,\rval_1}{0,2}=1\\[1mm]
+\hspace{2.4cm}x=1,
+\openm{\meth_2,\cval_2}{1}=1,
+\callAct{\tid_2}{\meth_2}{\cval_2}
+\hspace{3.6cm}x=2
+\end{array}
+\]
+
+\smallskip
+A trace $\tau'$ equivalent to $\tau$, that reaches also $\state$, for which $\Pi(\state)=\Pi(\trace')$:
+
+\[
+\begin{array}{l}
+\openm{\meth_1,\cval_1}{0}=1,\callAct{\tid_1}{\meth_1}{\cval_1}
+\hspace{5.3cm}
+\hspace{.7cm}\retAct{\tid_1}{\meth}{\rval},
+\openm{\meth_1,\cval_1}{0}=0,\donem{\meth_1,\cval_1,\rval_1}{0,2}=1\\[1mm]
+\hspace{4.3cm}x=1,
+\openm{\meth_2,\cval_2}{1}=1,
+\callAct{\tid_2}{\meth_2}{\cval_2},
+x=2
+\end{array}
+\]
+}
+\caption{Traces in the proof of Proposition~\ref{prop:trace_state}. They contain two threads; each line contains actions of the same thread. The variable $x$ is shared. For readability, we omit the thread ids from the client actions, the {\tt assume} and the assignment corresponding to a method call.}
+\label{fig:proof_trace_state}
+\vspace{-3eX}
+\end{figure*}
+
+To prove the inclusion from right to left, let $\state$ be a state reachable in the composition of $\instr{\prog}$ with $\libq$ from some state $\state_0\in\InitStates$
+and by some trace $\trace$.
+W.l.o.g. we assume that for every command $y \colonequals \callCom{\meth}{x}$ of $\prog$, $x$ and $y$ are local variables.
+ Because the updates on {\tt open} and {\tt done} are not necessarily followed or preceded by library actions, it may happen that $\Pi(\state)\neq\Pi(\trace)$. An example of such a trace $\trace$ can be found in the upper part of Figure~\ref{fig:proof_trace_state}. However, we can always construct another trace $\trace'$ in the composition of $\instr{\prog}$ with $\libq$, which is equivalent to $\trace$, such that $\Pi(\state)=\Pi(\trace')$. For example, for the trace $\trace$ in Figure~\ref{fig:proof_trace_state}, there exists an equivalent trace $\trace'$ pictured in the lower part of Figure~\ref{fig:proof_trace_state}. The trace $\trace'$ is obtained from $\trace$ by shifting (1) the call action of the first thread to the left such that it immediately follows the update on $\openm{\meth_1,\cval_1}{0}$ and (2) the return action of the first thread to the right such that it immediately precedes the update on $\openm{\meth_1,\cval_1}{0}$. This trace is equivalent to $\trace$ because library actions are independent of any action executed by a concurrent thread and it is a trace in the composition of $\instr{\prog}$ with $\libq$ because the history of $\trace'$ is a quiescent permutation of the history of $\trace$ and thus, it belongs to $\libq$. The definition of $\trace'$ in the general case can be done in a similar way.
+Finally, since $\trace$ is executable, $\trace'$ is also executable, which concludes our proof.
+\hfill$\Box$
+%
+% $\reach{\instr{\prog}}{\libq}{\state_0}$, for some $\state_0\in\InitStates$. Let $\trace$ be the executable trace in $\tracesExec{\instr{\prog}}{\libq}$ such that $\state\in \eval{\trace}{\state_0}$.
+%
+%It can be proved that, for any library $\libq$, $\counters{\prog}{\libq}$ is exactly the set of all valuations of ${\tt open}$ and ${\tt done}$
+%included in a reachable state of $\progC$ composed with $\libq$. Formally, for any $\libq$,
+%\begin{equation}\label{eq:counters1}
+%\counters{\prog}{\libq}=\bigcup_{q_0}\ \projReach{\progC}{\libq}{\state_0}{{\tt open},{\tt done}}.
+%\end{equation}
+%\todo{explain more: here we use the closure property on histories}
+\end{proof}
+
+

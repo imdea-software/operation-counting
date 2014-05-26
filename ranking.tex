@@ -1,0 +1,198 @@
+%!TEX root = draft.tex
+\section{Prioritized Exploration of Simple Clients}
+\label{sec:ranking}
+
+In principle, the Sections~\ref{sec:counting}--\ref{sec:reach} outline
+a complete technique for detecting violations to observational refinement,
+relying on a single ``most general client'' program which exercises every
+library history which can possibly be exposed by any program. In applying
+this technique however, we have found that existing program analysis tools can
+have difficulty reasoning about this most general client, due to the high
+degree of nondeterminism employed: this client calls an arbitrary number of
+arbitrary methods in an arbitrary order.
+
+In this section we propose another complete exploration scheme which reduces
+the program analysis burden by considering, instead of one monolithic and
+highly nondeterministic client, a sequence of simpler clients. In particular,
+each client is a parallel composition of a fixed number of threads, each of which
+calls one fixed method; of course, nondeterminism in the order in which threads
+interleave the execution of their methods is still present. The main complication
+in proposing such a scheme is in prioritizing the clients which are likely to
+induce violations, in order to quickly converge in the case violating
+observational refinement is possible. Formally we say a class $\pclass$ of
+programs is \emph{complete} for a given specification $S$ when for any library
+$L$ with the same methods as $S$ which does not observationally refine $S$, $L$
+does not observationally refine $S$ with respect to $\pclass$. We prioritize
+client exploration order according to a \emph{ranking function} $R : \pclass ->
+\<Nats>$.
+
+In what follows, we develop our clients and ranking functions assuming the very
+simple setting without shared memory writes. Extending the following concepts
+to allow shared-memory writes is straightforward, by using shared-memory reads
+and writes to enforce a particular interval partitioning, and thus specific
+counter values --- each client will correspond to a single counter valuation.
+
+Our strategy for prioritizing clients follows two basic principles:
+(1)~avoiding clients whose operation counts are included in the specification,
+and (2)~preferring clients whose operation counts are ``near'' those included
+in the specification. For example, while one $\mathrm{push}[a]$-operation
+concurrent with two $\mathrm{pop}[a]$-operations would not be included in the
+specification of a stack, the count having only one of each operation would; we
+thus assign a low rank to the client concurrently invoking these three
+operations. The relevance of this heuristic is based on the hypothesis that
+programming errors are more likely to surface within a certain proximity of the
+intended behavior. Plus, by prioritizing according to specification proximity,
+and client size, we favor small manifestations of violations to observational
+refinement for any given programming error.
+
+\begin{definition}
+  A \emph{counter client} is a program
+  $$P_{\tilde\pi} = C_{f_1} \| C_{f_2} \| .. \| C_{f_k}$$
+  for a given multiset $\tilde\pi = \mset{ f_1, f_2, .., f_k }$ of method names,
+  where each $C_{f_i}$ simply calls method $f_i$ with arbitrary argument
+  values.
+\end{definition}
+
+For the rest of this section, we fix a specification $S$, and the class
+$\pclass = \set{ P_{\tilde\pi} \mid \tilde\pi : \meths{S} -> \<Nats> }$ of
+counter clients for $S$.
+
+We base our client ranking on a measure of similarity to allowed counter
+valuations in the specification. Let $<Ops>$ denote the set of symbols $\oper{f}{\cval}{\rval}$,
+for all $f\in\meths{S}$, $\cval,\rval\in\<Nats>$. The \emph{distance} $@D(\pi_1,\pi_2)$ between
+valuations $\pi_1, \pi_2 : \<Ops> -> \<Nats>$ is the sum of differences:
+\begin{align*}
+  @D(\pi_1, \pi_2) = 
+    \sum_{f[n,m] \in \<Ops>} \bigl| \pi_1(f[n,m]) - \pi_2(f[n,m]) \bigr|.
+\end{align*}
+A valuation $\pi : \<Ops> -> \<Nats>$ is said to \emph{match} $\tilde\pi :
+\meths{S}-> \<Nats>$, written $\pi |= \tilde\pi$, when $\sum_{n,m} \pi(f[n,m])
+= \tilde\pi(f)$ for all $f \in \meths{S}$.
+The \emph{distance} $@D(\tilde\pi,S)$ between a valuation $\tilde\pi :
+\meths{S} -> \<Nats>$ and the specification $S$ is the minimal non-zero
+distance $\<min>\set{ @D(\pi,\pi') \mid \pi |= \tilde\pi \text{ and } \pi' \in
+S}$ between any $\pi$ matching $\tilde\pi$ and a counter valuation $\pi'$
+allowed by $S$, or $0$ if no such non-zero distance count exists.
+
+The \emph{counter client ranking function} $R_S$ assigns each client
+the sum of its size and distance from the specification $S$, or $@w$ when that
+distance is zero:
+\begin{align*}
+  R_S( P_{\tilde\pi} ) = \left\{
+  \begin{array}{ll}
+    @D(\tilde\pi,S) + |\tilde\pi| - 2
+    & \text{ when } @D(\tilde\pi,S) > 0 \\
+    @w 
+    & \text{ otherwise. }
+  \end{array}
+  \right.
+\end{align*}
+The simplest violation-inducing clients (\ie size and distance $1$) have rank
+$0$. Note that rank-$@w$ clients cannot witness a violation to observational
+refinement, since their 0-distance counts are included in the 
+specification. Furthermore, all clients are rank @w (\resp their size plus $1$)
+when $S$ permits all (\resp none) operation counts.
+
+\vspace{-1eX}
+\begin{lemma}
+  The set $\set{ P_{\tilde\pi} \in \pclass \mid R_S(P_{\tilde\pi}) < @w }$ of
+  finite-rank counter clients is complete.
+  \vspace{-1eX}
+\end{lemma}
+
+Figure~\ref{fig:client:dist} illustrates a ranking calculation for clients of a
+stack specification. Note that we differentiate two $\mathrm{pop}$ operations,
+by writing $\mathrm{pop\_OK}$ for those that return some element, and
+$\mathrm{pop\_EMP}$ for those which return empty. Taking, for instance, the
+multiset $\tilde\pi = \mset{ \mathrm{push}^2, \mathrm{pop\_OK}^2 }$ of two push
+operations concurrent with two pop operations, $\tilde\pi$ matches
+the zero-distance valuation $\pi = \mset{ \mathrm{push}[d_1]^2,
+\mathrm{pop\_OK}[d_1]^2 }$, the distance-one valuation $\mset{
+\mathrm{push}[d_1], \mathrm{push}[d_2], \mathrm{pop\_OK}[d_1]^2 }$, and the
+distance-two valuation $\mset{ \mathrm{push}[d_1]^2, \mathrm{pop\_OK}[d_2]^2}$,
+for data values $d_1 \neq d_2 \in D$. Thus $R_S(P_{\tilde\pi}) =
+@D(\tilde\pi,S) + |\tilde\pi| - 2 = 1 + 4 - 2 = 3$. As we discuss in
+Section~\ref{sec:exp}, we find that violations to observational refinement
+surface in low-rank clients.
+
+% according to our ranking, the first three rounds ..
+% \begin{align*}
+%   \text{ round 1: } \quad
+%   & \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>], 
+%     \quad \mathrm{pop}[\ast,\<true>] \big\| \mathrm{pop}[\ast,\<false>] \\
+%   \text{ round 2: } \quad
+%   & \mathrm{pop}[\ast,\<true>]^2,
+%     \quad \mathrm{push}[\ast]^2 \big\| \mathrm{pop}[\ast,\<true>],
+%     \quad \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>]^2, \\
+%   & \mathrm{push}[\ast] \big\| \mathrm{pop}[\ast,\<true>] \big\| 
+%       \mathrm{pop}[\ast,\<false>],
+%     \quad \mathrm{pop}[\ast,\<true>] \big\| \mathrm{pop}[\ast,\<false>]^2 \\
+%   \text{ round 3: } \quad
+%   & \mathrm{pop}[\ast,\<true>]^2 \big\| \mathrm{pop}[\ast,\<false>],
+%   \quad \mathrm{push}[\ast]^3 \big\| \mathrm{pop}[\ast,\<true>], \ldots
+% \end{align*}
+
+\begin{figure*}[ht]
+  \centering
+  \scriptsize
+  \begin{tabular}{|l|p{4mm}p{6mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    & \multicolumn{6}{c|}{2 operations} \\
+    \hline
+    $\#\mathrm{push}$ 
+    & 2 & 1 & 1 & 0 & 0 & 0 \\
+    $\#\mathrm{pop\_OK}$ 
+    & 0 & 1 & 0 & 2 & 1 & 0 \\
+    $\#\mathrm{pop\_EMP}$
+    & 0 & 0 & 1 & 0 & 1 & 2 \\
+    \hline
+    % $\Delta$ (1 val) 
+    % & 0 & 0 & 0 & 2 & 1 & 0 \\
+    $\Delta(\cdot,S)$ % (abs) 
+    & 0 & 0,\underline{1} & 0 & 2 & 1 & 0 \\
+    $R(\cdot)$
+    & @w & 1 & @w & 2 & 1 & @w \\
+    \hline
+  \end{tabular}
+  \begin{tabular}{%
+    |p{4mm}p{6mm}p{4mm}p{6mm}p{6mm}p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    \multicolumn{10}{|c|}{3 operations} \\
+    \hline
+    3 & 2 & 2 & 1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 \\
+    0 & 0 & 1 & 0 & 1 & 2 & 0 & 1 & 2 & 3 \\
+    \hline
+    % 0 & 0 & 0 & 1 & 0 & 0 & 3 & 2 & 1 & 0 \\
+    0 & 0,\underline{1} & 0 & \underline{1},2 & 0,\underline{1} & 0 & 3 & 2 & 1 & 0 \\
+    @w & 2 & @w & 2 & 2 & @w & 4 & 3 & 2 & @w \\
+    \hline
+  \end{tabular}
+  \\[1mm]
+  \begin{tabular}{|l|p{4mm}p{6mm}p{4mm}p{8mm}p{6mm}p{4mm}p{6mm}p{6mm}p{6mm}%
+    p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}p{4mm}|}
+    \hline
+    & \multicolumn{15}{c|}{4 operations} \\
+    \hline
+    $\#\mathrm{push}$ 
+    & 4 & 3 & 3 & 2 & 2 & 2 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+    $\#\mathrm{pop\_OK}$ 
+    & 0 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $\#\mathrm{pop\_EMP}$
+    & 0 & 0 & 1 & 0 & 1 & 2 & 0 & 1 & 2 & 3 & 0 & 1 & 2 & 3 & 4 \\
+    \hline
+    % $\Delta$ (1 val) 
+    % & 0 & 0 & 0 & 0 & 0 & 0 & 2 & 1 & 0 & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $\Delta(\cdot,S)$ % (abs) 
+    & 0 & 0,\underline{1} & 0 & 0,\underline{1},2 & 0,\underline{1} & 0 & \underline{2},3 & \underline{1},2 & 0,\underline{1} & 0 & 4 & 3 & 2 & 1 & 0 \\
+    $R(\cdot)$
+    & @w & 3 & @w & 3 & 3 & @w & 4 & 3 & 3 & @w & 6 & 5 & 4 & 3 & @w \\
+    \hline
+  \end{tabular}
+  \caption{The calculation of the ranking function for
+    a typical stack specification. % in zero-barrier executions.  
+    All distances for 
+    matching images are listed, with the minimal non-zero distance underlined.}
+  \label{fig:client:dist}
+  \vspace{-3eX}
+\end{figure*}

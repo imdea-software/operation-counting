@@ -1,0 +1,154 @@
+\documentclass[preprint,nocopyrightspace]{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\usepackage{enumerate}
+
+%% Macros theorems
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
+%\newtheorem{proofs}{Proof Sketch}
+\newtheorem{remark}{Remark}[section]
+
+%% Hyperlinked references
+\usepackage{hyperref,shuffle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[numbers]{natbib}
+% \usepackage{etoolbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{colonequals}
+\usepackage{alltt}
+\usepackage{pgf}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning,shapes,shadows}
+\usetikzlibrary{decorations}
+
+\input macros-mje
+\input macros-programs
+
+\conferenceinfo{PLDI'14}{June 9--11, 2014, Edinburgh, UK} 
+\copyrightyear{2014} 
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm} 
+\doi{nnnnnnn.nnnnnnn}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+\titlebanner{banner above paper title}        % These are ignored unless
+\preprintfooter{\today}   % 'preprint' option specified.
+
+
+\title{Verification of Observational Refinement by Counting}
+%\subtitle{Draft, \today}
+
+\authorinfo{}{}{}
+%{Name1}
+%           {Affiliation1}
+%           {Email1}
+%\authorinfo{Name2\and Name3}
+%           {Affiliation2/3}
+%           {Email2/3}
+
+\begin{document}
+  \input macros-local
+  \maketitle 
+  
+%  \begin{abstract}
+%
+%\emph{Observational refinement} between software library implementations is
+%key to modular reasoning: knowing that any program behavior using
+%some sophisticated library implementation $L$ is also possible using a
+%simplistic implementation $S$, allows replacing $S$ for $L$, thus
+%simplifying reasoning about any module using $L$. 
+%
+%Automating the verification of observational refinement between a \emph{concurrent} implementation~$L$ and
+%its (sequential, usually) specification~$S$ is a quite challenging problem.
+%The principal approach for tackling this problem is based on verifying the alternate, yet equivalent, criterion of linearizability. It consists in showing that for every partially ordered set of operations corresponding to an execution of a library $L$, there is a linearization that is executable by its specification $S$. Most existing automated approaches for verifying linearizability either require manual effort in fixing the \emph{linearization point} of each operation, or suffer from exponential explosion in considering all possible linearizations.
+%
+%In this work, we develop a fundamentally different approach to automated refinement checking based on \emph{operation counting}. Our aim is to face the intrinsic complexity of checking observational refinement by using an approach that ultimately allows to use symbolic techniques for reasoning about partial orders. For that, we use counters to track the number of library operations executed between shared-memory writes by the client programs, and we define a notion of operation counter refinement based on entailment of reachable counts. We demonstrate that this notion of refinement is not only equivalent to observational refinement, but leads to effective means for automatic checking. We develop an approach for finding violation of observational refinement based on bounding the number of shared-memory writes, in the spirit of context-bounded analysis. For a given bound, we show that observational refinement can be checked precisely as a state reachability problem on a suitably instrumented concurrent program. This program can then be analyzed using adequate sequentialization and symbolic techniques.
+%
+%\end{abstract}
+  
+%  \begin{abstract}
+%    
+%    \emph{Observational refinement} between software library implementations is
+%    key to modular reasoning: knowing that any program behavior using
+%    some sophisticated library implementation $L$ is also possible using a
+%    simplistic implementation $S$, allows replacing $S$ for $L$, thus
+%    simplifying reasoning about any module using $L$. High-performance data
+%    structure implementations and their abstract specifications are canonical
+%    examples where such refinement is beneficial.
+%
+%    While automating refinement checking between deterministic
+%    \emph{sequential} implementations is relatively straightforward, by
+%    ensuring each sequence of operations executed by $L$ is also executable by
+%    $S$, checking refinement between a \emph{concurrent} implementation~$L$ and
+%    its (sequential, usually) specification~$S$ presents a severe complication:
+%    to which linear order $\sigma$ should concurrently-executed operations of
+%    $L$ be resolved, in order to check whether $\sigma$ is also executable by
+%    $S$? Existing automated approaches either require manual effort in fixing
+%    the \emph{linearization point} of each operation, thus uniquely determining
+%    $\sigma$, or suffer from exponential explosion in considering all possible
+%    linearizations $\sigma$.
+%
+%    In this work we develop a fundamentally different approach to automated
+%    refinement checking, called \emph{operation counting}. Rather than
+%    reasoning over \emph{sequences} of executed operations, we reason over
+%    \emph{counts} of executed and executing library operations; we say
+%    implementation~$L$ refines $S$ when any valuation to the counters which is
+%    reachable with $L$ is also reachable with $S$. We demonstrate that this
+%    notion of refinement is not only equivalent to observational refinement,
+%    but leads to effective means for automatic checking.
+%    
+%  \end{abstract}
+
+%  \input intro
+% % \input overview
+%  \input notations
+%  \input method_counting
+%  \input reduction
+%  \input violation
+%%  \input definitions
+%%  \input sc2
+%%  \input barriers
+% % \input decidability
+%  
+%%   \input experimentations
+%%  \input encoding-linearizability
+%
+%  \input ranking
+%  \input experience
+%  \input discussion
+  
+\input sketch  
+  
+  \bibliographystyle{abbrvnat}
+  \bibliography{violin}
+  
+
+\end{document}

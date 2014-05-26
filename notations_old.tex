@@ -1,0 +1,257 @@
+%!TEX root = draft.tex
+\section{Preliminaries}
+\label{sec:prelim}
+
+In this section, we define the formal setting in which we prove our results. % (basically, we follow the notations introduced in \citep{FilipovicORY10}.}
+A library is abstractly defined as a set of histories, which are sequences of call and return actions.
+%Then, we define an abstract programming language  
+We consider a very restricted set of programs for the library clients without most of the constructs that we can find in real programming languages, e.g., conditionals or loops.  Our intention is to consider the simplest possible setting for our results -- yet without losing any generality (see Section~\ref{sec:obs_ref}).
+%and that this simple setting is indeed without loss of generality.
+%The programming language is defined by an unspecified set of primitive commands, commands for method calls, the sequential and the parallel composition. 
+%For the verification problems we consider in this paper, it is not necessary to consider other constructs such as non-deterministic choice or loops .
+
+\subsection{Libraries} 
+
+A \emph{library action} is a 
+\emph {call action} $\callAct{\tid}{\meth}{\cval}$
+or a \emph{return action} $\retAct{\tid}{\meth}{\rval}$,
+%\[ 
+%  \libAct \coloncolonequals %(\tid,\act)\ |\
+%  \callAct{\tid}{\meth}{\cval}\ |\
+%  \retAct{\tid}{\meth}{\rval},
+%\]
+where $\tid$ is a thread id (\ie a natural number), $\meth$ is a method name, $\cval$ is the parameter value,
+and $\rval$ is the return value. For simplicity, we suppose that all methods have exactly one input parameter and one output parameter
+and also, that the parameters and the return values are natural numbers. %belong to some data domain $\<Dom>$.
+%A \emph{trace} is a sequence of client actions.
+%An \emph{object action} $\objAct$ can be a call action or a return action.
+
+A \emph{sequential history} is a sequence of library actions such that every call action $\callAct{\tid}{\meth}{\cval}$ is immediately followed by a matching return action 
+$\retAct{\tid}{\meth}{\rval}$ %, for some $\rval$, 
+except possibly for the last one.
+
+A \emph{history} is a sequence of library actions $\hist$ such that %every return matches a previous call action and 
+for every thread $t$, the projection of $\hist$ to the actions of the thread $t$ is a sequential history.
+% \ie every $\retAct{\tid}{\lib}{\meth}{\rval}$ is
+%preceded by an action 
+
+A history $\hist'$ is called a \emph{quiescent permutation} of a history $\hist$ if it is obtained from $\hist$ by shifting a call action to left or by shifting a return action to the right (without crossing actions of the same thread).
+Formally, $\hist'$ is a quiescent permutation of $\hist$ if 
+\begin{itemize}
+	\item %if $\hist$ is a history in $L$, then any history $\hist'$ obtained from $\hist$ by moving one call action to the left belongs also to $L$. Formally, if 
+	$\hist=\hist_1\cdot \hist_2\cdot \callAct{\tid}{\meth}{\cval}\cdot \hist_3$, where $\hist_2$ doesn't contain actions of thread $\tid$, and $\hist'=\hist_1\cdot \callAct{\tid}{\meth}{\cval}\cdot \hist_2\cdot  \hist_3$ ($\cdot$ denotes the concatenation of sequences), or
+	\item %if $\hist$ is a history in $L$, then any history $\hist'$ obtained from $\hist$ by moving one return action to the right belongs also to $L$. Formally, if 
+	$\hist=\hist_1\cdot \retAct{\tid}{\meth}{\rval}\cdot\hist_2\cdot \hist_3$, where $\hist_2$ doesn't contain actions of thread $\tid$, and $\hist'=\hist_1\cdot \hist_2\cdot \retAct{\tid}{\meth}{\rval}\cdot \hist_3$.
+\end{itemize}
+A set of histories $\lib$ is called \emph{quiescent permutation closed} iff for every history $\hist\in \lib$, $\lib$ contains all the quiescent permutations of $\hist$.
+
+For example, consider the following history ($\_$ is a special value denoting the fact that the method has no input or return value):
+{\small
+\[
+\hist=\callAct{\tid_1}{push}{1}\cdot \callAct{\tid_2}{pop}{\_}\cdot \retAct{\tid_2}{pop}{1}\cdot \retAct{\tid_1}{push}{\_}.
+\]}
+Then, the following two histories are quiescent permutations of $\hist$:
+{\small
+\[
+\begin{array}{l}
+\hist_1=\callAct{\tid_2}{pop}{\_}\cdot \callAct{\tid_1}{push}{1}\cdot \retAct{\tid_2}{pop}{1}\cdot \retAct{\tid_1}{push}{\_},\\[.5mm]
+\hist_2=\callAct{\tid_1}{push}{1}\cdot \callAct{\tid_2}{pop}{\_}\cdot \retAct{\tid_1}{push}{\_} \cdot \retAct{\tid_2}{pop}{1}.
+\end{array}
+\]}
+
+We will define a library as a set of histories, which is quiescent permutation closed. We use the two examples above to motivate this fact.
+First, the history $\hist_1$ is obtained by shifting $\callAct{\tid_2}{pop}{\_}$ to the left. A library %n implementation of a concurrent stack (with $push$ and $pop$ methods) 
+which allows $\hist$ should also allow $\hist_1$. If there exists a concrete execution of these two methods, where the $push$ method is invoked before $pop$, then there also exists an execution where $pop$ is invoked before $push$ (with the same parameter and return values). In the latter execution, the method $pop$ is invoked first but executes its first action at the same moment as in the former execution.
+%the implementations of its methods can not constrain the order in which the call actions are issued by the clients of the library.
+Second, the history $\hist_2$ is obtained by shifting $\retAct{\tid_2}{pop}{\cval}$ to the right. If we assume w.l.o.g. that all the return statements in a library are of the form {\tt return} $x$, where $x$ is a method-local variable, then a library which allows $\hist$ should also allow $\hist_2$. This is because the value of the method-local variable $x$ is not affected by concurrently executing methods.
+
+\begin{definition}[Library]
+A \emph{library} $\lib$ is a set of histories, which is prefix closed and quiescent permutation closed.
+\end{definition}
+
+%\todo{See if the condition that call actions can be moved to the left is still required}
+
+The set of all method names appearing in $L$ is denoted by $\meths{L}$.
+
+An $\oper{\meth}{\cval}{\rval}$-operation (or more simply, operation) of a history $\hist$ is a pair of two actions $\callAct{\tid}{\meth}{\cval}$ and $\retAct{\tid}{\meth}{\rval}$, which are successive in the projection of $\hist$ over the actions of thread $\tid$. An $\oper{\meth}{\cval}{*}$-operation of a history $\hist$ is a call action $\callAct{\tid}{\meth}{\cval}$, which is not followed by a matching return. An $\oper{\meth}{\cval}{\rval}$-operation is called a \emph{completed} operation while an $\oper{\meth}{\cval}{*}$-operation is called \emph{pending}.
+
+Many of the results in this paper are given for a class of libraries, which are called \emph{thread-independent}. Intuitively, these are libraries whose behaviors don't depend on the thread ids. Formally, 
+
+\begin{definition}[Thread-independent library]
+A library $L$ is \emph{thread-independent} iff for every history $h$ in $\sem{L}$, $\sem{L}$ contains all the histories $h'$ obtained 
+from $h$ by replacing the thread id $\tid$ of an operation with some arbitrary value $\tid'$.
+% pair of matching call and return actions $\callAct{\tid}{\meth}{\cval}$ and $\retAct{\tid}{\meth}{\rval}$ (resp., an unmatched call action $\callAct{\tid}{\meth}{\cval}$) with some arbitrary value $\tid'$.
+%every thread id $t$ with $\alpha(t)$ belongs also to $\sem{L}$.
+\end{definition}
+%A library $L$ is \emph{data-independent} iff for any history $h$ in $\sem{L}$ and any injective function $\beta:\<Dom>->\<Dom>$, the history obtained from $h$ by replacing every actual parameter or return value $d$ with $\beta(d)$ belongs also to $\sem{L}$.
+
+\subsection{Clients}
+
+We use the following syntax for sequential commands 
+$\commands$ and programs $\programs$:
+\begin{align*}
+\commands \coloncolonequals\ & c\ |\
+%x := E\ |\ 
+y \colonequals \callCom{\meth}{x}\ |\ 
+%\assume B \ |\
+%\assert B \ |\ 
+%\yield \ |\
+%\\
+%&
+\commands; \commands\ %|\
+%\commands + \commands\ |\ 
+%\commands^*\
+\\
+\programs \coloncolonequals & \commands \| \dots \| \commands
+%\spawn \commands \ |\ \programs;\programs\ |\ \programs+\programs\ |\  \programs^* %\commands \| \dots \| \commands
+\end{align*}
+where $c$ ranges over an unspecified set $\pcommands$ of primitive commands and $x$, $y$ are variables interpreted as natural numbers.
+We assume that $\pcommands$ includes (atomic sequences) of assignments of the form $x:=E$, where $E$ is an arithmetic expression, 
+and an $\assume\ B$ statement, which only advances when the boolean expression $B$ evaluates to true. %and an $\assert\ B$ statement, which results in an error when $B$ is not true. 
+%Also, in order to simplify the presentation, we assume that there exists a primitive command $\yield$, which allows the current thread to give up control to the thread scheduler. 
+%Therefore, a sequential command with no $\yield$ is executed atomically.
+%the sequential commands interleavings 
+
+Given a program $P=\commands_1 \| \dots \| \commands_k$, a variable in $P$ is called \emph{shared} if it appears in at least two sequential commands $C_i$ and $C_j$ with $i\neq j$ and \emph{local} otherwise.
+
+%$E$ ranges over an unspecified set $\expr$ of expressions interpreted over an infinite data domain $\<Dom>$, which contains the nullary non-deterministic choice operator $\star$.
+
+A \emph{client action} is a pair $(t,a)$, where $a$ is an atomic client operation taken from an unspecified set $\clientop$. An \emph{action} is a client action or a library action.
+% action is a client action $(t,a)$, where $a$ is an internal action, % belonging to some unspecified set  that assigns the value $n\in\<Dom>$ to the variable $x$, 
+%or a library action.
+A \emph{trace} is a sequence of actions such that 
+for every thread $t$, the projection over the library actions of the thread $t$ is sequential.
+The history $\getHist{\trace}$ of a trace $\trace$ is the projection of $\trace$ on library actions.
+The notion of operation is extended to traces straightforwardly. 
+
+We assume that every primitive command $c$ is interpreted as a set of atomic client actions, denoted by $\sem{c}$. 
+Given a program $\prog$, its set of traces, denoted by $\toTraceFinal{\prog}$, is defined in Figure~\ref{fig:traces}.
+For simplicity, we assume that a program state is a valuation for its variables; the set of all program states is denoted by $\States$.
+The set of states reachable by trace $\trace$ from state $\state$, denoted by $\eval{\trace}{\state}$, is defined in Figure~\ref{fig:eval}. 
+Note that the effect of a command $y \colonequals \callCom{\meth}{x}$ over the client's state is encoded in the assignment $y:=\rval$
+from the trace corresponding to this command. Therefore, the library actions themselves don't affect the client's state.
+%Since a state represents a valuation for the client's variables, it is not affected by call and return actions.
+
+\begin{figure}[t]
+\begin{align*}
+\toTrace{c}{\tid}&= \{(\tid,a)\mid a\in\sem{c}\}\\ %(\tid,a_1)\cdot\ldots\cdot (\tid,a_k)\mid a_1\cdot\ldots\cdot a_k\in\sem{c}
+\toTrace{y\colonequals \callCom{\meth}{x}}{\tid}&
+= \{ \trace_1\cdot\callAct{\tid}{\meth}{\cval}\cdot
+\retAct{\tid}{\meth}{\rval}\cdot \trace_2\ |\
+\cval,\rval \in \<Nats>, \\
+& \hspace{5mm}\trace_1 \in \toTrace{\assume\ x=n}{\tid}, \trace_2 \in \toTrace{y:=m}{\tid} \}\\
+\toTrace{\commands_1;\commands_2}{\tid}& = 
+  \set{\trace_1\cdot\trace_2\ |\ \trace_i \in \toTrace{\commands_i}{\tid},\mbox{ for all $1\leq i\leq 2$}}\\
+%\semantic{\tid,\commands_1 + \commands_2}& = 
+%  \semantic{\tid,\commands_1} \cup \semantic{\tid,\commands_2}\\
+%\semantic{\tid,\commands^*}& = \semantic{\tid,\commands}^*\\
+\toTraceFinal{\commands_1\|\dots\|\commands_n}& =
+  \{\trace|\ \trace\mbox{ is a prefix of }\trace_1\shuffle \dots\shuffle\trace_n\\
+  &\hspace{5mm}\mbox{with }  \trace_i \in \toTrace{\commands_i}{i}, 
+\mbox{for all $1\leq i\leq n$}\}
+% T (C1+C2 )t = T (C1 )t ∪ T (C2)t
+% T (C )t = (T (C)t)
+% T (C1 · · · Cn) =
+%  { interleave(τ1, ..., τn) | τi ∈ T (Ci )i ∧ 1 ≤ i ≤ n }
+\end{align*}
+\caption{The set of traces of a program ($\shuffle$ denotes the shuffling operator over sequences).}
+\label{fig:traces}
+\end{figure}
+%
+\begin{figure}[h]
+\begin{align*}
+%\evalSymb &: \States \times \wfTraces \rightarrow \mathcal{P}(\States)\\
+\eval{\trace\cdot \callAct{\tid}{\meth}{\cval}}{\state} &= 
+  \eval{\trace}{\state}\\
+\eval{\trace\cdot \retAct{\tid}{\meth}{\rval}}{\state} &= 
+  \eval{\trace}{\state}\\
+\eval{\trace\cdot (\tid,\act)}{\state} &=
+	\set{\state''\ |\  (\state',\state'') \in \sem{\act}\mbox{ and }\state' \in \eval{\trace}{\state}}\\
+\eval{\epsilon}{\state} &= \set{\state}
+% evaleval(s, τ ; (t, call o.f (n)))eval(s, τ ; (t, ret(n) o.f ))eval(s, τ ; (t, a))eval(s, ):===
+% =States × WTraces → P(States)
+% eval(s, τ )
+% eval(s, τ )
+% s ∈eval(s,τ ) {s | (s , s ) ∈ [[a]]}
+% {s}
+\end{align*}
+\caption{Trace evaluation. We assume that every atomic client action is interpreted as a binary relation over states, denoted by $\sem{a}$.}
+\label{fig:eval}
+\end{figure}
+
+
+We define \emph{the set of traces} in the composition of a program $\prog$ with a library $\lib$, denoted by $\traces{\programs}{\lib}$, as follows:
+\[
+%\comp{\programs}{\lib} &: \States \rightarrow 2^{\States}\\
+\traces{\prog}{\lib} =
+\set{\trace\ |\ \trace \in \sem{\prog} \mbox{ and }
+  \getHist{\trace} \in \lib}.
+\]
+Also, \emph{the set of reachable states} in the composition of $\prog$ with $\lib$ starting from state $\state_0$, denoted by $\reach{\programs}{\lib}{\state_0}$ is defined by:
+\[
+%\comp{\programs}{\lib} &: \States \rightarrow 2^{\States}\\
+\reach{\prog}{\lib}{\state_0} =
+\set{\eval{\trace}{\state_0}\ |\ \trace \in \traces{\prog}{\lib}}.
+\]
+
+A trace $\trace$ is called \emph{executable} iff there exists some initial state $\state_0$ such that $\eval{\trace}{\state_0}$ is non-empty. The set of executable traces in the composition of a program $\prog$ with a library $\lib$ is denoted by $\tracesExec{\programs}{\lib}$, \ie
+\[
+%\comp{\programs}{\lib} &: \States \rightarrow 2^{\States}\\
+\tracesExec{\prog}{\lib} =
+\set{\trace\ |\ \trace \in \traces{\prog}{\lib} \mbox{ and }
+  \exists \state_0\in\States.\ \eval{\trace}{\state_0}\neq\emptyset}.
+\]
+
+Two actions $\alpha$ and $\alpha'$ are \emph{independent} iff they contain different thread-ids and $\eval{\alpha\cdot\alpha'}{\state}=\eval{\alpha'\cdot\alpha}{\state}$ for all states $\state$. Otherwise, they are \emph{dependent}.
+
+Two traces $\trace$ and $\trace'$ are \emph{equivalent}, denoted by $\trace\equiv\trace'$, iff $\trace'$ is a permutation of $\trace$ that preserves the order between \emph{dependent} actions.
+Formally, $\trace\equiv\trace'$ iff there exists a bijection $\bijection:\{1,\ldots,|\trace|\}->\{1,\ldots,|\trace'|\}$ such that, for every $i$, the action on position $i$ in $\trace$ is the same as the action on position $\bijection(i)$ in $\trace'$ and for every two dependent actions of $\trace$ occurring on the positions $i$ and $j$, with $i<j$, we have that $\pi(i)<\pi(j)$.
+
+
+%For any variable $x$, the set of atomic client operations that modify the value of $x$ is denoted by $\Writes{x}$.
+Let $\prog$ be a program.
+A client action $(t,a)$ is called a \emph{{\shwrite} for $\prog$} if $a$ modifies the value of some shared variable of $\prog$ and 
+%belongs to $\Writes{x}$, for some shared variable $x$ of $P$.
+a primitive command $c$ of $\prog$ is called a \emph{\shwrite} if its interpretation $\sem{c}$ contains a {\shwrite} for $\prog$. % client action.
+
+
+%Given a trace $\trace$, a \emph{phase} of $\trace$ is a continuous maximal subsequence $\phase$ of $\trace$ delimited by two consecutive {\shwrites}, \ie $\trace=\trace_0 \cdot\phase\cdot\trace_1$, where $\trace_0$ ends in a {\shwrite}, $\trace_1$ starts with a {\shwrite}, and $\phase$ doesn't contain any {\shwrite}.
+
+
+ 
+
+%The projections of the states in $\reach{\prog}{\lib}{\state_0}$ over the set of variables $X$ is denoted by $\projReach{\prog}{\lib}{\state_0}{X}$.
+
+\subsection{Observational refinement}\label{sec:obs_ref}
+
+\begin{definition}[\bf Observational refinement]
+Let $\lib$ and $\spec$ be two libraries, and $\pclass$ a class of programs. We say that \emph{$\lib$ observationally refines $\spec$ w.r.t $\pclass$} iff
+\[
+\forall \prog\in\pclass,\ \state_0\in\States.\ \reach{\prog}{\lib}{\state_0}\subseteq \reach{\prog}{\spec}{\state_0}.
+%this definition is equivalent to the one in \citet{FilipovicORY10}.}
+\]
+
+When $\pclass$ contains all programs, we simply say that $\lib$ observationally refines $\spec$.
+\end{definition}
+
+There are definitions of observational refinement, \eg the one in \citet{journals/tcs/FilipovicORY10}, where a program may contain non-deterministic choices (conditionals) and loops. 
+However, because of the universal quantification over all the programs, the effect of these constructs is already captured.
+%it is not necessary to consider programs with such constructions. %sufficient to consider only programs 
+For instance, if we consider a program $\prog_1+\prog_2$, which represents the non-deterministic choice between two programs 
+$\prog_1$ and $\prog_2$ in our syntax, 
+then
+\[
+\forall\state_0\in\States.\ \reach{\prog_1+\prog_2}{\lib}{\state_0}\subseteq \reach{\prog_1+\prog_2}{\spec}{\state_0}
+\]
+is implied by 
+\[
+\forall \state_0\in\States.\ \reach{\prog_i}{\lib}{\state_0}\subseteq \reach{\prog_i}{\spec}{\state_0},\mbox{ for all $i\in\{1,2\}$}
+\]
+(as usual $\reach{\prog_1+\prog_2}{\lib}{\state_0}=\reach{\prog_1}{\lib}{\state_0}\cup \reach{\prog_2}{\lib}{\state_0}$).
+%which are parallel compositions of a fixed number of sequential commands, each sequential command being a sequential composition of boundedly-many primitive commands.
+%with sequential compositions of boundedly-many primitive commands and parallel compositions of boundedly-many sequential commands.
+
+%\begin{remark}
+%If $\lib$ observationally refines $\spec$, then $\meths{\lib}\subseteq \meths{\spec}$. To simplify the presentation, we will also assume that we 
+%\end{remark}
+

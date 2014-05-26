@@ -1,0 +1,21 @@
+\section{Discussion}
+\label{sec:discussion}
+
+In this work we have proposed an alternate path to automating the verification
+of observational refinement which explicitly avoids the drawbacks of
+linearization: either considering exponentially-many linearizations of each
+execution history, or fixing linearization points manually. The key sacrifice
+needed to enable operation counting is bounding the number of shared-memory
+writes performed by the considered client programs. Besides enabling operation
+counting in place of linearization, this bounding criterion is similar in
+spirit to other more-well established criteria such as context bounding~\citep{
+conf/tacas/QadeerR05}, which have proved quite useful as a means of
+prioritizing the search for violations to program correctness~\citep{
+conf/pldi/MusuvathiQ07}. In essence, this class of criteria work on the
+hypothesis that most observable program behaviors surface even with little
+interaction between concurrent threads; limiting shared-memory writes in
+library clients is one manifestation of limiting thread interaction, which, at
+least according to our initial experimental work, seems to conform to this
+hypothesis. Showing that there are no/few bugs which need many client
+shared-memory writes to express would require an extremely extensive
+experimental study, which we believe is beyond the scope of this paper.

@@ -1,0 +1,182 @@
+%!TEX root = draft.tex
+\section{Preliminaries}
+
+\subsection{LTS}
+
+An LTS is $A = (Q,\Sigma,q_0,\delta)$, where $\delta \subseteq Q \times \Sigma \times Q$
+
+$Lang(A)$ = the set of words labelling runs from $q_0$
+
+Given two LTSs $A_1$ and $A_2$, the product $A_1 \times A_2$ is defined as usual; $Lang(A_1\times A_2) = Lang(A_1) \cap Lang(A_22)$
+
+\subsection{Actions}
+
+Let $\mathbb{M}$ be a set of method names. 
+A \emph{library action} is a 
+\emph {call action} $\callAct{\tid}{\meth}{\cval}$
+or a \emph{return action} $\retAct{\tid}{\meth}{\rval}$,
+where $\tid$ is a thread id (\ie a natural number), $\meth$ is a method name in $\mathbb{M}$, $\cval$ is the parameter value,
+and $\rval$ is the return value. 
+
+Let $\Sigma_c$ the set of call actions and $\Sigma_r$ the set of return actions. 
+
+Let $\Sigma_i$ be a set of client internal actions of the form $(\tid,a)$.
+
+\subsection{Library}
+
+A program is an LTS $L$ over an alphabet $\Sigma=\Sigma_c\cup \Sigma_r$ s.t.
+\begin{itemize}
+	\item for every word $w \in Lang(L)$, each return has a unique matching call
+	\item libraries cannot disable calls
+	\begin{itemize}
+		\item $w.w'\in Lang(L)\Rightarrow w.c.w'\in Lang(L)$ if the thread $th(c)$ has not an unfinished call in $w$
+    	\end{itemize}	
+	\item calls cannot disable actions 
+	\begin{itemize}
+		\item $w.a.c.w' \in Lang(L) \Rightarrow w.c.a.w'\in Lang(L)$ if $th(a) \neq th(c)$
+    	\end{itemize}
+	\item returns cannot enable actions 
+	\begin{itemize}
+		\item $w.r.a.w'\in Lang(L)\Rightarrow w.a.r.w'\in Lang(L)$ if $th(a) \neq th(r)$
+	\end{itemize}
+\end{itemize}
+
+\subsection{Program}
+
+
+
+A program is an LTS $P$ over an alphabet $\Sigma=\Sigma_c\cup \Sigma_r\cup \Sigma_i$, describing executions, s.t.
+\begin{itemize}
+	\item for every execution $w \in Lang(P)$, each return has a unique matching call
+	\item calls cannot enable or disable actions %(returns can enable actions because they can set some variable)
+	\begin{itemize}
+		\item $w.c.a.w'\in Lang(P)\Rightarrow w.a.c.w'\in Lang(P)$ if $th(a) \neq th(c)$
+		\item $w.a.c.w' \in Lang(P) \Rightarrow w.c.a.w'\in Lang(P)$ if $th(a) \neq th(c)$
+    	\end{itemize}
+	\item returns cannot enable or disable actions 
+	\begin{itemize}
+		\item $w.r.a.w'\in Lang(P)\Rightarrow w.a.r.w'\in Lang(P)$ if $th(a) \neq th(r)$
+		\item $w.a.r.w'\in Lang(P) \Rightarrow w.r.a.w' \in Lang(P)$ if $th(a) \neq th(r)$
+	\end{itemize}
+\end{itemize}
+
+\subsection{Compositions of programs and libraries}
+
+Given a library $L$ and a program $P$, the composition of $P$ with $L$ is the LTS $P\times L$.
+
+\subsection{Observational refinement}
+
+Given two libraries $L_1$ and $L_2$, $L_1\leq L_2$ iff
+\begin{itemize}
+	\item for all $P$, 
+	\[
+	ReachStates_1(P\times L_1) \subseteq ReachStates_1(P\times L_2),
+	\] 
+	where $ReachStates_1$ is the projection on the first component of the states reached in the product $P\times L$.
+\end{itemize}
+
+\subsection{Histories - as partial orders}
+
+An operation synopsis is a triple in $\mathbb{M}\times\<Nats>\times\<Nats>$. Let $\Gamma$ be the set of synopsis. 
+
+Given a \emph{well-formed} sequence $w\in (\Sigma_c\cup\Sigma_r\cup\Sigma_i)^*$, we define the history of $w$, denoted $Hist(w)$ as a labeled partial order $(Op,\ell,<)$, where
+\begin{itemize}
+	\item $Op$ is the set of operations in $w$ (pair of matching call and return, or a single call if there exists no matching return)
+	\item $\ell:Op\rightarrow \Gamma$ gives for each operation, its synopsis. 
+	\item $<$ is the order relation between the time spans of the operations
+\end{itemize}
+
+\begin{lemma}
+For any $w$, $Hist(w)$ is an interval order, i.e., for any $a,b,c,d$, if $a<b$ and $c<d$ then $a<d$ or $c<b$.
+\end{lemma}
+
+For a library $L$, $Hist(L)=\{Hist(w)\mid w\in Lang(L)\}$.
+
+We define the order relation $\preceq$ on histories by $h=(Op,\ell,<)\preceq h'=(Op',\ell',<')$ iff:
+\begin{itemize}
+	\item there exists a bijection $\gamma:Op\rightarrow Op'$ % (up to thread renaming)
+	\item for every operation $o$, $\ell(o)=\ell'(\gamma(o))$ %if $c(o)=false$ then $c'(o)=false$ (i think it works also with equality $c(o)=c'(o)$).
+	\item $\gamma(<)\subseteq <'$
+\end{itemize}
+
+\begin{lemma}
+Given a library $L$, $Hist(L)$ is downward closed w.r.t. $\preceq$.
+\end{lemma}
+\begin{proof}
+From the closure properties on $Lang(L)$.
+\end{proof}
+
+We say that two histories $h$ and $h'$ are equivalent, denoted by $h\equiv h'$ iff $h\preceq h'$ and $h'\preceq h$.
+
+\section{Observational refinement is equivalent to history inclusion}
+
+\begin{theorem}
+For all libraries $L_1$ and $L_2$, 
+$L_1 \leq L_2$ iff $Hist(L_1) \subseteq Hist(L_2)$.
+\end{theorem}
+\begin{proof}
+($\Rightarrow$) Let $h\in Hist(L_1)$. As in Filipovic et al., construct a program $P_h$ (this LTS can be described as a program with shared variables) where we use shared variables to enforce the order constraints in $h$. Because $ReachStates_1(P_h\times L_1) \subseteq ReachStates_1(P_h\times L_2)$, there exists an execution $e$ of $P_h\times L_2$ s.t. $hist(w)=h'$ and $h\preceq h'$. By the closure property on $L_2$, if $h'\in Hist(L_2)$ then $h\in Hist(L_2)$. 
+
+($\Leftarrow$) Let $P$ be a program and let $e$ be an execution in $P\times L_1$. By hypothesis, $h=Hist(e)\in Hist(L_2)$. Let $w'\in L_2$ s.t. $Hist(w')=h$. Note that the projection of $e$ on library actions may be different than $w'$. We must show that by the closure properties on $P$, $Lang(P)$ contains the interleaving of $w'$ and the projection of $e$ on client actions.
+\end{proof}
+
+\section{Counter-based representations for interval orders}
+
+Let $(A,<)$ be an interval order.
+Given $a\in A$, let 
+\[
+pre^*(a)=\{b < a\mid b\in A\}\mbox{ and }post^*(a)=\{a < b\mid b\in A\}.
+\]
+
+\begin{lemma}[\cite{Rabinovitch197850}]
+Let $(A,<)$ be an interval order. Then, the possible values of $pre^*(a)$ are linearly ordered by set inclusion. Similarly, for the possible values of $post^*(a)$.
+\end{lemma}
+
+Let $\sim$ be an equivalence relation over $A$ defined by $a\sim b$ iff $pre^*(a)=pre^*(b)$ and $post^*(a)=post^*(b)$.
+
+The quotient of $(A,<)$ w.r.t. $\sim$ is denoted by $(A/_\sim,<_\sim)$.
+
+Two labeled interval orders are $\sim$-equivalent if there exists an isomorphism between their quotients s.t. two equivalence classes are related by the isomorphism if they contain the same multiset of synopses. 
+
+We represent an equivalence class w.r.t. the $\sim$-equivalence (i.e., a set of labeled interval orders) by integer maps $\iota:\<Nats>\times \<Nats>\times \Gamma\rightarrow \<Nats>$. First, given a labeled interval order $(A,\ell,<)$, we define a notation for equivalence classes of $\sim$ as follows:
+\begin{itemize}
+	\item let $pre^*(a_0)\subseteq pre^*(a_1)\subseteq \ldots\subseteq pre^*(a_n)$ be the set of different values of $pre^*(a)$. For any $a\in A$, let $low(a)=i$ s.t. $pre^*(a)=pre^*(a_i)$.
+	\item let $post^*(b_1)\supseteq post^*(b_1)\supseteq \ldots\supseteq post^*(b_n)$ be the set of different values of $post^*(b)$. For any $a\in A$, let $high(a)=j$ s.t. $post^*(a)=post^*(a_j)$.
+	\item the equivalence class $[a]$ is denoted by $[low(a),high(a)]$.
+\end{itemize}
+
+Given $h=(A,\ell,<)$, the integer map associated to $h$, $\Pi(h)$ is defined by: $\Pi(h)(low(a),high(a))(s)=$ the number of operations in $[a]$ having the synopsis $s$.
+
+\begin{lemma}
+For any two $\sim$-equivalent labeled interval orders $h$ and $h'$, $\Pi(h)=\Pi(h')$.
+\end{lemma}
+
+\section{Checking history inclusion using counting}
+
+Given a library $L$, $\Pi(L)=\{\Pi(h)\mid h\in Hist(L)\}$.
+
+\begin{lemma}
+Given $L$ and $L'$ which are thread-independent, $Hist(L)\subseteq Hist(L')$ iff
+\[
+\Pi(L) \subseteq \Pi(L')
+\]
+\end{lemma}
+ 
+\section{Reducing history inclusion to a state inclusion problem}
+
+Define the monitor that counts.
+ 
+\section{Bounding}
+
+Bounding the set of input/output values and the size of the $\sim$-quotients ... Bounding the number of elements of the $\sim$-quotient corresponds to bounding the number of barriers.
+
+%Bounding
+%--------
+%1. idea: bound "k" on Values & size of history quotients (or separately)
+%2. this bounds the G and dom(\pi) in representations (G,\pi) of (f,<)
+%3. decidability of H[k](L) \subseteq H[k](S) via \Pi[k](L) \subseteq \Pi[k](S),
+%   when L and S use only finite domain variables
+%4. better to compute invariant \varphi of \Pi[k](S), and \Pi[k](L) |= G \varphi
+%5. better yet to fix complete enumeration G1, G2, .. of bounded barrier graphs
+%   -- now \varphi is in Presburger arithmetic
+%6. then demonstrate small "k" is usually adequate in theory and practice

@@ -1,0 +1,323 @@
+%!TEX root = draft.tex
+
+\section{Operation Counting Refinement vs Observational Refinement}
+\label{sec:equiv}
+
+We prove that observational refinement is equivalent to the trace-based version of operation counting refinement w.r.t. a class of programs, 
+where each thread executes at most one operation. Such programs are called \emph{\simple}; formally, they are parallel compositions of 
+sequential commands, where every sequential command contains at most one command of the form $y \colonequals \callCom{\meth}{x}$.
+Let $\sprogs$ denote the class of {\simple} programs. 
+
+\begin{theorem}\label{prop:count}
+Let $L$ and $S$ be two thread-independent libraries. % such that $L$ observationally refines $S$. 
+Then, $\lib$ observationally refines $\spec$ iff operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\sprogs$.
+\end{theorem}
+
+The proof of this result is done in two steps. Lemma~\ref{lemma:equiv1} shows that if we consider thread-independent libraries, 
+then observational refinement w.r.t. the class of all programs is equivalent to observational refinement w.r.t. the class of canonical 
+programs. It is based on the fact that that behavior of any thread that executes two operations $\theta_1$ and $\theta_2$, in this order,
+is captured by two threads that execute $\theta_1$ and \resp $\theta_2$, which synchronize themselves such that the 
+thread executing $\theta_2$ begins after the thread executing $\theta_1$ has finished. 
+
+Lemma~\ref{lemma:equiv2} shows that observational refinement w.r.t. $\sprogs$ is equivalent to operation counting refinement w.r.t. $\sprogs$.
+The fact that observational refinement implies operation counting refinement  is a direct consequence of the equivalence between 
+operation counting refinement and its state-based version. For the other direction, we prove that if operation counting refinement
+holds from $\lib$ to $\spec$, then for every executable trace $\trace$ in the composition of a program $\prog$ with $\lib$, %, that reaches a state $\state$,
+there exists an \emph{equivalent} executable trace $\trace'$ in the composition of $\prog$ with $\spec$. The trace $\trace'$ has the
+same operation count as $\trace$ and its existence is implied by the definition of operation counting refinement.
+This relation between executable traces in the composition of $\prog$ with the two libraries implies that any reachable state
+in the composition of $\prog$ with $\lib$ is also reachable in the composition of $\prog$ with $\spec$.
+
+\begin{lemma}\label{lemma:equiv1}
+Given two thread-independent libraries $\lib$ and $\spec$, $\lib$ observationally refines $\spec$ iff $\lib$ observationally refines $\spec$ w.r.t. $\sprogs$.
+\end{lemma}
+%\smallskip
+\noindent
+{\bf Proof sketch:} Assume that $\lib$ observationally refines $\spec$ w.r.t. the class of {\simple} programs.
+
+Let $\prog$ be an arbitrary program. We define a {\simple} program $\prog'$ such that any trace of $\prog$ is also a trace of $\prog'$ modulo a renaming of thread ids, and vice-versa. 
+Therefore, $\prog'$ is obtained by rewriting each sequential command $C$ of $\prog$, which contains at least two method calls, into 
+\[
+\begin{array}{ll}
+&(\assume\ g_C=0; C_1;g_C:=1) \\
+\| &(\assume\ g_C=1;C_2;g_C:=2) \\
+&\ldots \\
+\|&(\assume\ g_C=n-1;C_n)
+\end{array}
+\]
+where $C_1$,$\ldots$,$C_n$ are sequential commands s.t. $C=C_1;\ldots;C_n$ and each sequential command $C_i$ with $1\leq i\leq n$ contains at most one command of the form $y \colonequals \callCom{\meth}{x}$.The program $\prog'$ uses a different variable $g_C$ for each rewritten command $C$.
+
+For any library $\libq$, there exists a bijection $\bijection$ between $\traces{\prog}{\libq}$ and $\traces{\prog'}{\libq}$ (modulo thread id renaming), such that for every trace $\trace\in \traces{\prog}{\libq}$, $\bijection(\trace)$ consists in the same sequence of actions as $\trace$, except for the fact that, for every rewritten command $C=C_1;\ldots;C_n$ of $\prog$ and every $1\leq i\leq n$, the thread id of the actions in $\trace$ corresponding to $C_i$ is substituted by a new value in $\bijection(\trace)$. %The same holds for the composition of $\prog$ and \resp $\prog'$ with $\spec$. 
+Therefore, 
+%The fact that the traces of $\prog'$ and the ones of $\prog'$ (that they are equal up to thread-id renaming)
+%We can prove that 
+for any state $\state_0$,
+\[
+\begin{array}{c}
+\reach{\prog}{\lib}{\state_0}\subseteq \reach{\prog}{\spec}{\state_0} %\\[.5mm]
+\mbox{ iff } %\\[.5mm]
+\reach{\prog'}{\lib}{\state_0}\subseteq \reach{\prog'}{\spec}{\state_0}.
+\end{array}
+\]
+
+Since $\lib$ observationally refines $\spec$ w.r.t. the class of {\simple} programs, the latter inclusion holds, which implies that also the first inclusion holds. Consequently, $\lib$ observationally refines $\spec$.\hfill$\Box$
+
+
+%\paragraph{The inclusion between states can be reduced to the inclusion between some counter valuations:}
+%\subsection{Main result}
+
+%Given a trace $\tau$ in the composition of a program $\prog$ with a library $\lib$, we define two mappings
+%\[
+%{\tt open}[\trace]:\meths{L}\times\<Dom>\times\<Nats>->\<Nats> \mbox{, } {\tt done}[\trace]:\meths{L}\times\<Dom>\times\<Dom>\times\<Nats>\times\<Nats>->\<Nats>,
+%\]
+%which count the number of method calls performed in $\trace$ as follows:
+%\begin{itemize}
+%	\item $\opent{\trace}{f,i}{k}$ stands for the number of unfinished calls to $f$ with input $i$, initiated in between the $k$th and $(k+1)$th {\shwrite}. By convention, the $0$th {\shwrite} is the beginning of $\trace$. Also, if $K$ is the total number of {\shwrites} in $\trace$, then the $(K+1)$th {\shwrite} is the end of $\trace$.
+%	\item $\donet{\trace}{f,i,o}{k_1,k_2}$ stands for the number of completed calls to $f$ with input $i$ and return value $o$, which begin in between the $k_1$th and $(k_1+1)$th {\shwrite} and finish in between the $k_2$th and $(k_2+1)$th {\shwrite}.
+%\end{itemize}
+%
+%The set of all valuations for ${\tt open}$ and ${\tt done}$ corresponding a trace in the composition of a program $\prog$ with a library $\lib$ is denoted by $\counters{\prog}{\lib}$, \ie
+%\[
+%\counters{\prog}{\lib}=\set{({\tt open}[\trace],{\tt done}[\trace])\mid \trace\in\traces{\prog}{\lib}}.
+%\]
+
+
+\begin{lemma}\label{lemma:equiv2}
+Let $L$ and $S$ be two thread-independent libraries. % such that $L$ observationally refines $S$. 
+Then, $\lib$ observationally refines $\spec$ w.r.t. $\sprogs$ iff operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\sprogs$.
+%there exists a method counting refinement from $\lib$ to $\spec$, \ie
+%for any program $\prog$ and state $\state_0$,
+\end{lemma}
+{\bf Proof:} 
+($\Rightarrow$) 
+By definition, if $\lib$ observationally refines $\spec$ w.r.t. $\sprogs$, then state-based operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\sprogs$. 
+Consequently, by Proposition~\ref{prop:trace_state},  trace-based operation counting refinement w.r.t. $\sprogs$ also holds.
+
+%let $\reach{\prog}{\lib}{\state}[{\tt open},{\tt done}]$
+%be the projections of the sates in $\reach{\progC}{\lib}{\state}$ on the values of ${\tt open}$ and ${\tt done}$.
+
+%Since $\lib$ observationally refines $\spec$, we have that 
+%\[
+%\forall \programs\in\sprogs,
+%%\ \comp{\progC}{\lib}\subseteq \comp{\progC}{\spec},
+%\ \state_0\in\States.\ \reach{\progC}{\lib}{\state_0}\subseteq \reach{\progC}{\spec}{\state_0},
+%\]
+%which, by (\ref{eq:counters1}), %the characterization of $\counters{\prog}{\lib}$, 
+%implies that
+%\[
+%\forall \prog\in\sprogs.\ 
+%%\comp{\prog}{\lib}\state_0\subseteq \comp{\prog}{\spec}\state_0\mbox{ iff }
+%\counters{\prog}{\lib}\subseteq \counters{\prog}{\spec}
+%\]
+%and
+%\[
+%\bigcup_{\prog\in\sprogs} \counters{\prog}{\lib}\subseteq \bigcup_{\prog\in\sprogs} \counters{\prog}{\spec}.
+%\]
+%
+
+($\Leftarrow$)
+Assume that operation counting refinement holds, \ie
+\begin{equation}\label{eq:count1}
+%\forall \prog\in\sprogs.\ 
+%\comp{\prog}{\lib}\state_0\subseteq \comp{\prog}{\spec}\state_0\mbox{ iff }
+\bigcup_{\prog\in\sprogs}\counters{\prog}{\lib}\subseteq \bigcup_{\prog\in\sprogs}\counters{\prog}{\spec}.
+\end{equation}
+
+Let $\prog\in\sprogs$, $\state_0$ a state, and $\state\in \reach{\prog}{\lib}{\state_0}$.
+The latter implies that there exists a trace $\tau$ in $\tracesExec{\prog}{\lib}$ such that 
+$\state\in \eval{\trace}{\state_0}$. W.l.o.g. we assume that for every command $y \colonequals \callCom{\meth}{x}$ of 
+$\prog$, $x$ and $y$ are local variables.
+
+In the following, we prove that there exists a trace $\trace'\in\tracesExec{\prog}{\spec}$ such that $\trace'\equiv\trace$. 
+This implies that $\state\in \eval{\trace'}{\state_0}$ and thus, $\state\in \reach{\prog}{\spec}{\state_0}$.
+
+By (\ref{eq:count1}), there is a trace $\tracep$ in $\tracesExec{\prog'}{\spec}$, for some $\prog'\in\sprogs$, s.t. 
+$\Pi(\trace)=\Pi(\tracep)$.
+%\begin{equation}\label{eq:count2}
+%{\tt open}[\trace]={\tt open}[\tracep]\mbox{ and }{\tt done}[\trace]={\tt done}[\tracep].
+%\end{equation}
+%By (\ref{eq:count2}), 
+If we ignore thread ids, $\trace$ and $\tracep$ contain exactly the same set of library actions
+between every two consecutive shared writes. Because $\Pi(\trace)=\Pi(\tracep)$ there exists 
+a bijection $\gamma$ between the thread ids of $\trace$ and the thread ids of $\tracep$ such that:
+%We define a new history $\histpp$ by substituting in $\histp$ a thread id $\tid$ by $\tid'$ whenever:
+%\vspace{-1eX}
+\begin{itemize}
+	\item $\tid$ and $\gamma(\tid)$ execute an $\oper{\meth}{\cval}{*}$-operation between the $k$th and $(k+1)$th {\shwrite} of $\trace$, \resp $\tracep$, 
+	for some $\meth$, $\cval$, $k$, 
+	or
+%	let $t$ be a thread in $\trace$ that executes an $\oper{f}{\cval}{*}$-operation between the $k$th and $(k+1)$th {\shwrite}. Because we have that $\opent{\trace}{\oper{f}{\cval}{*}}{k}=\opent{\tracep}{\oper{f}{\cval}{*}}{k}$, there exists a thread $t'$ in $\tracep$ that executes a similar operation (\ie an $\oper{f}{\cval}{*}$-operation between the $k$th and $(k+1)$th {\shwrite}). %We replace in $\histp$ the thread $t'$ by $t$.
+%We define $\gamma(t)=t'$.
+	\item $\tid$ and $\gamma(\tid)$ execute an $\oper{f}{\cval}{\rval}$-operation, which begins between the $k_1$th and $(k_1+1)$th {\shwrite} of $\trace$, \resp $\tracep$, and ends between the $k_2$th and $(k_2+1)$th {\shwrite} of $\trace$, \resp $\tracep$, for some $\meth$, $\cval$, $\rval$, $k_1$, $k_2$.
+%	let $t$ be a thread in $\trace$ that executes an $\oper{f}{\cval}{\rval}$-operation, which begins between the $k_1$th and $(k_1+1)$th {\shwrite} and ends between the $k_2$th and $(k_2+1)$th {\shwrite}. Because $\donet{\trace}{\oper{f}{\cval}{\rval}}{k_1,k_2}=\donet{\tracep}{\oper{f}{\cval}{\rval}}{k_1,k_2}$, there is a thread $t'$ in $\tracep$ executing a similar operation. 
+%	%We replace in $\histp$ the thread $t'$ by $t$.
+%We define $\gamma(t)=t'$.
+%\vspace{-1eX}
+\end{itemize}
+
+%Let $\histp=\getHist{\tracep}$. 
+Since $\spec$ is thread-independent, the history $\histpp$ obtained from $\getHist{\tracep}$ by replacing every thread id $t$ with $\gamma^{-1}(t)$ is also in $\spec$.
+% in order to build another history $\histpp\in\sem{\spec}$
+
+If $K$ is the total number of {\shwrites} in $\trace$, then $\trace=\trace_0\cdot\ldots\cdot\trace_K$, where, for every $0\leq k\leq K$, $\trace_k$ contains all the actions starting from the $k$th {\shwrite} and until the $(k+1)$th {\shwrite}. 
+%Let $\trace_k$ be the sub-sequence of $\trace$ containing all the actions in between the $k$th and $(k+1)$th {\shwrite}. %(these two {\shwrite} are not included in $\trace_k$). 
+By definition, $\histpp$ can be written as $\histpp_0\cdot \ldots\cdot \histpp_K$ s.t.
+%\begin{itemize}
+%\item 
+for all $0\leq k\leq K$, $\histpp_k$ contains exactly the same set of library actions as $\trace_k$, but not necessarily in the same order.
+%\end{itemize} 
+
+We define $\trace'=\trace'_0\cdot\ldots\cdot\trace'_K$, where every $\trace'_k$ is a reordering of $\trace_k$ such that $\getHist{\trace'_k}=\histpp_k$.
+% as a reordering of $\trace$ such that $\tracep$ is equivalent to $\trace$ and $\getHist{\tracep}=\histpp$. Therefore, for each $0\leq k\leq K$, the actions in $\trace_k$ are reordered as follows:
+Therefore, $\trace'_k$ is defined by a recursive procedure ${\tt reorder}(\trace_k,\histpp_k)$ that works as follows.
+%\begin{itemize}
+Let $l$ be the first library action of $\histpp_k$ and let $\tid$ be the thread-id of $l$. Let $\trace_k[l]$ be the sub-sequence of $\trace_k$ containing all the actions of thread $\tid$ appearing before and including $l$ and let $\trace_k[{\neg l}]$ be the sub-sequence of $\trace_k$ containing all the other actions. We define 
+\vspace{-1eX}
+\[
+\trace'_k=\trace_k[l]\cdot {\tt reorder}(\trace_k[{\neg l}],{\tt tail}(\histpp_k)),
+\vspace{-1eX}
+\]
+where ${\tt tail}(\histpp_k)$ is the sequence $\histpp_k$ without its first element.
+	%The actions in $\trace_k$ are reordered such that all the actions of $\trace_k^l$ appear at the beginning, but in the same order. 
+	The trace $\trace'_k$ is equivalent to $\trace_k$ because $\trace_k[l]$ contains only the library action $l$, client actions over the local variables, and client actions that don't modify the value of the shared variables. Thus, any two actions, one from $\trace_k[l]$ and one from $\trace_k[\neg l]$, are independent.\hfill$\Box$
+%	\begin{itemize}
+%		\item $\trace_k[l]$ contains the library action $l$, client actions over the local variables, and client reads over the shared variables.
+%		\item the actions of $\trace$ placed between the first and the last action of $\trace_k^l$ (which are not kept in $\trace_k^l$) are library actions, client actions over the local variables,  or client reads over the shared variables.
+%	\end{itemize}
+%Thus, any action of $\trace_k^l$ is independent of any action of $\trace$ placed between the first and the last action of $\trace_k^l$.
+%	\item we consider the next library action of $\hist''_k$ and apply the same transformation starting from the current reordering of $\trace$. This continues until all the library actions of $\hist''_k$ are considered.
+%\end{itemize}
+
+
+%The latter implies that there exists a trace $\trace$ in $\sem{P}$ such that $\state\in \eval{\trace}{\state_0}$.
+%
+%Let $\state^C$ be the valuation for ${\tt nbW}$, ${\tt open}$, and ${\tt done}$ satisfied in $\trace$.
+%Clearly, $\state^C\in {\tt Count}(\prog,\lib,\state_0)$, which, by the hypothesis, implies that 
+%$\state^C\in {\tt Count}(\prog,\spec,\state_0)$. The latter implies that there exists a history $\hist$ of $S$ that contains all the 
+%method calls in the trace $\trace$ (with the same input/return values) and that satisfies the following order constraints
+%defined from $\trace$:
+%\begin{itemize}
+%\item a method call on $\meth$ with input $\cval$ and output $\rval$ is before a method call on $\meth'$ with input $\cval'$ and output $\rval'$
+%if $\trace$ contains a write on a shared variable between $\retAct{\tid}{\lib}{\meth}{\rval}$ and $\callAct{\tid}{\lib}{\meth}{\cval}$.
+%\end{itemize}
+%
+%One can prove that there exists a trace $\trace'$ that consists of all the internal actions of $\trace$ (in the same order if they
+%belong to the same thread or if they concern the shared memory) and the history $\hist$, which is executable in the composition 
+%of $P$ and $S$. Here, we use the fact the $S$ is thread-independent. Thus, $\state\in \comp{\progC}{\spec}\state_0$. 
+
+\section{Operation Counting Refinement as a Reachable-state Inclusion Problem}
+\label{sec:client}
+
+%\paragraph{The universal quantification over programs can be reduced to some property of a most general client that counts method calls:}
+We show that operation counting refinement can be equivalently stated as an inclusion between the reachable counter valuations in two instrumented programs. 
+This simplifies the reasoning about the infinite union over all program clients in the original definition. % of operation counting refinement.
+Therefore, %, which by Proposition~\ref{prop:trace_state} is equivalent to the trace-based version, 
+we define a most general client for a library $\lib$ that represents all the reachable operation counts in a canonical client of $\lib$.
+This is a program with an unbounded number of threads, where each thread non-deterministically calls a method of $L$. In order
+to represent reachable operation counts this program is instrumented by $\Xi$. 
+This program contains constructs that were not introduced in Section~\ref{sec:prelim}, but which 
+are commonly found in concrete programming languages. Therefore, it contains the operator $+$ for the non-deterministic choice 
+between a set of sequential commands, the operator $^*$ for the iteration of a sequential command, and the operator 
+$^{\shuffle}$ for the parallel composition of an unbounded number of instances of a sequential command. Extending
+the notion of trace and reachable state to programs that contain such constructs is straightforward. 
+
+Given a library $\lib$ with $\meths{\lib}=\{\meth_1,\ldots,\meth_n\}$, the most general client for $\lib$, denoted by $\mgc{\lib}$,
+%we will define a program $\mgc{\lib}$ whose reachable states in the composition with $\lib$ is exactly the union of 
+%all $\reachCount{\instr{\prog}}{\lib}{\state_0}$ with $\prog\in \sprogs$ and $\state_0\in\States$. 
+% Also, it uses the variable ${\tt shWr}$ and the mappings ${\tt open}$ and ${\tt done}$ in a similar way
+%to the instrumentation $\Xi$ defined in Section~\ref{sec:ct_ref}.
+is defined by 
+%If $\meths{\lib}=\{\meth_1,\ldots,\meth_n\}$, then 
+\[
+%\mgc{\lib}\coloncolonequals Init; \big(\ 
+(sh\colonequals \star)^*\ \|\   (C_{\meth_1}+\ldots+C_{\meth_n})\,^{\shuffle}
+\]
+where $sh$ is a shared variable\footnote{In order to respect the definition of a shared variable in Section~\ref{sec:prelim}, one should also add some dummy reads of $sh$ in the commands $C_{f_i}$.}
+%and $C_{\lib}$ is the non-deterministic choice $C_{\meth_1}+\ldots+C_{\meth_n}$, where
+and each $C_{f_i}$ calls $f_i$ with an arbitrary value, \ie $C_{f_i}$ is the sequential command 
+$x\colonequals \star;y \colonequals \callCom{\meth_i}{x}$ (here, $\star$ stands for non-deterministic assignment).
+Also, the variables $x$ and $y$ are considered to be local to each of the threads executing a command $\instr{C_L}$.
+%a loop that non-deterministically calls methods of $L$, updating also the maps ${\tt open}$ and ${\tt done}$, \ie
+%%\[
+%%\begin{array}{l}
+%$
+%C_{\lib}\coloncolonequals \big(\ \instr{C_{\meth_1}}+\ldots+\instr{C_{\meth_n}})^*,
+%$
+%%\end{array}
+%%\]
+%and for any method $f_i$, $C_{f_i}$ is the sequential command $x\colonequals \star;y \colonequals \callCom{\meth_i}{x}$
+%($\star$ stands for non-deterministic assignment).
+%\[
+%	\begin{array}{l}
+%	x\colonequals \star;\\
+%	{\tt atomic}\ \{ \\
+%	\hspace{3mm}\open{\meth_i,x}{shWr}\mbox{\tt ++;}\\
+%	\hspace{3mm}{\tt shWr0_c}\colonequals {\tt shWr;}\\
+%	\}\\[.5mm]
+%	y \colonequals \callCom{\meth_i}{x}{\tt ;} \\[.5mm]
+%	{\tt atomic}\ \{\\ 
+%	\hspace{3mm}\open{\meth_i,x}{shWr}\mbox{\tt --;} \\
+%	\hspace{3mm} \done{\meth_i,x,y}{shWr0_c,shWr}\mbox{\tt ++;}\\
+%	\}\\
+%	\end{array}
+%\]
+%%and for any method $f$, $C_{f}$ is the sequential command defined in (\ref{eq:instr}).
+%%and $C_{f_i}$ is the statement
+%%	\[
+%%	\begin{array}{ll}
+%%	C_{f_i}\coloncolonequals & x\colonequals \star;\\
+%%	&\open{\meth_i,x}{nbW}{\tt ++;}\\
+%%	&{\tt nbW0}\colonequals {\tt nbW;}\\
+%%	&y \colonequals \callCom{\meth_i}{x}{\tt ;} \\
+%%	&\done{\meth_i,x,y}{nbW0,nbW}{\tt ++;}\\
+%%	\end{array}
+%%	\]
+%
+%%Let $\states{\mgc{\lib}}{\lib}|_{{\tt open},{\tt done}}$ denote the set of states in $\states{\mgc{\lib}}{\lib}$ projected on the values of {\tt open} and {\tt done}.
+
+
+The set of reachable states in the composition of $\instr{\mgc{\lib}}$ with $\lib$, projected over the values of {\tt open} and {\tt done}, doesn't depend on the initial state. Thus, we omit the initial state from the function {\tt St} when applied to $\instr{\mgc{\lib}}$ and under the scope of $\Pi$.
+%The set of reachable states in this program composed with $L$, projected on the values of ${\tt open}$ and ${\tt done}$, is denoted by $\reachMGC{\lib}$.
+%\[
+%\reachMGC{\lib}=\projReach{\mgc{\lib}}{\lib}{\state_0}{{\tt open},{\tt done}}
+%\]
+
+\begin{proposition}\label{prop:mgc}
+Let $\lib$ be a thread-independent library. Then, 
+\[
+\reachMGC{\lib} = \bigcup_{\prog\in\sprogs,\state_0\in\InitStates}\reachCount{\instr{\prog}}{\lib}{\state_0}.
+\]%\in\InitStates
+\end{proposition}
+
+The following result states that (state-based) operation counting refinement from a library $\lib$ to a library $\spec$ 
+is equivalent to checking the inclusion between the reachable counter valuations in the instrumentation by $\Xi$ of the most general client 
+of $\lib$ and \resp $\spec$. 
+%This simplifies the problem of verifying operation counting refinement 
+%because it avoids reasoning about the infinite set of library clients. 
+It is a direct consequence of 
+Proposition~\ref{prop:trace_state} and Proposition~\ref{prop:mgc}.
+
+\begin{corollary}\label{th:mgc_count}
+Let $L$ and $S$ be two thread-independent libraries. % such that $\meths{\lib}=\meths{\spec}={\mathbb M}$.
+Then, operation counting refinement holds from $\lib$ to $\spec$ w.r.t. $\sprogs$ iff
+\[
+\reachMGC{\lib}\subseteq 
+\reachMGC{\spec}.
+\]
+\end{corollary}
+%{\bf Proof sketch:} 
+
+
+
+
+
+
+
+
+
+
+
+
+%which clearly implies that ${\tt Count}(\prog,\lib,\state)\subseteq {\tt Count}(\prog,\spec,\state)$.
+
+%Since the actions on the variables of $P'$ 
