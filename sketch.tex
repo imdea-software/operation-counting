@@ -77,14 +77,8 @@ Formally, a program $P$ is an LTS over an alphabet $@S$ such that $(C \u R)
 
 \paragraph{Observational refinement}
 
-Given two libraries $L_1$ and $L_2$, $L_1\leq L_2$ iff
-\begin{itemize}
-	\item for all $P$, 
-	\[
-	ReachStates_1(P\times L_1) \subseteq ReachStates_1(P\times L_2),
-	\] 
-	where $ReachStates_1$ is the projection on the first component of the states reached in the product $P\times L$.
-\end{itemize}
+The library $L_1$ \emph{refines} library $L_2$, written $L_1 \leq L_2$, if and
+only if $E(P \x L_1)|@S_P \subseteq E(P \x L_2)|@S_P$ for all programs $P$.
 
 \paragraph{Histories}
 
