@@ -41,14 +41,14 @@ Formally, a library $L$ is an LTS over an alphabet $@S$ such that $(C \u R)
 
   \item Each execution $e \in E(L)$ is well formed.
 
-  \item Transitions cannot disable call actions $c \in C$: \\
+  \item Call actions $c \in C$ cannot be disabled: \\
   $e \cdot e' \in E(L)$ implies $e \cdot c \cdot e' \in E(L)$
   if $e \cdot c \cdot e'$ is well formed.
   
-  \item Calls $c \in C$ cannot disable actions: \\
+  \item Call actions $c \in C$ cannot disable other actions: \\
   $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e \in E(L)$.
   
-  \item Returns $r \in R$ cannot enable actions: \\
+  \item Return actions $r \in R$ cannot enable other actions: \\
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
 
 \end{itemize}
@@ -63,11 +63,11 @@ Formally, a program $P$ is an LTS over an alphabet $@S$ such that $(C \u R)
   
   \item Each execution $e \in E(P)$ is well formed.
   
-	\item Calls $c \in C$ cannot enable actions: \\
+	\item Call actions $c \in C$ cannot enable other actions: \\
   $e \cdot c \cdot a \cdot e' \in E(P)$ and $c \not\sim a$
   implies $e \cdot a \cdot c \cdot e' \in E(P)$.
   
-  \item Returns $r \in R$ cannot disable actions: \\
+  \item Return actions $r \in R$ cannot disable other actions: \\
   $e \cdot a \cdot r \cdot e' \in E(P)$ and $a \not\sim r$
   implies $e \cdot r \cdot a \cdot e \in E(P)$.
 
