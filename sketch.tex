@@ -1,70 +1,81 @@
 %!TEX root = draft.tex
 \section{Preliminaries}
 
-\subsection{LTS}
+\paragraph{LTSs}
 
-An LTS is $A = (Q,\Sigma,q_0,\delta)$, where $\delta \subseteq Q \times \Sigma \times Q$
+A \emph{labeled transition system} (LTS) $A = (Q,@S,q_0,@d)$ over alphabet $@S$
+is a set $Q$ of states with initial state $q_0 \in Q$, and a transition
+relation $@d \in Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in
+@S^*$ such that for some $q_1 q_2 .. q_{|e|} \in Q^*$ we have
+$@d(q_i,e_i,q_{i+1})$ for each $0 \le i < |e|$. $E(A)$ denotes the set of $A$'s
+executions. The \emph{synchronous product} $A_1 \x A_2$ of two LTSs is defined
+as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) = E(A_1)|@S_2 \n
+E(A_2)|@S_1$.
 
-$E(A)$ = the set of words labelling runs from $q_0$
+\paragraph{Actions}
 
-Given two LTSs $A_1$ and $A_2$, the product $A_1 \times A_2$ is defined as usual; $E(A_1\times A_2) = E(A_1) \cap E(A_22)$
-
-\subsection{Actions}
-
-Let $\mathbb{M}$ be a set of method names. 
-A \emph{library action} is a 
-\emph {call action} $\callAct{\tid}{\meth}{\cval}$
-or a \emph{return action} $\retAct{\tid}{\meth}{\rval}$,
-where $\tid$ is a thread id (\ie a natural number), $\meth$ is a method name in $\mathbb{M}$, $\cval$ is the parameter value,
-and $\rval$ is the return value. 
-
-Let $\Sigma_c$ the set of call actions and $\Sigma_r$ the set of return actions. 
-
-Let $\Sigma_i$ be a set of client internal actions of the form $(\tid,a)$.
-
-\subsection{Library}
-
-A program is an LTS $L$ over an alphabet $\Sigma=\Sigma_c\cup \Sigma_r$ s.t.
+For a given set $M$ of methods, we fix the sets $C = M \x \<Nats>$ of
+\emph{call actions} and $R = \<Nats> \x M$ of \emph{return actions}. Each call
+action $c = \tup{m,i}$ pairs together a method $m \in M$ with an
+\emph{operation identifier} $i \in \<Nats>$ in the opposite order of a return
+action $r = \tup{i,m}$; we denote the method and identifier of a call/return
+action $c$ by $\<method>(c)$ and $\<id>(c)$. Two call/return actions $c$ and
+$r$ are \emph{matching}, written $c ~ r$, when $\<method>(c) = \<method>(r)$,
+$\<id>(c) = \<id>(r)$, and $c \neq r$. A word $e \in @S^*$ over alphabet $@S$,
+such that $(C \u R) \subseteq @S$, is \emph{well formed} when
 \begin{itemize}
-	\item for every word $w \in E(L)$, each return has a unique matching call
-	\item libraries cannot disable calls
-	\begin{itemize}
-		\item $w.w'\in E(L)\Rightarrow w.c.w'\in E(L)$ if the thread $th(c)$ has not an unfinished call in $w$
-    	\end{itemize}	
-	\item calls cannot disable actions 
-	\begin{itemize}
-		\item $w.a.c.w' \in E(L) \Rightarrow w.c.a.w'\in E(L)$ if $th(a) \neq th(c)$
-    	\end{itemize}
-	\item returns cannot enable actions 
-	\begin{itemize}
-		\item $w.r.a.w'\in E(L)\Rightarrow w.a.r.w'\in E(L)$ if $th(a) \neq th(r)$
-	\end{itemize}
+  \item Each return is preceded by a matching call: \\
+  $e(j) \in R$ implies $e(i) ~ e(j)$ for some $i < j$.
+
+  \item Each operation identifier is used in at most one call/return: \\
+  $\<id>(e(i)) = \<id>(e(j))$ and $i < j$ implies $e(i) ~ e(j)$.
 \end{itemize}
 
-\subsection{Program}
+\paragraph{Libraries}
 
+TODO DESCRIBE THE INTUITION BEHIND WHAT A LIBRARY IS...
 
-
-A program is an LTS $P$ over an alphabet $\Sigma=\Sigma_c\cup \Sigma_r\cup \Sigma_i$, describing executions, s.t.
+Formally, a library $L$ is an LTS over an alphabet $@S$ such that $(C \u R)
+\subseteq @S$, and
 \begin{itemize}
-	\item for every execution $w \in E(P)$, each return has a unique matching call
-	\item calls cannot enable or disable actions %(returns can enable actions because they can set some variable)
-	\begin{itemize}
-		\item $w.c.a.w'\in E(P)\Rightarrow w.a.c.w'\in E(P)$ if $th(a) \neq th(c)$
-		\item $w.a.c.w' \in E(P) \Rightarrow w.c.a.w'\in E(P)$ if $th(a) \neq th(c)$
-    	\end{itemize}
-	\item returns cannot enable or disable actions 
-	\begin{itemize}
-		\item $w.r.a.w'\in E(P)\Rightarrow w.a.r.w'\in E(P)$ if $th(a) \neq th(r)$
-		\item $w.a.r.w'\in E(P) \Rightarrow w.r.a.w' \in E(P)$ if $th(a) \neq th(r)$
-	\end{itemize}
+
+  \item Each execution $e \in E(L)$ is well formed.
+
+  \item Transitions cannot disable call actions $c \in C$: \\
+  $e \cdot e' \in E(L)$ implies $e \cdot c \cdot e' \in E(L)$
+  if $e \cdot c \cdot e'$ is well formed.
+  
+  \item Calls $c \in C$ cannot disable actions: \\
+  $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e \in E(L)$.
+  
+  \item Returns $r \in R$ cannot enable actions: \\
+  $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
+
 \end{itemize}
 
-\subsection{Compositions of programs and libraries}
+\paragraph{Programs}
 
-Given a library $L$ and a program $P$, the composition of $P$ with $L$ is the LTS $P\times L$.
+TODO DESCRIBE THE INTUITION BEHIND WHAT A PROGRAM IS...
 
-\subsection{Observational refinement}
+Formally, a program $P$ is an LTS over an alphabet $@S$ such that $(C \u R)
+\subseteq @S$, and
+\begin{itemize}
+  
+  \item Each execution $e \in E(P)$ is well formed.
+  
+	\item Calls $c \in C$ cannot enable actions: \\
+  $e \cdot c \cdot a \cdot e' \in E(P)$ and $c \not\sim a$
+  implies $e \cdot a \cdot c \cdot e' \in E(P)$.
+  
+  \item Returns $r \in R$ cannot disable actions: \\
+  $e \cdot a \cdot r \cdot e' \in E(P)$ and $a \not\sim r$
+  implies $e \cdot r \cdot a \cdot e \in E(P)$.
+
+\end{itemize}
+
+(The composition of program $P$ with library $L$ is the LTS $P \x L$.)
+
+\paragraph{Observational refinement}
 
 Given two libraries $L_1$ and $L_2$, $L_1\leq L_2$ iff
 \begin{itemize}
@@ -75,38 +86,63 @@ Given two libraries $L_1$ and $L_2$, $L_1\leq L_2$ iff
 	where $ReachStates_1$ is the projection on the first component of the states reached in the product $P\times L$.
 \end{itemize}
 
-\subsection{Histories - as partial orders}
+\paragraph{Histories}
 
-An operation synopsis is a triple in $\mathbb{M}\times\<Nats>\times\<Nats>$. Let $\Gamma$ be the set of synopsis. 
-
-Given a \emph{well-formed} sequence $w\in (\Sigma_c\cup\Sigma_r\cup\Sigma_i)^*$, we define the history of $w$, denoted $H(w)$ as a labeled partial order $(Op,\ell,<)$, where
+A \emph{history} $h = \tup{N,f,\ll}$ is a set $N \subset \<Nats>$ of operation
+identifiers, along with a function $f: N -> (M \x \<Bools>)$ and partial order
+$\ll$ on $N$. The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$
+is given by
 \begin{itemize}
-	\item $Op$ is the set of operations in $w$ (pair of matching call and return, or a single call if there exists no matching return)
-	\item $\ell:Op\rightarrow \Gamma$ gives for each operation, its synopsis. 
-	\item $<$ is the order relation between the time spans of the operations
+
+  \item $N = \set{ \<id>(e(i)) : 0 \le i < |e| \text{ and } e(i) \in C }$,
+
+  \item $f(i) = \left\{
+  \begin{array}{ll}
+    \tup{m,\<true>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \in e \\
+    \tup{m,\<false>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \not\in e
+  \end{array}
+  \right.$
+
+  \item $\<id>(e(i)) \ll \<id>(e(j))$ iff $i < j$, $e(i) \in R$, and $e(j) \in C$.
+
 \end{itemize}
+The \emph{histories} of a library $L$ are those of its admitted executions:
+$H(L) = \set{ H(e) : e \in E(L) }$.
 
 \begin{lemma}
-For any $w$, $H(w)$ is an interval order, i.e., for any $a,b,c,d$, if $a<b$ and $c<d$ then $a<d$ or $c<b$.
+
+  The history $H(e) = \tup{N,f,\ll}$ of a well-formed execution $e$ forms an
+  interval order: $i_1 \ll j_1$  and $i_2 \ll j_2$ implies either
+  $i_1 \ll j_2$ or $i_2 \ll j_1$.
+
 \end{lemma}
 
-For a library $L$, $H(L)=\{H(w)\mid w\in E(L)\}$.
-
-We define the order relation $\preceq$ on histories by $h=(Op,\ell,<)\preceq h'=(Op',\ell',<')$ iff:
+A history $h_1 = \tup{N_1, f_1, \ll_1}$ is \emph{stricter than} a history $h_2
+= \tup{N_2, f_2, \ll_2}$ (alternatively, $h_2$ is \emph{weaker than} $h_1$)
+written $h_1 \preceq h_2$, when there exists a bijection $g : N_1 -> N_2$ such
+that
 \begin{itemize}
-	\item there exists a bijection $\gamma:Op\rightarrow Op'$ % (up to thread renaming)
-	\item for every operation $o$, $\ell(o)=\ell'(\gamma(o))$ %if $c(o)=false$ then $c'(o)=false$ (i think it works also with equality $c(o)=c'(o)$).
-	\item $\gamma(<)\subseteq <'$
+
+  \item $f_1(i) \preceq f_2(g(i))$ for each $i \in N_1$, and
+  
+  \item $i \ll_1 j$ if $g(i) \ll_2 g(j)$ for each $i,j \in N_1$.
+
 \end{itemize}
+where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_2
+\Rightarrow b_1$. Two histories $h_1$ and $h_2$ are equivalent, denoted by $h_1
+\equiv h_2$ iff $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
 
 \begin{lemma}
-Given a library $L$, $H(L)$ is downward closed w.r.t. $\preceq$.
+  
+  The histories $H(L)$ of a library $L$ upward closed under $\preceq$.
+
 \end{lemma}
+
 \begin{proof}
-From the closure properties on $E(L)$.
-\end{proof}
 
-We say that two histories $h$ and $h'$ are equivalent, denoted by $h\equiv h'$ iff $h\preceq h'$ and $h'\preceq h$.
+  From the closure properties on $E(L)$.
+
+\end{proof}
 
 \section{Observational refinement is equivalent to history inclusion}
 

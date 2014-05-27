@@ -165,7 +165,7 @@
 % \mathlig{<|}{\lhd}
 % \mathlig{:=}{:=}
 % \mathlig{!}{\lnot}
-% \mathlig{~}{\sim}
+\mathlig{~}{\sim}
 
 %%% MATH NOTATION %%%
 
@@ -186,7 +186,7 @@
 \newcommand{\x}{\times}
 \newcommand{\intv}[2]{[{#1},{#2}]}
 % \newcommand{\set}[1]{{\{ #1 \}}}
-\newcommand{\tuple}[1]{\angles{#1}}
+\newcommand{\tup}[1]{\angles{#1}}
 \newcommand{\ftuple}[1]{\fangles{#1}}
 \newcommand{\card}[1]{\lines{#1}}
 % \newcommand{\abs}[1]{\lines{#1}}
@@ -295,6 +295,7 @@
   push, pop, popall[pop^\ast], eval, stack, next, yield,procedure,returns,thread,method,
   give, take, empty, delay, dequeue, enqueue, 
   stash, spost[post], blocked, %
+  method, id, ids,
 }
 
 \semanticdomain{%
