@@ -10,9 +10,9 @@ transition systems (LTS).
 
 A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over alphabet $@S$ is a
 set $Q$ of states with initial state $q_0 \in Q$, and a transition relation $@d
-\in Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
-that for some $q_1 q_2 .. q_{|e|} \in Q^*$ we have $@d(q_i,e_i,q_{i+1})$ for
-each $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$
+\subseteq Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
+that for some $q_1, q_2, .., q_{|e|} \in Q$ we have $@d(q_i,e_i,q_{i+1})$ for
+each $i$ such that $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$
 over alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$
 their projections over $@G$. The \emph{synchronous product} $A_1 \x A_2$ of two
 LTSs is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) =
