@@ -1,0 +1,87 @@
+\section{Operation Histories}
+
+While observational refinement is defined over program executions, in the
+following we introduce an alternative mathematical structure called
+\emph{histories} which concisely summarize the executions admitted by a
+library. Histories also provide a convenient foundation in which to formulate
+our technical development.
+
+A \emph{history} $h = \tup{N,f,\ll}$ is a partial order $\ll$ on a set $N
+\subset \<Nats>$ of operation identifiers labeled by $f: N -> (M \x \<Bools>)$.
+The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
+operation with a method and completed status, and orders the non-overlapping
+operations, according to:
+\begin{itemize}
+
+  \item $N = \set{ \<id>(e(i)) : 0 \le i < |e| \text{ and } e(i) \in C }$,
+
+  \item $f(i) = \left\{
+  \begin{array}{ll}
+    \tup{m,\<true>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \in e \\
+    \tup{m,\<false>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \not\in e
+  \end{array}
+  \right.$
+
+  \item $\<id>(e(i)) \ll \<id>(e(j))$ iff $i < j$, $e(i) \in R$, and $e(j) \in C$.
+
+\end{itemize}
+The \emph{histories} of a library $L$ are those of its admitted executions:
+$H(L) = \set{ H(e) : e \in E(L) }$.
+
+\begin{example}
+  \label{ex:histories}
+
+  TODO DRAW THE HISTORY/IES CORRESPONDING TO A/SOME PREVIOUS EXECUTION/S
+  
+\end{example}
+
+A history $h_1 = \tup{N_1, f_1, \ll_1}$ is \emph{stricter than} a history $h_2
+= \tup{N_2, f_2, \ll_2}$ (alternatively, $h_2$ is \emph{weaker than} $h_1$)
+written $h_1 \preceq h_2$, when there exists a bijection $g : N_1 -> N_2$ such
+that
+\begin{itemize}
+
+  \item $f_1(i) \preceq f_2(g(i))$ for each $i \in N_1$, and
+  
+  \item $i \ll_1 j$ if $g(i) \ll_2 g(j)$ for each $i,j \in N_1$.
+
+\end{itemize}
+where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_2
+\Rightarrow b_1$. Two histories $h_1$ and $h_2$ are equivalent, denoted by $h_1
+\equiv h_2$ iff $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
+
+\begin{lemma}
+  
+  The histories $H(L)$ of a library $L$ upward closed under $\preceq$.
+
+\end{lemma}
+
+\begin{proof}
+
+  From the closure properties on $E(L)$.
+
+\end{proof}
+
+\begin{theorem}
+
+  $L_1 \leq L_2$ iff $H(L_1) \subseteq H(L_2)$.
+
+\end{theorem}
+
+\begin{proof}
+
+  ($\Rightarrow$) Let $h\in H(L_1)$. As in Filipovic et al., construct a
+  program $P_h$ (this LTS can be described as a program with shared variables)
+  where we use shared variables to enforce the order constraints in $h$.
+  Because $ReachStates_1(P_h\times L_1) \subseteq ReachStates_1(P_h\times
+  L_2)$, there exists an execution $e$ of $P_h\times L_2$ s.t. $H(w)=h'$ and
+  $h\preceq h'$. By the closure property on $L_2$, if $h'\in H(L_2)$ then $h\in
+  H(L_2)$.
+
+  ($\Leftarrow$) Let $P$ be a program and let $e$ be an execution in $P\times
+  L_1$. By hypothesis, $h=H(e)\in H(L_2)$. Let $w'\in L_2$ s.t. $H(w')=h$. Note
+  that the projection of $e$ on library actions may be different than $w'$. We
+  must show that by the closure properties on $P$, $E(P)$ contains the
+  interleaving of $w'$ and the projection of $e$ on client actions.
+
+\end{proof}

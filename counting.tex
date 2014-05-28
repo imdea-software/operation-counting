@@ -1,0 +1,77 @@
+\section{Operation Counting}
+
+While the general definition of histories allows arbitrary partial orders of
+operations, histories which arise from LTS executions fall into a special class
+called \emph{interval orders}.
+
+\begin{lemma}
+
+  The history $H(e) = \tup{N,f,\ll}$ of a well-formed execution $e$ forms an
+  interval order: $i_1 \ll j_1$  and $i_2 \ll j_2$ implies either
+  $i_1 \ll j_2$ or $i_2 \ll j_1$.
+
+\end{lemma}
+
+Let $(A,<)$ be an interval order.
+Given $a\in A$, let 
+\[
+pre^*(a)=\{b < a\mid b\in A\}\mbox{ and }post^*(a)=\{a < b\mid b\in A\}.
+\]
+
+\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
+
+  Let $(A,<)$ be an interval order. Then, the possible values of $pre^*(a)$ are
+  linearly ordered by set inclusion. Similarly, for the possible values of
+  $post^*(a)$.
+
+\end{lemma}
+
+Let $\sim$ be an equivalence relation over $A$ defined by $a\sim b$ iff
+$pre^*(a)=pre^*(b)$ and $post^*(a)=post^*(b)$.
+
+The quotient of $(A,<)$ w.r.t. $\sim$ is denoted by $(A/_\sim,<_\sim)$.
+
+Two labeled interval orders are $\sim$-equivalent if there exists an
+isomorphism between their quotients s.t. two equivalence classes are related by
+the isomorphism if they contain the same multiset of synopses.
+
+We represent an equivalence class w.r.t. the $\sim$-equivalence (i.e., a set of
+labeled interval orders) by integer maps $\iota:\<Nats>\times \<Nats>\times
+\Gamma\rightarrow \<Nats>$. First, given a labeled interval order $(A,\ell,<)$,
+we define a notation for equivalence classes of $\sim$ as follows:
+
+\begin{itemize}
+
+	\item let $pre^*(a_0)\subseteq pre^*(a_1)\subseteq \ldots\subseteq
+pre^*(a_n)$ be the set of different values of $pre^*(a)$. For any $a\in A$, let
+$low(a)=i$ s.t. $pre^*(a)=pre^*(a_i)$.
+
+	\item let $post^*(b_1)\supseteq post^*(b_1)\supseteq \ldots\supseteq
+post^*(b_n)$ be the set of different values of $post^*(b)$. For any $a\in A$,
+let $high(a)=j$ s.t. $post^*(a)=post^*(a_j)$.
+
+	\item the equivalence class $[a]$ is denoted by $[low(a),high(a)]$.
+
+\end{itemize}
+
+Given $h=(A,\ell,<)$, the integer map associated to $h$, $\Pi(h)$ is defined
+by: $\Pi(h)(low(a),high(a))(s)=$ the number of operations in $[a]$ having the
+synopsis $s$.
+
+\begin{lemma}
+
+  For any two $\sim$-equivalent labeled interval orders $h$ and $h'$,
+  $\Pi(h)=\Pi(h')$.
+
+\end{lemma}
+
+Given a library $L$, $\Pi(L)=\{\Pi(h)\mid h\in H(L)\}$.
+
+\begin{lemma}
+
+  Given $L$ and $L'$ which are thread-independent, $H(L)\subseteq H(L')$ iff
+  \[
+    \Pi(L) \subseteq \Pi(L')
+  \]
+
+\end{lemma}
