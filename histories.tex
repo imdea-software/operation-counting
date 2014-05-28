@@ -13,7 +13,7 @@ operation with a method and completed status, and orders the non-overlapping
 operations, according to:
 \begin{itemize}
 
-  \item $N = \set{ \<id>(e(i)) : 0 \le i < |e| \text{ and } e(i) \in C }$,
+  \item $N = \set{ \<id>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
 
   \item $f(i) = \left\{
   \begin{array}{ll}
@@ -22,7 +22,7 @@ operations, according to:
   \end{array}
   \right.$
 
-  \item $\<id>(e(i)) \ll \<id>(e(j))$ iff $i < j$, $e(i) \in R$, and $e(j) \in C$.
+  \item $\<id>(e_i) \ll \<id>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
 
 \end{itemize}
 The \emph{histories} of a library $L$ are those of its admitted executions:

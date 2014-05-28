@@ -1,5 +1,7 @@
 \section{Observational Refinement}
 
+\newcommand{\match}{\bowtie}
+
 Standard correctness criteria for software library implementations are their
 conformance to \emph{reference implementations}. The literature captures such
 conformance with the notion of \emph{observational refinement}: is every
@@ -63,15 +65,15 @@ action $c = \tup{m,i}$ pairs together a method $m \in M$ with an
 \emph{operation identifier} $i \in \<Nats>$ in the opposite order of a return
 action $r = \tup{i,m}$; we denote the method and identifier of a call/return
 action $c$ by $\<method>(c)$ and $\<id>(c)$. Two call/return actions $c$ and
-$r$ are \emph{matching}, written $c ~ r$, when $\<method>(c) = \<method>(r)$,
+$r$ are \emph{matching}, written $c \match r$, when $\<method>(c) = \<method>(r)$,
 $\<id>(c) = \<id>(r)$, and $c \neq r$. A word $e \in @S^*$ over alphabet $@S$,
 such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
 \begin{itemize}
   \item Each return is preceded by a matching call: \\
-  $e(j) \in R$ implies $e(i) ~ e(j)$ for some $i < j$.
+  $e_j \in R$ implies $e_i \match e_j$ for some $i < j$.
 
   \item Each operation identifier is used in at most one call/return: \\
-  $\<id>(e(i)) = \<id>(e(j))$ and $i < j$ implies $e(i) ~ e(j)$.
+  $\<id>(e_i) = \<id>(e_j)$ and $i < j$ implies $e_i \match e_j$.
 \end{itemize}
 Well-formed words will represent executions. We assume every set of well-formed
 words is closed under isomorphic renaming of operation identifiers.
@@ -163,12 +165,12 @@ A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
   \item Each execution $e \in E(P)$ is well formed.
   
 	\item Call actions $c \in C$ cannot enable other actions: \\
-  $e \cdot c \cdot a \cdot e' \in E(P)$ and $c \not\sim a$
-  implies $e \cdot a \cdot c \cdot e' \in E(P)$.
+  $e \cdot c \cdot a \cdot e' \in E(P)$ implies
+  $c \match a$ or $e \cdot a \cdot c \cdot e' \in E(P)$.
   
   \item Return actions $r \in R$ cannot disable other actions: \\
-  $e \cdot a \cdot r \cdot e' \in E(P)$ and $a \not\sim r$
-  implies $e \cdot r \cdot a \cdot e \in E(P)$.
+  $e \cdot a \cdot r \cdot e' \in E(P)$ implies
+  $a \match r$ or $e \cdot r \cdot a \cdot e \in E(P)$.
 
 \end{itemize}
 Note that since even call actions specify return values, if a program allows
