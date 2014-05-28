@@ -1,18 +1,62 @@
 %!TEX root = draft.tex
-\section{Preliminaries}
 
-\paragraph{LTSs}
+\section{Observational Refinement}
 
-A \emph{labeled transition system} (LTS) $A = (Q,@S,q_0,@d)$ over alphabet $@S$
-is a set $Q$ of states with initial state $q_0 \in Q$, and a transition
-relation $@d \in Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in
-@S^*$ such that for some $q_1 q_2 .. q_{|e|} \in Q^*$ we have
-$@d(q_i,e_i,q_{i+1})$ for each $0 \le i < |e|$. $E(A)$ denotes the set of $A$'s
-executions. The \emph{synchronous product} $A_1 \x A_2$ of two LTSs is defined
-as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) = E(A_1)|@S_2 \n
-E(A_2)|@S_1$.
+Standard correctness criteria for software library implementations are their
+conformance to \emph{reference implementations}. The literature captures such
+conformance with the notion of \emph{observational refinement}: is every
+behavior of a program using a given library also possible when using instead
+its reference implementation? Here we formalize this criterion using a simple
+yet universal model of computation, namely labeled transition systems (LTS).
 
-\paragraph{Actions}
+A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over alphabet $@S$ is a
+set $Q$ of states with initial state $q_0 \in Q$, and a transition relation $@d
+\in Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
+that for some $q_1 q_2 .. q_{|e|} \in Q^*$ we have $@d(q_i,e_i,q_{i+1})$ for
+each $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$
+over alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$
+their projections over $@G$. The \emph{synchronous product} $A_1 \x A_2$ of two
+LTSs is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) =
+E(A_1)|@S_2 \n E(A_2)|@S_1$.
+
+\begin{example}
+  \label{ex:threads}
+
+  A multithreaded system $\tup{S,L,@S,s_0,@l_0,n,->}$ of $n$ threads with
+  shared states $S$, local states $L$, actions $@S$, and per-thread transition
+  relation $-> \subseteq (S \x L) \x @S \x (S \x L)$ is modeled by the LTS
+  $\tup{Q,@S,q_0,@d}$ with states $Q = S \x L^n$ and initial state $q_0 =
+  \tup{s_0, @l_0, .., @l_0}$, which includes a transition
+  \begin{align*}
+    @d(\tup{s, @l_1, .., @l_n}, a, \tup{s', @l_1', .., @l_n'})
+  \end{align*}
+  iff $\tup{s,@l_i} \overset{a}{\rightarrow} \tup{s',@l_i'}$ for some $i$, and
+  $@l_j = @l_j'$ for $j \neq i$.
+
+\end{example}
+
+Programs interact with libraries by calling named library \emph{methods}, which
+receive parameter values and yield return values upon completion. For
+simplicity yet without loss of generality, we fix an arbitrary set $M$ of
+methods which comprise not only method names, but also parameter and return
+values.
+
+\begin{example}
+  \label{ex:methods}
+
+  The set of methods for a simple pushdown-stack data structure which stores
+  only natural numbers is
+  \begin{align*}
+    M = \set{ \<push>(x) : x \in \<Nats> }
+    \u \set{ \<pop>(x) : x \in \<Nats> \u \set{\bottom}}.
+  \end{align*}
+  Note that $M$ does not syntactically distinguish method parameter values from
+  return values: $x$ is a parameter value in $\<push>(x)$, yet a return value
+  in $\<pop>(x)$; the value $\bottom$ signifies empty.
+  Example~\ref{ex:programs} demonstrates how programs can distinguish between
+  parameter and return values.
+
+\end{example}
 
 For a given set $M$ of methods, we fix the sets $C = M \x \<Nats>$ of
 \emph{call actions} and $R = \<Nats> \x M$ of \emph{return actions}. Each call
@@ -22,7 +66,7 @@ action $r = \tup{i,m}$; we denote the method and identifier of a call/return
 action $c$ by $\<method>(c)$ and $\<id>(c)$. Two call/return actions $c$ and
 $r$ are \emph{matching}, written $c ~ r$, when $\<method>(c) = \<method>(r)$,
 $\<id>(c) = \<id>(r)$, and $c \neq r$. A word $e \in @S^*$ over alphabet $@S$,
-such that $(C \u R) \subseteq @S$, is \emph{well formed} when
+such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
 \begin{itemize}
   \item Each return is preceded by a matching call: \\
   $e(j) \in R$ implies $e(i) ~ e(j)$ for some $i < j$.
@@ -30,13 +74,36 @@ such that $(C \u R) \subseteq @S$, is \emph{well formed} when
   \item Each operation identifier is used in at most one call/return: \\
   $\<id>(e(i)) = \<id>(e(j))$ and $i < j$ implies $e(i) ~ e(j)$.
 \end{itemize}
+Well-formed words will represent executions.
 
-\paragraph{Libraries}
+\begin{example}
+  \label{ex:executions}
 
-TODO DESCRIBE THE INTUITION BEHIND WHAT A LIBRARY IS...
+  The well-formed words
+  \scriptsize
+  \begin{align*}
+    \tup{\<push>(0),0} \tup{\<pop>(0),1} \tup{\<pop>(0),2}
+    \tup{0,\<push>(0)} \tup{2,\<pop>(0)} \tup{1,\<pop>(0)} \\
+    \text{\normalsize and } 
+    \tup{\<push>(0),0} \tup{\<pop>(0),1} \tup{\<pop>(0),2}
+    \tup{0,\<push>(0)} \tup{1,\<pop>(0)}
+  \end{align*}
+  \normalsize
+  represent executions in which one call to the $\<push>(0)$ method overlaps
+  with two calls to $\<pop>(0)$. In the first execution both calls to
+  $\<pop>(0)$ have matching return actions, while operation $2$ has no matching
+  return in the second.
 
-Formally, a library $L$ is an LTS over an alphabet $@S$ such that $(C \u R)
-\subseteq @S$, and
+\end{example}
+
+Libraries dictate the execution of methods between their call and return
+points. Accordingly, a library cannot prevent a method from being called,
+though it can decide not to return. Furthermore, any library action performed
+in the interval between call and return points can also be performed should the
+call have been made earlier, and/or the return made later. Our technical
+results rely on these properties.
+
+A library $L$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
 \begin{itemize}
 
   \item Each execution $e \in E(L)$ is well formed.
@@ -52,13 +119,45 @@ Formally, a library $L$ is an LTS over an alphabet $@S$ such that $(C \u R)
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
 
 \end{itemize}
+Note that even a library that implements \emph{atomic methods} --- i.e.,~in
+which the actions of separate method calls do not interleave --- admits
+executions in which method calls and returns overlap.
 
-\paragraph{Programs}
+\begin{example}
+  \label{ex:libraries}
 
-TODO DESCRIBE THE INTUITION BEHIND WHAT A PROGRAM IS...
+  Any library which admits the execution
+  \scriptsize
+  \begin{align*}
+    \tup{\<push>(0),0} \tup{0,\<push>(0)} \tup{\<pop>(0),1} \tup{1,\<pop>(0)}
+  \end{align*}
+  \normalsize
+  with sequential calls to $\<push>(0)$ and $\<pop>(0)$ must also admit
+  \scriptsize
+  \begin{align*}
+    \tup{\<push>(0),0} \tup{\<pop>(0),1} \tup{0,\<push>(0)} \tup{1,\<pop>(0)}
+    \text{ \normalsize and} \\
+    \tup{\<push>(0),0} \tup{\<pop>(0),1} \tup{\<pop>(0),2} \tup{0,\<push>(0)} \tup{1,\<pop>(0)}
+    \text{\normalsize,}
+  \end{align*}
+  \normalsize
+  among others, yet need not admit an execution
+  \scriptsize
+  \begin{align*}
+    \tup{\<push>(0),0} \tup{\<pop>(0),1} \tup{\<pop>(0),2} \tup{0,\<push>(0)} \tup{2,\<pop>(0)} \tup{1,\<pop>(0)}
+  \end{align*}
+  \normalsize
+  with two completed $\<pop>(0)$ operations.
+\end{example}
 
-Formally, a program $P$ is an LTS over an alphabet $@S$ such that $(C \u R)
-\subseteq @S$, and
+Complementary to libraries, programs control their execution outside of method
+call and return points. Accordingly, any program action performed in the
+interval between call and return points can also be performed should the call
+have been made later, and/or the return made earlier. While our technical
+results do not rely on these properties, we suppose them for symmetry with
+libraries, and since they do hold in practice.
+
+A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
 \begin{itemize}
   
   \item Each execution $e \in E(P)$ is well formed.
@@ -72,15 +171,29 @@ Formally, a program $P$ is an LTS over an alphabet $@S$ such that $(C \u R)
   implies $e \cdot r \cdot a \cdot e \in E(P)$.
 
 \end{itemize}
+Note that since even call actions specify return values, if a program allows
+methods to return different values, then call actions for each possible return
+value should be enabled, in order to accept any returned value.
 
-(The composition of program $P$ with library $L$ is the LTS $P \x L$.)
+\begin{example}
+  \label{ex:programs}
 
-\paragraph{Observational refinement}
+  A program which allows any return value from a call to $\<pop>(\_)$ should
+  enable all call actions $\tup{\<pop>(x),i}$ from any state in which some call
+  action $\tup{\<pop>(\_),\_}$ is enabled. 
 
-The library $L_1$ \emph{refines} library $L_2$, written $L_1 \leq L_2$, if and
-only if $E(P \x L_1)|@S_P \subseteq E(P \x L_2)|@S_P$ for all programs $P$.
+\end{example}
 
-\paragraph{Histories}
+Finally, refinement between libraries $L_1$ and $L_2$ means that any program
+execution possible in its composition with $L_1$ is also possible with $L_2$.
+Formally, $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
+\begin{align*}
+  (E(P \x L_1)|@S_P) \subseteq (E(P \x L_2)|@S_P)
+\end{align*}
+for all programs $P$.
+
+
+\section{Histories}
 
 A \emph{history} $h = \tup{N,f,\ll}$ is a set $N \subset \<Nats>$ of operation
 identifiers, along with a function $f: N -> (M \x \<Bools>)$ and partial order
