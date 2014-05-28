@@ -4,8 +4,9 @@ Standard correctness criteria for software library implementations are their
 conformance to \emph{reference implementations}. The literature captures such
 conformance with the notion of \emph{observational refinement}: is every
 behavior of a program using a given library also possible when using instead
-its reference implementation? Here we formalize this criterion using a simple
-yet universal model of computation, namely labeled transition systems (LTS).
+its reference implementation? We formalize this criterion using a simple yet
+universal model of computation for libraries and programs, namely labeled
+transition systems (LTS).
 
 A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over alphabet $@S$ is a
 set $Q$ of states with initial state $q_0 \in Q$, and a transition relation $@d
@@ -18,7 +19,7 @@ LTSs is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) =
 E(A_1)|@S_2 \n E(A_2)|@S_1$.
 
 \begin{example}
-  \label{ex:threads}
+  \label{ex:threads:1}
 
   A multithreaded system $\tup{S,L,@S,s_0,@l_0,n,->}$ of $n$ threads with
   shared states $S$, local states $L$, actions $@S$, and per-thread transition
@@ -72,7 +73,8 @@ such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
   \item Each operation identifier is used in at most one call/return: \\
   $\<id>(e(i)) = \<id>(e(j))$ and $i < j$ implies $e(i) ~ e(j)$.
 \end{itemize}
-Well-formed words will represent executions.
+Well-formed words will represent executions. We assume every set of well-formed
+words is closed under isomorphic renaming of operation identifiers.
 
 \begin{example}
   \label{ex:executions}
@@ -182,10 +184,31 @@ value should be enabled, in order to accept any returned value.
 
 \end{example}
 
+\begin{example}
+  \label{ex:threads:2}
+
+  A multithreaded program $P$ with $n$ threads, e.g.,~as defined in
+  Example~\ref{ex:threads:1}, only admits executions with at most $n$
+  overlapping method calls. A library which accesses $P$'s thread identifiers
+  can be modeled by defining the set $M$ of methods to include thread
+  identifiers as method parameters.
+
+\end{example}
+
 Finally, refinement between libraries $L_1$ and $L_2$ means that any program
 execution possible in its composition with $L_1$ is also possible with $L_2$.
 Formally, $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
 \begin{align*}
   (E(P \x L_1)|@S_P) \subseteq (E(P \x L_2)|@S_P)
 \end{align*}
-for all programs $P$.
+for all programs $P$. We assume that $P$'s alphabet $@S_P$ only overlaps with
+$@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
+
+\begin{example}
+
+  An $L_1$ that admits both executions from Example~\ref{ex:executions} does
+  not refine any $L_2$ which only admits the first execution, as witnessed by
+  the program $P$ which calls $\<push>(0)$ once and $\<pop>(0)$ twice, in
+  parallel.
+
+\end{example}
