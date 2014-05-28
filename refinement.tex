@@ -197,12 +197,17 @@ value should be enabled, in order to accept any returned value.
 
 Finally, refinement between libraries $L_1$ and $L_2$ means that any program
 execution possible in its composition with $L_1$ is also possible with $L_2$.
-Formally, $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
-\begin{align*}
-  (E(P \x L_1)|@S_P) \subseteq (E(P \x L_2)|@S_P)
-\end{align*}
-for all programs $P$. We assume that $P$'s alphabet $@S_P$ only overlaps with
-$@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
+\begin{definition}
+
+  The library $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
+  \begin{align*}
+    (E(P \x L_1)|@S_P) \subseteq (E(P \x L_2)|@S_P)
+  \end{align*}
+  for all programs $P$.
+
+\end{definition}
+We assume without loss of generality that $P$'s alphabet $@S_P$ only overlaps
+with $@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
 
 \begin{example}
 
