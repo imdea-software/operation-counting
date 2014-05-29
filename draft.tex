@@ -1,39 +1,32 @@
 \documentclass[preprint,nocopyrightspace]{sigplanconf}
 
-% The following \documentclass options may be useful:
-
-% preprint      Remove this option only once the paper is in final form.
-% 10pt          To set in 10-point type instead of 9-point.
-% 11pt          To set in 11-point type instead of 9-point.
-% authoryear    To obtain author/year citation style instead of numeric.
-
-\special{papersize=8.5in,11in}
-\setlength{\pdfpageheight}{\paperheight}
-\setlength{\pdfpagewidth}{\paperwidth}
-
-\usepackage{enumerate}
-
-%% Macros theorems
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}{Lemma}[section]
-\newtheorem{proposition}{Proposition}[section]
-\newtheorem{definition}{Definition}[section]
-\newtheorem{corollary}{Corollary}[section]
-\newenvironment{proof}[1][Proof]{\begin{trivlist}
-\item[\hskip \labelsep {\bfseries #1.}]}{\end{trivlist}}
-%\newtheorem{proofs}{Proof Sketch}
-\newtheorem{remark}{Remark}[section]
-
-%% Hyperlinked references
-\usepackage{hyperref,shuffle}
-
+% \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{microtype}
 \usepackage[numbers]{natbib}
-% \usepackage{etoolbox}
+\usepackage{xspace}
+\usepackage{balance}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{breakurl}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\def\ttat{\mtt{@}} % the at package clobbers this
+\usepackage{at}
+
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{colonequals}
+\usepackage{latexsym}
+\usepackage{wasysym} % causing problems with llncs's bold vectors
+\usepackage{stmaryrd}
 \usepackage{alltt}
+\usepackage{mathpartir}
+\usepackage[ligature,reserved,inference]{semantic}
+\usepackage[figure,lined]{algorithm2e}
+\usepackage{graphicx}
 \usepackage{pgf}
 \usepackage{tikz}
 
@@ -41,41 +34,34 @@
 \usetikzlibrary{positioning,shapes,shadows}
 \usetikzlibrary{decorations}
 
-\input macros-mje
-\input macros-programs
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}[section]
+\newenvironment{proof}[1][Proof]{%
+  \begin{trivlist}%
+    \item[\hskip \labelsep {\bfseries #1.}]%
+}{%
+  \end{trivlist}%
+}
+% \newtheorem{proofs}{Proof Sketch}
 
-\conferenceinfo{PLDI'14}{June 9--11, 2014, Edinburgh, UK} 
-\copyrightyear{2014} 
-\copyrightdata{978-1-nnnn-nnnn-n/yy/mm} 
-\doi{nnnnnnn.nnnnnnn}
-
-% Uncomment one of the following two, if you are not going for the 
-% traditional copyright transfer agreement.
-
-%\exclusivelicense                % ACM gets exclusive license to publish, 
-                                  % you retain copyright
-
-%\permissiontopublish             % ACM gets nonexclusive license to publish
-                                  % (paid open-access papers, 
-                                  % short abstracts)
-
-\titlebanner{banner above paper title}        % These are ignored unless
-\preprintfooter{\today}   % 'preprint' option specified.
-
+% \titlebanner{banner above paper title}        % These are ignored unless
+% \preprintfooter{\today}   % 'preprint' option specified.
 
 \title{Verification of Observational Refinement by Counting}
-%\subtitle{Draft, \today}
 
 \authorinfo{}{}{}
-%{Name1}
-%           {Affiliation1}
-%           {Email1}
-%\authorinfo{Name2\and Name3}
-%           {Affiliation2/3}
-%           {Email2/3}
+% \authorinfo{Ahmed Bouajjani \and Constantin Enea \\ \and Jad Hamza}%
+% {LIAFA, Université Paris 7}{\{abou,cenea,jhamza\}@liafa.univ-paris-diderot.fr}
+% \authorinfo{Michael Emmi}{IMDEA Software Institute}{michael.emmi@imdea.org}
+
+\input macros
 
 \begin{document}
-  \input macros-local
   \maketitle 
   
 %  \begin{abstract}
