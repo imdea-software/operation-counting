@@ -35,24 +35,23 @@ $H(L) = \set{ H(e) : e \in E(L) }$.
   
 \end{example}
 
-A history $h_1 = \tup{O_1, f_1, <_1}$ is \emph{stricter than} a history $h_2
-= \tup{O_2, f_2, <_2}$ (alternatively, $h_2$ is \emph{weaker than} $h_1$)
-written $h_1 \preceq h_2$, when there exists a bijection $g : O_1 -> O_2$ such
-that
+A history $h_1 = \tup{O_1,f_1,<_1}$ is \emph{weaker than} another history $h_2
+= \tup{O_2,f_2,<_2}$ written $h_1 \preceq h_2$, when there exists a bijection
+$g : O_1 -> O_2$ such that
 \begin{itemize}
 
   \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$, and
   
-  \item $o_1 <_1 o_2$ if $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$.
+  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$.
 
 \end{itemize}
-where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_2
-\Rightarrow b_1$. Two histories $h_1$ and $h_2$ are equivalent, denoted by $h_1
-\equiv h_2$ iff $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
+where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
+Two histories $h_1$ and $h_2$ are equivalent, denoted by $h_1 \equiv h_2$ iff
+$h_1 \preceq h_2$ and $h_2 \preceq h_1$.
 
 \begin{lemma}
   
-  The histories $H(L)$ of a library $L$ upward closed under $\preceq$.
+  The histories $H(L)$ of a library $L$ downward closed under $\preceq$.
 
 \end{lemma}
 
