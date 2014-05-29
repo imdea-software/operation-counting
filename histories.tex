@@ -6,23 +6,23 @@ following we introduce an alternative mathematical structure called
 library. Histories also provide a convenient foundation in which to formulate
 our technical development.
 
-A \emph{history} $h = \tup{N,f,\ll}$ is a partial order $\ll$ on a set $N
-\subset \<Nats>$ of operation identifiers labeled by $f: N -> (M \x \<Bools>)$.
+A \emph{history} $h = \tup{O,f,<}$ is a partial order $<$ on a set $O \subseteq
+\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$.
 The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
 operation with a method and completed status, and orders the non-overlapping
 operations, according to:
 \begin{itemize}
 
-  \item $N = \set{ \<id>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
+  \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
 
-  \item $f(i) = \left\{
+  \item $f(o) = \left\{
   \begin{array}{ll}
-    \tup{m,\<true>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \in e \\
-    \tup{m,\<false>} & \text{ if } \tup{m,i} \in e \text{ and } \tup{i,m} \not\in e
+    \tup{m,\<true>} & \text{ if } \tup{m,o} \in e \text{ and } \tup{o,m} \in e \\
+    \tup{m,\<false>} & \text{ if } \tup{m,o} \in e \text{ and } \tup{o,m} \not\in e
   \end{array}
   \right.$
 
-  \item $\<id>(e_i) \ll \<id>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
+  \item $\<op>(e_i) < \<op>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
 
 \end{itemize}
 The \emph{histories} of a library $L$ are those of its admitted executions:
@@ -35,15 +35,15 @@ $H(L) = \set{ H(e) : e \in E(L) }$.
   
 \end{example}
 
-A history $h_1 = \tup{N_1, f_1, \ll_1}$ is \emph{stricter than} a history $h_2
-= \tup{N_2, f_2, \ll_2}$ (alternatively, $h_2$ is \emph{weaker than} $h_1$)
-written $h_1 \preceq h_2$, when there exists a bijection $g : N_1 -> N_2$ such
+A history $h_1 = \tup{O_1, f_1, <_1}$ is \emph{stricter than} a history $h_2
+= \tup{O_2, f_2, <_2}$ (alternatively, $h_2$ is \emph{weaker than} $h_1$)
+written $h_1 \preceq h_2$, when there exists a bijection $g : O_1 -> O_2$ such
 that
 \begin{itemize}
 
-  \item $f_1(i) \preceq f_2(g(i))$ for each $i \in N_1$, and
+  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$, and
   
-  \item $i \ll_1 j$ if $g(i) \ll_2 g(j)$ for each $i,j \in N_1$.
+  \item $o_1 <_1 o_2$ if $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$.
 
 \end{itemize}
 where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_2
