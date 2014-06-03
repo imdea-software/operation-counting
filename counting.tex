@@ -1,94 +1,110 @@
 %!TEX root = draft.tex
 \section{Operation Counting}
 
+THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
+STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
+
 While the general definition of histories allows arbitrary partial orders of
 operations, histories which arise from LTS executions fall into a special class
 called \emph{interval orders}.
 
+\begin{definition}
+
+  An \emph{interval order} is a partial order $\tup{O,<}$ such that
+  $o_1 < o_3$ and $o_2 < o_4$ implies $o_1 < o_4$ or $o_2 < o_3$.
+
+\end{definition}
+
 \begin{lemma}
+  \label{lem:intervals}
 
   The history $H(e) = \tup{O,f,<}$ of a well-formed execution $e$ forms an
-  interval order: $i_1 < j_1$  and $i_2 < j_2$ implies either
-  $i_1 < j_2$ or $i_2 < j_1$.
+  interval order $\tup{O,<}$.
 
 \end{lemma}
 
-Next, we introduce a procedure for checking the equivalence between two histories, which exploits the fact that they are interval orders.
-This procedure is based on a symbolic encoding of interval orders using counters, which roughly count operations of a history that are invocations of the same method. 
+\begin{proof}
 
-A first condition that two histories $h_1$ and $h_2$ must satisfy in order to be equivalent is that there exists a bijection between their operations that 
-preserves the labelling with method names. Said otherwise, the multiset of labels in $h_1$ equals the multiset of labels in $h_2$.
-To check this condition, one can define a representation of histories using counters, one for each method, that counts the number of occurrences of that label, and then, test equality between counters that correspond to the same label.
+  Suppose $o_1 < o_3$ and $o_2 < o_4$ in $H(e)$, and fix $i_1, i_2, i_3, i_4$
+  such that $e_{i_1}$ and $e_{i_2}$ are the return actions of $o_1$ and $o_2$,
+  and $e_{i_3}$ and $e_{i_4}$ are the call actions of $o_3$ and $o_4$; note
+  that $i_1 < i_3$ and $i_2 < i_4$. Since $<$ linearly orders $\set{i_1, i_2,
+  i_3, i_4}$, either $i_1 < i_4$, in which case $o_1 < o_4$, or $i_4 < i_1$, in
+  which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
 
-However, history equivalence also requires that the bijection between operations preserves the order constraints from one history to another. This can be checked by refining the counter-based representation above. Essentially, we will define a partition over the operations in a history such that for every two classes $C_1$ and $C_2$ of the partition, either (1) every element of $C_1$ is incomparable to every element of $C_2$, (2) every element of $C_1$ is smaller than every element of $C_2$ or (3) every element of $C_1$ is greater than every element of $C_2$. Therefore, one can extend the order relation to classes of the partition in a conservative and complete way. Then, we will associate a counter for each class and each method, that counts the number of invocations of that method in that class. History equivalence now corresponds to the fact that the order relations on classes of operations are isomorphic and that the counters associated to isomorphic classes and the same method are equal.
+\end{proof}
 
-The definition of history partitions is strongly based on the fact that they are interval orders. Moreover, the order relation on classes of the partition is also an interval order. This allows us to define a representation for histories using integer maps, that encode the values of the counters but also the order relation between classes of the partition. Basically, the classes of the partition are represented in the domain of the integer map using intervals on the integer line. Now, history equivalence can be decided by checking the equality between the corresponding integer maps.
+Next, we introduce a procedure for checking the equivalence between two
+histories, which exploits the fact that they are interval orders. This
+procedure is based on a symbolic encoding of interval orders using counters,
+which roughly count operations of a history that are invocations of the same
+method.
 
-%$h_1 = \tup{O_1,f_1,<_1}$
+A first condition that two histories $h_1$ and $h_2$ must satisfy in order to
+be equivalent is that there exists a bijection between their operations that
+preserves the labelling with method names. Said otherwise, the multiset of
+labels in $h_1$ equals the multiset of labels in $h_2$. To check this
+condition, one can define a representation of histories using counters, one for
+each method, that counts the number of occurrences of that label, and then,
+test equality between counters that correspond to the same label.
 
-\subsection{Quotients}
+However, history equivalence also requires that the bijection between
+operations preserves the order constraints from one history to another. This
+can be checked by refining the counter-based representation above. Essentially,
+we will define a partition over the operations in a history such that for every
+two classes $C_1$ and $C_2$ of the partition, either (1) every element of $C_1$
+is incomparable to every element of $C_2$, (2) every element of $C_1$ is
+smaller than every element of $C_2$ or (3) every element of $C_1$ is greater
+than every element of $C_2$. Therefore, one can extend the order relation to
+classes of the partition in a conservative and complete way. Then, we will
+associate a counter for each class and each method, that counts the number of
+invocations of that method in that class. History equivalence now corresponds
+to the fact that the order relations on classes of operations are isomorphic
+and that the counters associated to isomorphic classes and the same method are
+equal.
 
+The definition of history partitions is strongly based on the fact that they
+are interval orders. Moreover, the order relation on classes of the partition
+is also an interval order. This allows us to define a representation for
+histories using integer maps, that encode the values of the counters but also
+the order relation between classes of the partition. Basically, the classes of
+the partition are represented in the domain of the integer map using intervals
+on the integer line. Now, history equivalence can be decided by checking the
+equality between the corresponding integer maps.
 
-Let $(A,<)$ be an interval order.
-Given $a\in A$, let 
-\[
-pre^*(a)=\{b < a\mid b\in A\}\mbox{ and }post^*(a)=\{a < b\mid b\in A\}.
-\]
+\begin{lemma}[Greenough~\cite{phd/Greenough76}]
+  \label{lem:representation}
 
-\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
-
-  Let $(A,<)$ be an interval order. Then, the possible values of $pre^*(a)$ are
-  linearly ordered by set inclusion. Similarly, for the possible values of
-  $post^*(a)$.
+  An interval order $\tup{O,<}$ has a canonical representation $I : O -> [n]^2$
+  for some minimal $n \in \<Nats>$ mapping each $o \in O$ to the interval $I(o)
+  = [i,j] \subseteq [0,n]$, where $o_1 < o_2$ iff $\sup I(o_1) < \inf I(o_2)$.
 
 \end{lemma}
 
-Let $\sim$ be an equivalence relation over $A$ defined by $a\sim b$ iff
-$pre^*(a)=pre^*(b)$ and $post^*(a)=post^*(b)$.
+Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
+order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
+a representation $\pi$ including operations' methods, by $\pi(o) =
+\tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
+of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-interval pairs
+$\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
+counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
+H(L) }$.
 
-The quotient of $(A,<)$ w.r.t. $\sim$ is denoted by $(A/_\sim,<_\sim)$.
+This representation reduces the problem of ensuring that each history $h \in
+H(L_1)$ of some library is included in the histories $H(L_2)$ of another, to
+ensuring that each multiset $\Pi(h) \in \Pi(L_1)$ is also included in
+$\Pi(L_2)$.
 
-Two labeled interval orders are $\sim$-equivalent if there exists an
-isomorphism between their quotients s.t. two equivalence classes are related by
-the isomorphism if they contain the same multiset of synopses.
-
-We represent an equivalence class w.r.t. the $\sim$-equivalence (i.e., a set of
-labeled interval orders) by integer maps $\iota:\<Nats>\times \<Nats>\times
-\Gamma\rightarrow \<Nats>$. First, given a labeled interval order $(A,\ell,<)$,
-we define a notation for equivalence classes of $\sim$ as follows:
-
-\begin{itemize}
-
-	\item let $pre^*(a_0)\subseteq pre^*(a_1)\subseteq \ldots\subseteq
-pre^*(a_n)$ be the set of different values of $pre^*(a)$. For any $a\in A$, let
-$low(a)=i$ s.t. $pre^*(a)=pre^*(a_i)$.
-
-	\item let $post^*(b_1)\supseteq post^*(b_1)\supseteq \ldots\supseteq
-post^*(b_n)$ be the set of different values of $post^*(b)$. For any $a\in A$,
-let $high(a)=j$ s.t. $post^*(a)=post^*(a_j)$.
-
-	\item the equivalence class $[a]$ is denoted by $[low(a),high(a)]$.
-
-\end{itemize}
-
-Given $h=(A,\ell,<)$, the integer map associated to $h$, $\Pi(h)$ is defined
-by: $\Pi(h)(low(a),high(a))(s)=$ the number of operations in $[a]$ having the
-synopsis $s$.
+TODO EXPLAIN BETTER THE SIGNIFICANCE OF THIS REDUCTION.
 
 \begin{lemma}
 
-  For any two $\sim$-equivalent labeled interval orders $h$ and $h'$,
-  $\Pi(h)=\Pi(h')$.
+  $H(L_1) \subseteq H(L_2)$ iff $\Pi(L_1) \subseteq \Pi(L_2)$.
 
 \end{lemma}
 
-Given a library $L$, $\Pi(L)=\{\Pi(h)\mid h\in H(L)\}$.
+\begin{proof}
 
-\begin{lemma}
+  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
 
-  Given $L$ and $L'$ which are thread-independent, $H(L)\subseteq H(L')$ iff
-  \[
-    \Pi(L) \subseteq \Pi(L')
-  \]
-
-\end{lemma}
+\end{proof}
