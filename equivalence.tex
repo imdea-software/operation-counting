@@ -1,0 +1,30 @@
+%!TEX root = draft.tex
+\section{Observational refinement is equivalent to history inclusion}
+
+To avoid an overload of notation, for any two sets of histories $H$ and $H'$, $H\subseteq H'$ 
+denotes the fact that for every history $h\in H$ there exists a history $h'\in H'$ s.t. 
+$h$ and $h'$ are equivalent.
+
+\begin{theorem}
+
+  $L_1 \leq L_2$ iff $H(L_1) \subseteq H(L_2)$.
+
+\end{theorem}
+
+\begin{proof}
+
+  ($\Rightarrow$) Let $h\in H(L_1)$. As in Filipovic et al., construct a
+  program $P_h$ (this LTS can be described as a program with shared variables)
+  where we use shared variables to enforce the order constraints in $h$.
+  Because $ReachStates_1(P_h\times L_1) \subseteq ReachStates_1(P_h\times
+  L_2)$, there exists an execution $e$ of $P_h\times L_2$ s.t. $H(w)=h'$ and
+  $h\preceq h'$. By the closure property on $L_2$, if $h'\in H(L_2)$ then $h\in
+  H(L_2)$.
+
+  ($\Leftarrow$) Let $P$ be a program and let $e$ be an execution in $P\times
+  L_1$. By hypothesis, $h=H(e)\in H(L_2)$. Let $w'\in L_2$ s.t. $H(w')=h$. Note
+  that the projection of $e$ on library actions may be different than $w'$. We
+  must show that by the closure properties on $P$, $E(P)$ contains the
+  interleaving of $w'$ and the projection of $e$ on client actions.
+
+\end{proof}

@@ -1,3 +1,4 @@
+%!TEX root = draft.tex
 \section{Operation Counting}
 
 While the general definition of histories allows arbitrary partial orders of
@@ -11,6 +12,22 @@ called \emph{interval orders}.
   $i_1 < j_2$ or $i_2 < j_1$.
 
 \end{lemma}
+
+Next, we introduce a procedure for checking the equivalence between two histories, which exploits the fact that they are interval orders.
+This procedure is based on a symbolic encoding of interval orders using counters, which roughly count operations of a history that are invocations of the same method. 
+
+A first condition that two histories $h_1$ and $h_2$ must satisfy in order to be equivalent is that there exists a bijection between their operations that 
+preserves the labelling with method names. Said otherwise, the multiset of labels in $h_1$ equals the multiset of labels in $h_2$.
+To check this condition, one can define a representation of histories using counters, one for each method, that counts the number of occurrences of that label, and then, test equality between counters that correspond to the same label.
+
+However, history equivalence also requires that the bijection between operations preserves the order constraints from one history to another. This can be checked by refining the counter-based representation above. Essentially, we will define a partition over the operations in a history such that for every two classes $C_1$ and $C_2$ of the partition, either (1) every element of $C_1$ is incomparable to every element of $C_2$, (2) every element of $C_1$ is smaller than every element of $C_2$ or (3) every element of $C_1$ is greater than every element of $C_2$. Therefore, one can extend the order relation to classes of the partition in a conservative and complete way. Then, we will associate a counter for each class and each method, that counts the number of invocations of that method in that class. History equivalence now corresponds to the fact that the order relations on classes of operations are isomorphic and that the counters associated to isomorphic classes and the same method are equal.
+
+The definition of history partitions is strongly based on the fact that they are interval orders. Moreover, the order relation on classes of the partition is also an interval order. This allows us to define a representation for histories using integer maps, that encode the values of the counters but also the order relation between classes of the partition. Basically, the classes of the partition are represented in the domain of the integer map using intervals on the integer line. Now, history equivalence can be decided by checking the equality between the corresponding integer maps.
+
+%$h_1 = \tup{O_1,f_1,<_1}$
+
+\subsection{Quotients}
+
 
 Let $(A,<)$ be an interval order.
 Given $a\in A$, let 
