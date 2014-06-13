@@ -1,15 +1,19 @@
+%!TEX root = draft.tex
 \section{Operation Histories}
 
-THE POINT: REDUCING REFINEMENT TO SOMETHING WITHOUT A UNIVERSALLY QUANTIFIED
-PROGRAM: INCLUSION OF LIBRARY HISTORIES.
+%THE POINT: REDUCING REFINEMENT TO SOMETHING WITHOUT A UNIVERSALLY QUANTIFIED
+%PROGRAM: INCLUSION OF LIBRARY HISTORIES.
 
 While observational refinement is defined over program executions, in the
 following we introduce an alternative mathematical structure called
 \emph{histories} which concisely summarize the executions admitted by a
 library. Histories also provide a convenient foundation in which to formulate
-our technical development.
+our technical development. More precisely, we show that observational refinement
+is equivalent to a plain inclusion between library histories. This result is important because
+it reduces observational refinement to a property that doesn't contain the universal quantifier
+over programs. 
 
-A \emph{history} $h = \tup{O,f,<}$ is a partial order $<$ on a set $O \subseteq
+A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
 \<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$.
 The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
 operation with a method and completed status, and orders the non-overlapping
@@ -18,6 +22,8 @@ operations, according to:
 
   \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
 
+  \item $\<op>(e_i) < \<op>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
+
   \item $f(o) = \left\{
   \begin{array}{ll}
     \tup{m,\<true>} & \text{ if } \tup{m,o} \in e \text{ and } \tup{o,m} \in e \\
@@ -25,11 +31,12 @@ operations, according to:
   \end{array}
   \right.$
 
-  \item $\<op>(e_i) < \<op>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
-
 \end{itemize}
 The \emph{histories} of a library $L$ are those of its admitted executions:
 $H(L) = \set{ H(e) : e \in E(L) }$.
+
+The \emph{histories} of a program $P$ are the histories of its admitted executions projected on call and return actions:
+$H(P) = \set{ H(e|(C\cup R)) : e \in E(P) }$.
 
 \begin{example}
   \label{ex:histories}
@@ -38,23 +45,39 @@ $H(L) = \set{ H(e) : e \in E(L) }$.
   
 \end{example}
 
-A history $h_1 = \tup{O_1,f_1,<_1}$ is \emph{weaker than} another history $h_2
-= \tup{O_2,f_2,<_2}$ written $h_1 \preceq h_2$, when there exists a bijection
+\todo{Show that histories are an abstraction of executions, i.e., there are different executions that have the same history}
+
+A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{weaker than} another history $h_2
+= \tup{O_2,<_2,f_2}$ written $h_1 \preceq h_2$, when there exists a bijection
 $g : O_1 -> O_2$ such that
 \begin{itemize}
-
-  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$, and
   
-  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$.
+  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
+  
+  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
 
 \end{itemize}
 where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
-Two histories $h_1$ and $h_2$ are equivalent, denoted by $h_1 \equiv h_2$ iff
+Two histories $h_1$ and $h_2$ are \emph{equivalent}, denoted by $h_1 \equiv h_2$ iff
 $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
 
-\begin{lemma}
+A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{quasi-equivalent} to another history $h_2
+= \tup{O_2,<_2,f_2}$ written $h_1 \sim h_2$, when there exists a bijection
+$g : O_1 -> O_2$ such that
+\begin{itemize}
   
-  The histories $H(L)$ of a library $L$ downward closed under $\preceq$.
+  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
+
+  \item $o_1 <_2 o_2$ implies $g^{-1}(o_1) <_1 g^{-1}(o_2)$ for each $o_1, o_2 \in O_2$, and
+  
+  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
+
+\end{itemize}
+%where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
+
+\begin{lemma}\label{lemma:lib_closure}
+  
+  The set of histories $H(L)$ of a library $L$ is downward closed under $\preceq$.
 
 \end{lemma}
 
@@ -63,6 +86,22 @@ $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
   From the closure properties on $E(L)$.
 
 \end{proof}
+
+\begin{lemma}\label{lemma:lib_exec}
+  
+Let $h$ be a history of a library $L$. Then, $L$ contains all executions $e$ having the history $h$, i.e., 
+\[
+\{e\mid e\in (C\cup R)^*,\mbox{ e is well formed, and }H(e)=h\}\subseteq L
+\]
+
+\end{lemma}
+
+\begin{proof}
+
+  From the closure properties on $E(L)$.
+
+\end{proof}
+
 
 
 

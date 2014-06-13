@@ -1,4 +1,5 @@
-\section{Observational Refinement}
+%!TEX root = draft.tex
+\section{Observational Refinement}\label{sec:obsref}
 
 \newcommand{\match}{\bowtie}
 
@@ -33,6 +34,8 @@ E(A_1)|@S_2 \n E(A_2)|@S_1$.
   \end{align*}
   iff $\tup{s,@l_i} \overset{a}{\rightarrow} \tup{s',@l_i'}$ for some $i$, and
   $@l_j = @l_j'$ for $j \neq i$.
+  
+  \todo{actions should be associated to a thread}
 
 \end{example}
 
@@ -122,7 +125,10 @@ A library $L$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
   
   \item Return actions $r \in R$ cannot enable other actions: \\
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
-
+  
+  \item Return actions $r \in R$ can be removed: \\
+  $e \cdot r \cdot e' \in E(L)$ implies $e \cdot e' \in E(L)$.
+  
 \end{itemize}
 Note that even a library that implements \emph{atomic methods} --- i.e.,~in
 which the actions of separate method calls do not interleave --- admits
@@ -153,14 +159,22 @@ executions in which method calls and returns overlap.
   \end{align*}
   \normalsize
   with two completed $\<pop>(0)$ operations.
+  
+  \todo{Add an example on removing return actions}
 \end{example}
 
+%\todo{The closure properties 2 and 3 are true because we suppose that program actions and library actions, respectively, act on disjoint 
+
 Complementary to libraries, programs control their execution outside of method
-call and return points. Accordingly, any program action performed in the
+call and return points. \alert{We assume that the program communicates with the library only through call
+and return actions, i.e., the actions performed by the program outside of method invocations 
+involve a part of the memory state which is disjoint from the one touched by the library.}
+Accordingly, any program action performed in the
 interval between call and return points can also be performed should the call
-have been made later, and/or the return made earlier. While our technical
-results do not rely on these properties, we suppose them for symmetry with
-libraries, and since they do hold in practice.
+have been made later, and/or the return made earlier. 
+%While our technical
+%results do not rely on these properties, we suppose them for symmetry with
+%libraries, and since they do hold in practice.
 
 A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
 \begin{itemize}
@@ -174,11 +188,20 @@ A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
   \item Return actions $r \in R$ cannot disable other actions: \\
   $e \cdot a \cdot r \cdot e' \in E(P)$ implies
   $a \match r$ or $e \cdot r \cdot a \cdot e \in E(P)$.
-
+ 
+ \item Return actions $r \in R$ that correspond to unmatched call actions $c\in C$ can be added at the end of an execution: \\
+ $e \cdot c \cdot e' \in E(P)$, $c=\tup{m,o}$, and $e'$ does not contain $r=\tup{o,m}$ implies
+ $e \cdot c \cdot e' \cdot r \in E(P)$.
+  
+ 
 \end{itemize}
+
 Note that since even call actions specify return values, if a program allows
 methods to return different values, then call actions for each possible return
 value should be enabled, in order to accept any returned value.
+
+An action in $@S$ which is not a call or a return action is called a \emph{program action}.
+The set of program actions of $P$ is denoted by $@S_P$, i.e., $@S_P=@S\setminus(C\cup R)$.
 
 \begin{example}
   \label{ex:programs}
@@ -211,8 +234,8 @@ execution possible in its composition with $L_1$ is also possible with $L_2$.
   for all programs $P$.
 
 \end{definition}
-We assume without loss of generality that $P$'s alphabet $@S_P$ only overlaps
-with $@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
+%We assume without loss of generality that $P$'s alphabet $@S_P$ only overlaps
+%with $@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
 
 \begin{example}
 

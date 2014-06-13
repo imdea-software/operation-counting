@@ -14,6 +14,11 @@
 \renewcommand{\u}{\cup}
 \newcommand{\U}{\bigcup}
 \newcommand{\x}{\times}
+\newcommand{\print}[1]{\<print> {#1}}
+\newcommand{\barrier}[1]{\<print> {#1}}
+\newcommand{\sync}[2]{\<sync> ({#1}, {#2})}
+
+
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
 \newcommand{\tup}[1]{\angles{#1}}
@@ -112,8 +117,8 @@
 \reservestyle{\semanticdomain}{\semanticdomainstyle} 
 \mathfn{min,max,log,dom,range}
 
-\metalangkeyword{true,false}
-\metalangkeyword{method,op}
+\metalangkeyword{true,false,assume}
+\metalangkeyword{method,op,print,sync}
 \metalangkeyword{push,pop,enqueue,dequeue}
 
 \semanticdomain{%
