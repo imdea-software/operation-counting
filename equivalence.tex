@@ -2,29 +2,52 @@
 \section{Observational refinement is equivalent to history inclusion}\label{sec:equiv}
 
 We show that the observational refinement between two libraries can be simply expressed as the inclusion between 
-their sets of histories.This result reduces the burden of reasoning about the universal quantifier over programs. This result is 
-similar to the equivalence between observational refinement and linearizability~\cite{journals/tcs/FilipovicORY10}. Actually,
-observational refinement implies linearizability only if we consider executions where every operation is completed 
+their sets of histories.This result reduces the burden of reasoning about the universal quantifier over programs and it is 
+similar to the relation between observational refinement and linearizability~\cite{journals/tcs/FilipovicORY10}: linearizability implies
+observational refinement and observational refinement implies linearizability but only for 
+executions where every operation is completed 
 (see the discussion below). To explain
-the differences we first recall the notion of linearizability. Thus, a library execution $e_1$ is linearizable w.r.t. a library execution $e_2$
+the differences we first recall the notion of linearizability. Thus, a library execution $e_1$ is linearizable w.r.t. a library $L_2$
 iff there exists an execution $e_1'$ obtained from $e_1$ by appending return actions (for unmatched call actions) or deleting call actions
-such that $e_1'$ doesn't contain pending operations, $e_1'$ and $e_2$ contain exactly the same set of actions and $e_2$ is a 
+and an execution $e_2$ of $L_2$ such that $e_1'$ doesn't contain pending operations, $e_1'$ and $e_2$ contain exactly the same set of actions and $e_2$ is a 
 permutation of $e_1'$ that preserves the order between 
 return and call actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$ in $e_1'$ then the same holds in $e_2$).
-Then, a library $L_1$ is linearizable w.r.t. a library $L_2$ iff every execution $e_1\in L_1$ is linearizable w.r.t. some execution $e_2\in L_2$.
+Then, a library $L_1$ is linearizable w.r.t. a library $L_2$ iff every execution $e_1\in L_1$ is linearizable w.r.t. $L_2$.
+%
 
-First, our result reduces to a comparison between histories which are more abstract than library executions (see Example~\ref{}).
-Then, linearizability is equivalent to the fact that every history of $L_1$ is weaker than a history of $L_2$ with no pending operations. 
-However, if we consider that $L_1$ and $L_2$ are real libraries, which must satisfy the closure properties in Section~\ref{sec:obsref}, the latter can be reduced to
-plain inclusion between the set of histories of $L_1$ and respectively, $L_2$. Finally, observational refinement does not imply 
-linearizability if we consider libraries defined as arbitrary sets of sequences of call and return actions with possibly 
-pending operations. For example, this holds when $L_1$ and $L_2$ contain a method $m$ that never finishes. Thus, a program can observe that 
-it called the method $m$ with both libraries (e.g., the program $\print{\tup{m,o}} \cdot \tup{m,o}$, where $\print{\tup{m,o}}$ is a program action, 
-has the observation $\print{\tup{m,o}}$)
-but the library execution $\tup{m,o}$ is not linearizable w.r.t. $L_2$ because $L_2$ doesn't
-contain an execution where $m$ finishes.
-In our case, we obtain a property equivalent to observation refinement which is independent of 
-the presence of pending operations.
+If we consider that libraries are defined as arbitrary sets of well-formed sequences of call and return actions with possibly 
+pending operations, then observational refinement does not imply linearizability. 
+For example, this holds for two libraries $L_1$ and $L_2$ containing a method $m$ that never finishes. 
+Intuitively, a program can observe that it called the method $m$ with both libraries but the library execution of $L_1$
+that allowed this observation is not linearizable. More precisely, let $L_1$ and $L_2$ be two libraries that contain 
+a single execution $\tup{m,o}$ and $P$ a program with a single execution 
+$\print{\tup{m,o}} \cdot \tup{m,o}$, where $\print{\tup{m,o}}$ is a program action. The observation of $P$ is $\print{\tup{m,o}}$
+and it is possible when composing $P$ with both $L_1$ and $L_2$ but the library execution $\tup{m,o}$ is not linearizable 
+w.r.t. $L_2$ because $L_2$ doesn't contain an execution where $m$ finishes.
+
+When considering two real libraries $L_1$ and $L_2$, which must satisfy the closure 
+properties in Section~\ref{sec:obsref}, we show that observational refinement between $L_1$ and $L_2$ is actually 
+\emph{equivalent} to a plain inclusion between histories. Compared to the
+result in \citet{journals/tcs/FilipovicORY10}, we give a property that is equivalent to observation refinement irrespectively of the
+presence of pending operations, we consider a comparison between histories, which are more abstract 
+than library executions (see Example~\ref{}), and we consider a universal model of computation for programs 
+(the result in \citet{journals/tcs/FilipovicORY10} is proved only for programs with shared variables). 
+
+Our result can be explained by the following relation between linearizability and the ``weaker than'' comparison between histories.
+
+\begin{lemma}\label{lemma:lin}
+An execution $e_1$ is linearizable w.r.t. a library $L_2$ iff there exists an execution $e_2\in L_2$, where every operation is completed, 
+such that $H(e_1)\preceq H(e_2)$.
+\end{lemma}
+
+
+%Then, linearizability between an execution $e_1$ and a library $L_2$ is equivalent to the fact that the history of $e_1$, where
+%some pending operations may be deleted, is weaker than a history of $L_2$ with no pending operations. Linearizability
+%between two libraries $L_1$ and $L_2$ means that every execution of $L_1$ is linearizable w.r.t. $L_2$.
+
+Thus, if an execution $e_1$ is linearizable w.r.t. a library $L_2$, so the comparison between their histories 
+stated in Lemma~\ref{lemma:lin} holds, then by Lemma~\ref{lemma:lib_closure}, 
+there exists a history of $L_2$ which is actually equivalent to the history of $e_1$.
 
 To avoid an overload of notation, for any two sets of histories $H$ and $H'$, $H\subseteq H'$ 
 denotes the fact that for every history $h\in H$ there exists a history $h'\in H'$ s.t. 
@@ -43,14 +66,14 @@ $h$ and $h'$ are equivalent.
   The annotation of $e$, denoted $\overline{e}$, is an execution obtained from $e$ by adding the following program actions:
   \begin{itemize}
   	\item $\print{\tup{m,o}}$ immediately before every call action $\tup{m,o}$,
-	\item $\print{\tup{o,m}}$ immediately before every return action $\tup{o,m}$,
+	\item $\print{\tup{o,m}}$ immediately after every return action $\tup{o,m}$,
 	\item $\sync{o}{o'}$ between every two actions $r=\tup{o,m}\in R$ and $c=\tup{m,o}\in C$ such that $r$ occurs before $c$ in $e$.
   \end{itemize}
   
   Let $P$ be a program such that $E(P)$ is the minimal set of executions that contains $\overline{e}$. %and satisfies all the closure properties required for a program. 
   The set of program actions in $P$, $\Sigma_P$, consists of symbols $\print{\tup{m,o}}$, $\print{\tup{o,m}}$, and $\sync{o}{o'}$ with $o,o'\in \<Ops>$ and $m\in\<Methods>$.
   
- Note that for any execution $e'$ obtained from $\overline{e}$ by applying the closure properties, $\sync{o}{o'}$ still occurs in between the return action $\tup{o,m}$ and the call action $\tup{m,o}$. This is because actions occurring after a return action $r$ cannot be moved to the left of $r$ and actions occurring before a call action $c$ cannot be moved to the right of $c$. Therefore, for any execution $e'\in E(P)$, that contains all the program actions in $\overline{e}$, $h\preceq H(e')$. Moving call actions to the right and return actions to the left may imply that the history $H(e')$ contains  more order constraints on operations than $h$ and adding return actions of the end may imply that the history $H(e')$ contains more completed operations than $h$.
+ Note that for any execution $e'$ obtained from $\overline{e}$ by applying the closure properties, $\sync{o}{o'}$ still occurs in between the return action $\tup{o,m}$ and the call action $\tup{m,o}$. This is because actions occurring after a return action $r$ cannot be moved to the left of $r$ and actions occurring before a call action $c$ cannot be moved to the right of $c$. Therefore, for any execution $e'\in E(P)$, that contains all the program actions in $\overline{e}$, $h\preceq H(e')$. Moving call actions to the right and return actions to the left may imply that the history $H(e')$ contains  more order constraints on operations than $h$ and adding return actions of the end may imply that the history $H(e')$ contains more completed operations than $h$. Also, prefix-closure implies that $h$ may have more pending operations.
   
 %  Let 
 %  \[
@@ -62,7 +85,7 @@ $h$ and $h'$ are equivalent.
   an execution $e'\in E(P \x L_2)$ such that $h\preceq H(e')$ with $H(e')\in H(L_2)$. 
   By Lemma~\ref{lemma:lib_closure}, the set of histories of $L_2$ is downward closed and consequently, $h\in H(L_2)$.
   
-  The same proof holds also if we consider multi-threaded programs as in Example~\ref{ex:threads:1}. In this case, the $\<print>$ actions are considered to be local to the thread that executes the corresponding call or return action while $\sync{o}{o'}$ is replaced by two actions: $(t,x[o,o']=\<true>)$ immediately after the return action $r=\tup{o,m}$ and $(t',\<assume> (x[o,o'] = = \<false>))$ immediately before the call action $c=\tup{m,o}$, where $t$ is the thread executing $r$ and $t'$ is the thread executing $c$.
+  The same proof holds also if we consider multi-threaded programs as in Example~\ref{ex:threads:1}. In this case, the $\<print>$ actions are considered to be local to the thread that executes the corresponding call or return action while $\sync{o}{o'}$ is replaced by two actions: $(t,x[o,o']=\<true>)$ immediately after the return action $r=\tup{o,m}$ and $(t',\<assume> (x[o,o'] = = \<true>))$ immediately before the call action $c=\tup{m,o}$, where $t$ is the thread executing $r$ and $t'$ is the thread executing $c$.
   
   ($\Leftarrow$) Let $P$ be a program and let $e$ be an execution in the composition of $P$ with $L_1$, $P\times L_1$. 
   We show that $e$ is also an execution of $P\times L_2$, which implies that the projection of $e$ on program actions $e|@S_P$ belongs to $E(P \x L_2)|@S_P$.

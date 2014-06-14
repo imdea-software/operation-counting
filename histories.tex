@@ -14,7 +14,8 @@ it reduces observational refinement to a property that doesn't contain the unive
 over programs. 
 
 A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
-\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$.
+\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$ such that
+any element $o$ s.t. $f(o)=\tup{m,\<false>}$, for some $m\in \<Methods>$, is maximal in $<$.
 The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
 operation with a method and completed status, and orders the non-overlapping
 operations, according to:
@@ -49,35 +50,38 @@ $H(P) = \set{ H(e|(C\cup R)) : e \in E(P) }$.
 
 A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{weaker than} another history $h_2
 = \tup{O_2,<_2,f_2}$ written $h_1 \preceq h_2$, when there exists a bijection
-$g : O_1 -> O_2$ such that
+$g : O_1' -> O_2$, where $O_1'$ is a subset of $O_1$ that contains all the completed
+operations in $O_1$, i.e., 
+$O_1=O_1\cup\set{o : f_1(o)=\tup{m,\<false>}\mbox{ with $m\in\<Methods>$}}$, such that
 \begin{itemize}
   
-  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
+  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1'$, and
   
-  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
+  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1'$.
 
 \end{itemize}
 where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
 Two histories $h_1$ and $h_2$ are \emph{equivalent}, denoted by $h_1 \equiv h_2$ iff
 $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
 
-A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{quasi-equivalent} to another history $h_2
-= \tup{O_2,<_2,f_2}$ written $h_1 \sim h_2$, when there exists a bijection
-$g : O_1 -> O_2$ such that
-\begin{itemize}
-  
-  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
+%A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{quasi-equivalent} to another history $h_2
+%= \tup{O_2,<_2,f_2}$ written $h_1 \sim h_2$, when there exists a bijection
+%$g : O_1 -> O_2$ such that
+%\begin{itemize}
+%  
+%  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
+%
+%  \item $o_1 <_2 o_2$ implies $g^{-1}(o_1) <_1 g^{-1}(o_2)$ for each $o_1, o_2 \in O_2$, and
+%  
+%  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
+%
+%\end{itemize}
+%%where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
 
-  \item $o_1 <_2 o_2$ implies $g^{-1}(o_1) <_1 g^{-1}(o_2)$ for each $o_1, o_2 \in O_2$, and
-  
-  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
-
-\end{itemize}
-%where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
 
 \begin{lemma}\label{lemma:lib_closure}
   
-  The set of histories $H(L)$ of a library $L$ is downward closed under $\preceq$.
+The set of histories $H(L)$ of a library $L$ is downward closed under $\preceq$, i.e., whenever some history $h$ belongs to $H(L)$ all the histories $h'$ with $h'\preceq h$ belong also to $H(L)$. %Moreover, if a history $h$ belongs to $H(L)$ then all the histories $h'=\tup{O,<,f}$ obtained from $h$ by adding pending operations, i.e., operations $o$ with $f(o)=\<false>$, belong also to $H(L)$.
 
 \end{lemma}
 
