@@ -1,5 +1,57 @@
 %!TEX root = draft.tex
-\section{Operation Counting}
+\section{Operation Counting for Bounded Histories}
+
+We have shown that observational refinement is equivalent to an inclusion between sets of histories. 
+However, in general, deciding this inclusion is undecidable even for libraries with a bounded number of 
+states~\cite{conf/esop/BouajjaniEEH13}.
+In the following, we consider an under-approximation of this problem, that decides the inclusion between
+bounded sets of histories. This under-approximation can be reduced to a reachability problem and enables
+several applications: symbolic and dynamic analyses for detecting violations to observational refinement, and 
+runtime monitoring (see Section~\ref{} for more details).
+
+Our technical development is based on the observation that histories of library executions are \emph{interval orders},
+a particular class of partial orders. Intuitively, histories come from executions where operations have access to a notion
+of global time and therefore, for every two operations in a history, their 
+\emph{pasts} (the set of operations that finished before an operation starts) cannot be incomparable. Then,
+the bound that we consider on histories is actually a bound on their \emph{length}, defined as the number of
+distinct pasts that an operation can have. 
+
+We show that this bound is important in the process of detecting violations to
+history inclusion and thus, observational refinement, in several ways. First, we provide a complexity result stating
+that deciding if the history of a concurrent register (a library with $\<read>$ and $\<write>$ methods) of bounded length
+is included in the histories of an atomic register (where method bodies are executed atomically in one step) 
+is polynomial time. Deciding this fact for arbitrary histories is known to be NP-complete~\cite{journals/siamcomp/GibbonsK97}.
+Therefore, bounding histories provides an efficiency gain, in theory but even in practice as we demonstrate in Section~\ref{}, if we 
+are interested in defining dynamic analyses for detecting violations to observational refinement or runtime monitors for 
+ensuring observational refinement. 
+
+Second, we provide theoretical results stating that
+for an important class of executions of common concurrent data structures, e.g.., stacks and queues, a bound of 2 on
+the length of their histories is enough to detect \emph{all possible violations}. This results are strengthened by the experiments
+in Section~\ref{}, which show that even for other classes violations, small bounds of at most 2 on the length of histories is enough
+in order to discover them.
+
+Deciding the inclusion between sets of \emph{bounded} histories is reduced to a reachability problem. This reduction
+is based on a canonical representation of histories/interval orders with integer maps. In this representation, each operation $o$ in the history
+is associated to an interval $I(o)$ on the integer line whose bounds are smaller than the length of the history. A history is then 
+represented by a map, which associates to each interval $I$ and method $m$ an integer that counts the number of operations 
+$o$ with $I(o)=I$, which are instances of $m$. Based on this representation, the problem of deciding $H_K(L_1)\subseteq H_K(L_2)$, where
+$L_1$ and $L_2$ are two libraries and $H_K(L_1)$, resp., $H_K(L_2)$, is the set of histories of $L_1$, resp., $L_2$, of length at most $K$, can be reduced to
+a reachability problem as follows:
+\begin{itemize}
+	\item define a most general client of $L_1$ (that calls arbitrarily methods of $L_1$ with an arbitrary number of threads), annotated 
+with a set of counters that record the canonical representations of $H_K(L_1)$,
+	\item construct a formula (e.g., in Presburger arithmetic) $\varphi[K,L_2]$ describing the canonical representations of the histories in $H_K(L_2)$,
+	\item the inclusion problem holds iff the formula $\varphi[K,L_2]$ is true in all reachable states of the annotated most general client of $L_1$.
+\end{itemize}
+
+In general, the difficulty in defining this reduction is to construct the formula $\varphi[K,L_2]$. 
+Note that a formula that over-approximates $\varphi[K,L_2]$ could still be useful in defining a reduction to reachability 
+that is precise for discovering violations to history inclusion. Actually, $\varphi[K,L_2]$ describes the counter values reachable
+in the annotated most general client of $L_2$ and any inductive invariant for this program is an over-approximation of $\varphi[K,L_2]$. 
+
+We show how to construct the formula $\varphi[K,L_2]$ for particular but widely-used specifications of concurrent data structures, 
+e.g., atomic stacks and atomic queues, and for regular atomic specifications with a bounded number of states.
 
 THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
 STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
