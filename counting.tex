@@ -27,7 +27,7 @@ ensuring observational refinement.
 
 Second, we provide theoretical results stating that
 for an important class of executions of common concurrent data structures, e.g.., stacks and queues, a bound of 2 on
-the length of their histories is enough to detect \emph{all possible violations}. This results are strengthened by the experiments
+the length of their histories is enough to detect \emph{all possible violations}. These results are strengthened by the experiments
 in Section~\ref{}, which show that even for other classes violations, small bounds of at most 2 on the length of histories is enough
 in order to discover them.
 
@@ -42,7 +42,7 @@ a reachability problem as follows:
 	\item define a most general client of $L_1$ (that calls arbitrarily methods of $L_1$ with an arbitrary number of threads), annotated 
 with a set of counters that record the canonical representations of $H_K(L_1)$,
 	\item construct a formula (e.g., in Presburger arithmetic) $\varphi[K,L_2]$ describing the canonical representations of the histories in $H_K(L_2)$,
-	\item the inclusion problem holds iff the formula $\varphi[K,L_2]$ is true in all reachable states of the annotated most general client of $L_1$.
+	\item history inclusion holds iff the formula $\varphi[K,L_2]$ is true in all reachable states of the annotated most general client of $L_1$.
 \end{itemize}
 
 In general, the difficulty in defining this reduction is to construct the formula $\varphi[K,L_2]$. 
