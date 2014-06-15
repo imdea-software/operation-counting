@@ -11,11 +11,11 @@ library. Histories also provide a convenient foundation in which to formulate
 our technical development. More precisely, we show that observational refinement
 is equivalent to a plain inclusion between library histories. This result is important because
 it reduces observational refinement to a property that doesn't contain the universal quantifier
-over programs. 
+over programs. TODO AWKWARD PHRASING
 
 A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
-\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$ such that
-any element $o$ s.t. $f(o)=\tup{m,\<false>}$, for some $m\in \<Methods>$, is maximal in $<$.
+\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$
+for which $f(o) = \tup{\_,\<false>}$ implies $o$ is maximal in $<$.
 The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
 operation with a method and completed status, and orders the non-overlapping
 operations, according to:
@@ -43,16 +43,18 @@ $H(P) = \set{ H(e|(C\cup R)) : e \in E(P) }$.
   \label{ex:histories}
 
   TODO DRAW THE HISTORY/IES CORRESPONDING TO A/SOME PREVIOUS EXECUTION/S
-  
+  \todo{Show that histories are an abstraction of executions, i.e., there are
+  different executions that have the same history}
+
 \end{example}
 
-\todo{Show that histories are an abstraction of executions, i.e., there are different executions that have the same history}
 
 A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{weaker than} another history $h_2
 = \tup{O_2,<_2,f_2}$ written $h_1 \preceq h_2$, when there exists a bijection
 $g : O_1' -> O_2$, where $O_1'$ is a subset of $O_1$ that contains all the completed
 operations in $O_1$, i.e., 
 $O_1=O_1\cup\set{o : f_1(o)=\tup{m,\<false>}\mbox{ with $m\in\<Methods>$}}$, such that
+TODO WHY MUST WE ALLOW OMITTING OPERATIONS??
 \begin{itemize}
   
   \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1'$, and
@@ -93,10 +95,10 @@ The set of histories $H(L)$ of a library $L$ is downward closed under $\preceq$,
 
 \begin{lemma}\label{lemma:lib_exec}
   
-Let $h$ be a history of a library $L$. Then, $L$ contains all executions $e$ having the history $h$, i.e., 
-\[
-\{e\mid e\in (C\cup R)^*,\mbox{ e is well formed, and }H(e)=h\}\subseteq L
-\]
+  $E(L)$ contains all executions with histories in $H(L)$:
+  \begin{align*}
+    h \in H(L) \text{ if and only if } \set{ e \in @S^* : H(e) = h } \subseteq E(L)
+  \end{align*}
 
 \end{lemma}
 

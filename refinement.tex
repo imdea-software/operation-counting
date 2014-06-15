@@ -165,21 +165,22 @@ executions in which method calls and returns overlap.
   \todo{Add an example on removing return actions}
 \end{example}
 
+TODO WHERE IS THIS NECESSARY? SHOULD ONLY BE MENTIONED THERE.
 Given a library execution $e$, an operation $o$ is called \emph{completed} if both the call and the return actions of $o$, 
 $\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pending}. 
 An execution is called 
 \emph{sequential} if all call actions are immediately followed by their matching return action. %except possibly the last one,
 
 Complementary to libraries, programs control their execution outside of method
-call and return points. \alert{We assume that the program communicates with the library only through call
-and return actions, i.e., the actions performed by the program outside of method invocations 
-involve a part of the memory state which is disjoint from the one touched by the library.}
-Accordingly, any program action performed in the
-interval between call and return points can also be performed should the call
-have been made later, and/or the return made earlier. 
-%While our technical
-%results do not rely on these properties, we suppose them for symmetry with
-%libraries, and since they do hold in practice.
+call and return points.
+%% MOVED TO THE DEFINITION OF REFINEMENT.
+% \alert{We assume that the program communicates with the library only through
+% call and return actions, i.e., the actions performed by the program outside of
+% method invocations involve a part of the memory state which is disjoint from
+% the one touched by the library.}
+Accordingly, any program action performed in the interval between call and
+return points can also be performed should the call have been made later,
+and/or the return made earlier.
 
 A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
 \begin{itemize}
@@ -197,6 +198,7 @@ A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
  \item Return actions $r \in R$ that correspond to unmatched call actions $c\in C$ can be added at the end of an execution: \\
  $e \cdot c \cdot e' \in E(P)$, $c=\tup{m,o}$, and $e'$ does not contain $r=\tup{o,m}$ implies
  $e \cdot c \cdot e' \cdot r \in E(P)$.
+ TODO WHY IS THIS NECESSARY?
   
  
 \end{itemize}
@@ -205,8 +207,9 @@ Note that since even call actions specify return values, if a program allows
 methods to return different values, then call actions for each possible return
 value should be enabled, in order to accept any returned value.
 
-An action in $@S$ which is not a call or a return action is called a \emph{program action}.
-The set of program actions of $P$ is denoted by $@S_P$, i.e., $@S_P=@S\setminus(C\cup R)$.
+% An action in $@S$ which is not a call or a return action is called a
+% \emph{program action}. The set of program actions of $P$ is denoted by $@S_P$,
+% i.e., $@S_P=@S\setminus(C\cup R)$.
 
 \begin{example}
   \label{ex:programs}
@@ -234,9 +237,10 @@ execution possible in its composition with $L_1$ is also possible with $L_2$.
 
   The library $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
   \begin{align*}
-    (E(P \x L_1)|@S_P) \subseteq (E(P \x L_2)|@S_P)
+    (E(P \x L_1)|@S) \subseteq (E(P \x L_2)|@S)
   \end{align*}
-  for all programs $P$.
+  for all programs $P$ with alphabet $@S \uplus C \uplus R$ such that $@S \cap
+  @S_1 = @S \cap @S_2 = @0$, where $@S_i$ is the alphabet of library $L_i$.
 
 \end{definition}
 %We assume without loss of generality that $P$'s alphabet $@S_P$ only overlaps
