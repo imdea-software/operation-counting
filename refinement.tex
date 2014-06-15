@@ -103,6 +103,8 @@ words is closed under isomorphic renaming of operation identifiers.
   matching return in the second.
 
 \end{example}
+ 
+\todo{Closure properties are motivated by the fact that we consider only concurrent libraries. In sequential libraries, they do not hold}
 
 Libraries dictate the execution of methods between their call and return
 points. Accordingly, a library cannot prevent a method from being called,
@@ -163,7 +165,10 @@ executions in which method calls and returns overlap.
   \todo{Add an example on removing return actions}
 \end{example}
 
-%\todo{The closure properties 2 and 3 are true because we suppose that program actions and library actions, respectively, act on disjoint 
+Given a library execution $e$, an operation $o$ is called \emph{completed} if both the call and the return actions of $o$, 
+$\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pending}. 
+An execution is called 
+\emph{sequential} if all call actions are immediately followed by their matching return action. %except possibly the last one,
 
 Complementary to libraries, programs control their execution outside of method
 call and return points. \alert{We assume that the program communicates with the library only through call

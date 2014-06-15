@@ -35,25 +35,25 @@ than library executions (see Example~\ref{}), and we consider a universal model 
 
 Our result can be explained by the following relation between linearizability and the ``weaker than'' comparison between histories.
 
-\begin{lemma}\label{lemma:lin}
+\begin{proposition}\label{prop:lin}
 An execution $e_1$ is linearizable w.r.t. a library $L_2$ iff there exists an execution $e_2\in L_2$, where every operation is completed, 
 such that $H(e_1)\preceq H(e_2)$.
-\end{lemma}
+\end{proposition}
 
 
 %Then, linearizability between an execution $e_1$ and a library $L_2$ is equivalent to the fact that the history of $e_1$, where
 %some pending operations may be deleted, is weaker than a history of $L_2$ with no pending operations. Linearizability
 %between two libraries $L_1$ and $L_2$ means that every execution of $L_1$ is linearizable w.r.t. $L_2$.
 
-Thus, if an execution $e_1$ is linearizable w.r.t. a library $L_2$, so the comparison between their histories 
-stated in Lemma~\ref{lemma:lin} holds, then by Lemma~\ref{lemma:lib_closure}, 
+Thus, if an execution $e_1$ is linearizable w.r.t. a library $L_2$, hence the comparison between their histories 
+stated in Proposition~\ref{prop:lin} holds, then by Lemma~\ref{lemma:lib_closure}, 
 there exists a history of $L_2$ which is actually equivalent to the history of $e_1$.
 
 To avoid an overload of notation, for any two sets of histories $H$ and $H'$, $H\subseteq H'$ 
 denotes the fact that for every history $h\in H$ there exists a history $h'\in H'$ s.t. 
 $h$ and $h'$ are equivalent.
 
-\begin{theorem}
+\begin{theorem}\label{th:equiv}
 
   $L_1 \leq L_2$ iff $H(L_1) \subseteq H(L_2)$.
 
@@ -93,10 +93,22 @@ $h$ and $h'$ are equivalent.
   By hypothesis, the history of $e$ is also a history of the library $L_2$, i.e., $H(e)\in H(L_2)$. 
   Let $l$ be the projection of $e$ on library actions. % and $l'$ an execution of $L_2$ whose history is $h$.   
   By Lemma~\ref{lemma:lib_exec}, $l$ is also an execution of $L_2$. Therefore, $e$ is also an execution of $P\times L_2$.
-  
+  \hfill $\Box$
 %  Note
 %  that the projection of $e$ on library actions may be different than $w'$. We
 %  must show that by the closure properties on $P$, $E(P)$ contains the
 %  interleaving of $w'$ and the projection of $e$ on client actions.
 
 \end{proof}
+
+\paragraph{Linearizability w.r.t. sequential specifications.} Concurrent implementations of data structures are usually considered to be correct if they are linearizable w.r.t. the sequential version of the same data structure, e.g., a concurrent stack should be linearizable w.r.t. the sequential stack. In our framework, we consider only concurrent libraries, therefore, this correctness condition translates to the fact that the concurrent implementation is an observational refinement of the atomic implementation, where, intuitively, method bodies execute in one single atomic step but, method calls and returns can still overlap. 
+
+Given a \emph{sequential} library $L_{seq}$, i.e., whose executions are all sequential, the set of executions allowed by the \emph{atomic} concurrent library $L_{at}$ where method bodies are exactly the same as in $L_{seq}$ (modulo the fact that they are surrounded by synchronization actions, e.g., locks, in order to ensure that they are executed atomically) can be defined as the least set of executions that contains all the executions of $L_{seq}$ and that satisfies the closure properties in Section~\ref{sec:obsref}. Then, the following result is a direct consequence of the definitions.
+
+\begin{proposition}\label{prop:atom}
+An execution $e_1$ is linearizable w.r.t. a sequential library $L_{seq}$ iff $H(e_1)\in H(L_{at})$, where $L_{at}$ is the atomic concurrent library corresponding to $L_{seq}$.
+\end{proposition}
+
+The extension of Proposition~\ref{prop:atom} to libraries is straightforward, i.e., a library $L$ is linearizable w.r.t. a sequential library $L_{seq}$ iff $H(L)\subseteq H(L_{at})$, where $L_{at}$ is as above (or equivalently, by Theorem~\ref{th:equiv}, $L$ is an observational refinement of $L_{at}$).
+
+
