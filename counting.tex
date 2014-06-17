@@ -53,8 +53,7 @@ in the annotated most general client of $L_2$ and any inductive invariant for th
 We show how to construct the formula $\varphi[K,L_2]$ for particular but widely-used specifications of concurrent data structures, 
 e.g., atomic stacks and atomic queues, and for regular atomic specifications with a bounded number of states.
 
-THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
-STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
+\subsection{Histories are interval orders}
 
 While the general definition of histories allows arbitrary partial orders of
 operations, histories which arise from LTS executions fall into a special class
@@ -85,6 +84,100 @@ called \emph{interval orders}.
   which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
 
 \end{proof}
+
+Interval orders have a canonical representation which basically, associates to each
+element an interval on the integer line. In general, there may exist several ways to associate
+intervals to elements of the interval order but, in the canonical representation, the limits
+of these intervals are bounded by an integer called the \emph{length} of the interval order.
+
+\begin{lemma}[Greenough~\cite{phd/Greenough76}]
+  \label{lem:representation}
+
+  An interval order $\tup{O,<}$ has a canonical representation $I : O -> [n]^2$
+  for some minimal $n \in \<Nats>$ mapping each $o \in O$ to the interval $I(o)
+  = (i,j) \subseteq (0,n)$, where $o_1 < o_2$ iff $\sup I(o_1) \leq \inf I(o_2)$.
+
+\end{lemma}
+The integer $n$ in Lemma~\ref{lem:representation} is called the \emph{length} of $\tup{O,<}$.
+
+Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
+order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
+a representation $\pi$ including operations' methods, by $\pi(o) =
+\tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
+of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-interval pairs
+$\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
+counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
+H(L) }$.
+
+This representation reduces the problem of ensuring that each history $h \in
+H(L_1)$ of some library is included in the histories $H(L_2)$ of another, to
+ensuring that each multiset $\Pi(h) \in \Pi(L_1)$ is also included in
+$\Pi(L_2)$.
+
+TODO EXPLAIN BETTER THE SIGNIFICANCE OF THIS REDUCTION.
+
+\begin{lemma}
+
+  $H(L_1) \subseteq H(L_2)$ iff $\Pi(L_1) \subseteq \Pi(L_2)$.
+
+\end{lemma}
+
+\begin{proof}
+
+  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
+
+\end{proof}
+
+Note that Lemma~\ref{lem:representation} doesn't provide an effective way of constructing the
+canonical representation. In the following, we show that the canonical representation of
+an interval order $\tup{O,<}$ can be defined effectively by considering for each element $o\in O$, 
+the set of elements which are ordered before $o$ w.r.t. $<$, called the \emph{past} of $o$, and 
+the set of elements which appear after $o$ in $<$, called the \emph{future} of $o$.
+Formally, for every $o\in O$, we define
+\[
+\past{o}=\{o' < o\mid o'\in A\}\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
+\]
+
+The following result states that every two pasts or futures in an interval order are ordered by set inclusion.
+
+\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
+
+  Given $\tup{O,<}$ an interval order, the sets $\past{o}$ with $o\in O$ are
+  linearly ordered by set inclusion. The same holds for the sets 
+  $\future{o}$ with $o\in O$.
+
+\end{lemma}
+
+The canonical representation of an interval order $\tup{O,<}$ can be defined effectively 
+as follows:
+\begin{itemize}
+
+	\item let $\past{o_0}\subset \past{o_1}\subset \ldots\subset
+\past{o_n}$ be the set of different pasts in $\tup{O,<}$. 
+
+	\item let $\future{o_1'}\supset \future{o_2'}\supset \ldots\supset
+\future{o_n'}$ be the set of different futures in $\tup{O,<}$.
+
+	\item for any $o\in O$, let $I(o)=(i,j)$ s.t. $\past{o}=\past{o_i}$ and
+$\future{o}=\future{o_j'}$.
+
+\end{itemize}
+
+\begin{lemma}
+
+  The function $I$ defined above is the canonical representation of $\tup{O,<}$.
+  The \emph{length} of an interval order $\tup{O,<}$ is the number of distinct sets $\past{o}$ with $o\in O$.
+
+\end{lemma}
+
+
+\input bounding_histories
+
+\subsection{Checking bounded history inclusion}
+
+THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
+STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
+
 
 Next, we introduce a procedure for checking the equivalence between two
 histories, which exploits the fact that they are interval orders. This
@@ -124,39 +217,3 @@ the partition are represented in the domain of the integer map using intervals
 on the integer line. Now, history equivalence can be decided by checking the
 equality between the corresponding integer maps.
 
-\begin{lemma}[Greenough~\cite{phd/Greenough76}]
-  \label{lem:representation}
-
-  An interval order $\tup{O,<}$ has a canonical representation $I : O -> [n]^2$
-  for some minimal $n \in \<Nats>$ mapping each $o \in O$ to the interval $I(o)
-  = [i,j] \subseteq [0,n]$, where $o_1 < o_2$ iff $\sup I(o_1) < \inf I(o_2)$.
-
-\end{lemma}
-
-Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
-order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
-a representation $\pi$ including operations' methods, by $\pi(o) =
-\tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
-of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-interval pairs
-$\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
-counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
-H(L) }$.
-
-This representation reduces the problem of ensuring that each history $h \in
-H(L_1)$ of some library is included in the histories $H(L_2)$ of another, to
-ensuring that each multiset $\Pi(h) \in \Pi(L_1)$ is also included in
-$\Pi(L_2)$.
-
-TODO EXPLAIN BETTER THE SIGNIFICANCE OF THIS REDUCTION.
-
-\begin{lemma}
-
-  $H(L_1) \subseteq H(L_2)$ iff $\Pi(L_1) \subseteq \Pi(L_2)$.
-
-\end{lemma}
-
-\begin{proof}
-
-  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
-
-\end{proof}
