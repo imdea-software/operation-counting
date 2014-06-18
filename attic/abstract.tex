@@ -1,0 +1,48 @@
+%  \begin{abstract}
+%
+%\emph{Observational refinement} between software library implementations is
+%key to modular reasoning: knowing that any program behavior using
+%some sophisticated library implementation $L$ is also possible using a
+%simplistic implementation $S$, allows replacing $S$ for $L$, thus
+%simplifying reasoning about any module using $L$. 
+%
+%Automating the verification of observational refinement between a \emph{concurrent} implementation~$L$ and
+%its (sequential, usually) specification~$S$ is a quite challenging problem.
+%The principal approach for tackling this problem is based on verifying the alternate, yet equivalent, criterion of linearizability. It consists in showing that for every partially ordered set of operations corresponding to an execution of a library $L$, there is a linearization that is executable by its specification $S$. Most existing automated approaches for verifying linearizability either require manual effort in fixing the \emph{linearization point} of each operation, or suffer from exponential explosion in considering all possible linearizations.
+%
+%In this work, we develop a fundamentally different approach to automated refinement checking based on \emph{operation counting}. Our aim is to face the intrinsic complexity of checking observational refinement by using an approach that ultimately allows to use symbolic techniques for reasoning about partial orders. For that, we use counters to track the number of library operations executed between shared-memory writes by the client programs, and we define a notion of operation counter refinement based on entailment of reachable counts. We demonstrate that this notion of refinement is not only equivalent to observational refinement, but leads to effective means for automatic checking. We develop an approach for finding violation of observational refinement based on bounding the number of shared-memory writes, in the spirit of context-bounded analysis. For a given bound, we show that observational refinement can be checked precisely as a state reachability problem on a suitably instrumented concurrent program. This program can then be analyzed using adequate sequentialization and symbolic techniques.
+%
+%\end{abstract}
+  
+%  \begin{abstract}
+%    
+%    \emph{Observational refinement} between software library implementations is
+%    key to modular reasoning: knowing that any program behavior using
+%    some sophisticated library implementation $L$ is also possible using a
+%    simplistic implementation $S$, allows replacing $S$ for $L$, thus
+%    simplifying reasoning about any module using $L$. High-performance data
+%    structure implementations and their abstract specifications are canonical
+%    examples where such refinement is beneficial.
+%
+%    While automating refinement checking between deterministic
+%    \emph{sequential} implementations is relatively straightforward, by
+%    ensuring each sequence of operations executed by $L$ is also executable by
+%    $S$, checking refinement between a \emph{concurrent} implementation~$L$ and
+%    its (sequential, usually) specification~$S$ presents a severe complication:
+%    to which linear order $\sigma$ should concurrently-executed operations of
+%    $L$ be resolved, in order to check whether $\sigma$ is also executable by
+%    $S$? Existing automated approaches either require manual effort in fixing
+%    the \emph{linearization point} of each operation, thus uniquely determining
+%    $\sigma$, or suffer from exponential explosion in considering all possible
+%    linearizations $\sigma$.
+%
+%    In this work we develop a fundamentally different approach to automated
+%    refinement checking, called \emph{operation counting}. Rather than
+%    reasoning over \emph{sequences} of executed operations, we reason over
+%    \emph{counts} of executed and executing library operations; we say
+%    implementation~$L$ refines $S$ when any valuation to the counters which is
+%    reachable with $L$ is also reachable with $S$. We demonstrate that this
+%    notion of refinement is not only equivalent to observational refinement,
+%    but leads to effective means for automatic checking.
+%    
+%  \end{abstract}

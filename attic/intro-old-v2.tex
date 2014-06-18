@@ -1,0 +1,186 @@
+%!TEX root = draft.tex
+
+\section{Introduction}
+\label{sec:intro}
+
+Our ability to reason about programs depends crucially on abstract
+specifications of software libraries. While library implementations are often
+finely detailed in order to perform their roles efficiently, the correctness of
+programs using such libraries typically relies on very coarse abstractions. For
+instance, while generic data structures such as queues and sets have intricate
+implementations in order to minimize the response time of concurrent
+operations, the correctness of programs using these structures usually relies
+only on some simple aspect of their behavior, such as the absence of duplicate
+elements in a set, or that elements of a queue are removed in the order they
+are added. Nevertheless the necessary intricacy of their implementations is a
+breeding ground for insidious and notoriously difficult-to-diagnose bugs;
+accordingly, formal verification that implementations meet their abstract
+specifications is in high demand.
+
+Roughly, a library implementation~$L$ meets its specification~$S$ so long as
+$L$ does not allow any behavior which $S$ does not. More precisely, the
+criterion called \emph{observational refinement}~\citep{ conf/esop/HeHS86,
+journals/ipl/HoareHS87, journals/tcs/Plotkin77} requires that the possible
+behaviors of \emph{any program~$P$} using $L$ are included in the possible
+behaviors of the same program $P$ using $S$ instead of $L$; a typical
+interpretation of ``behaviors'' here is ``reachable program states'' (not
+including library state). Note that formally $L$ and $S$ are the same type of
+object, that is, they are both implementations, and that refinement is
+quantified over all possible (library-client) programs~$P$. In practice, the
+operations of $S$ are \emph{atomic}, and observational refinement of $S$
+amounts to checking that $L$'s operations \emph{appear} to happen atomically,
+in a manner consistent with $S$, even though they may be concurrently
+intertwined.
+
+Naturally, automating the verification of observational refinement is quite
+challenging. The most immediate obstacle arises from the quantification over
+the infinitely-many possible library-client programs. The principal approach to
+avoiding this obstacle is verifying an alternate yet equivalent criterion
+called \emph{linearizability}~\citep{journals/toplas/HerlihyW90}. Rather than
+quantifying over (the reachable states of) each possible client program,
+linearizability quantifies over \emph{histories}, i.e.,~partial orders of
+library operations: with respect to a specification $S$, a history $h$ is
+linearizable when some linear ordering $\sigma$ of $h$'s operations is
+executable by $S$, and an implementation $L$ is linearizable if every history
+which $L$ can execute is linearizable. The drawback of this approach from the
+point of view of automation is that there are exponentially-many linearizations
+of $\sigma$ to explore for any given history; most existing approaches thus
+require manual effort in fixing the \emph{linearization point}~\citep{
+journals/toplas/HerlihyW90} of each library operation, thus uniquely
+determining $\sigma$. 
+%Moreover, it has been shown that checking linearizability of a library w.r.t. regular specification is in EXPSPACE when the number of threads is bounded, and becomes undecidable when the number of threads is unbounded.
+We discuss such approaches in Section~\ref{sec:related}.
+
+In this work  we develop a fresh approach to automated refinement checking, called \emph{operation counting}, which avoids linearizing histories, and thus avoids the manual effort required in determining linearization points. In fact, we consider that in order to tackle the intrinsic complexity of checking observational refinement, an approach that ultimately allows to apply symbolic techniques for reasoning about partial orders is needed. Our approach is then to use counting to encode partial orders, and therefore reducing problems that amount in enumerating orders to analysis problems on programs with counters (or integer maps in general).
+%
+In our context, rather than considering the exponentially-many possible linear orders of a given history $h$, we encode a partial order of operations in $h$ directly by counting. More precisely, we count the number of each operation occurring across a set of discrete time intervals which are partitioned by inter-thread communication in
+the client program; here an ``operation'' includes a method name and argument
+parameter values, along with return values for a completed operation;
+``inter-thread communication'' amounts to a shared-memory write, though could
+also correspond to messaging primitives; an operation is counted in interval
+$[i,j]$ if it begins after the $i$th shared-memory write, and ends before then
+$(j\!+\! 1)$st. The partial order induced by this counting relates the operations in non-overlapping intervals.
+
+Intuitively, this counting induces an equivalence relation on histories, which
+does not distinguish between histories with the same operations occurring
+across the same shared-memory-write-separated intervals. Shared-memory writes
+are significant since they induce a dependency between the library operations
+they separate; the absence of a write between two non-concurrent operations on
+distinct threads in a trace of program $P$ implies that $P$ also admits a trace
+due to an alternate thread interleaving in which those operations are
+concurrent. While this equivalence between histories clearly amounts to a loss
+of precision for any given history, since two non-overlapping operations in
+overlapping intervals will be considered concurrent according to our counters,
+we recover this precision in other histories, in which a shared-memory write
+does separate those operations. Ultimately we demonstrate that if any operation
+count attainable in programs using library $L$ is also attainable in programs
+using $S$, then $L$ observationally refines $S$, and vice versa, thus making
+inclusion of reachable operation counts (we call operation count refinement) equivalent to observational refinement.
+The proof that observational refinement is indeed equivalent to operation counting refinement, is quite subtle. To be precise, this equivalence holds when libraries are thread-independent, i.e., their behaviors are not dependent on the identities of the clients, which is a quite natural assumption on general software libraries. 
+%(Technically, this allows to prove that observational refinement can be precisely checked under the assumption that at most one method can be called by each thread, though an unbounded number of threads is allowed.) 
+
+Then, importantly, we show that checking operation counting refinement can be reduced to checking the entailment between the sets of reachable states in two (suitably instrumented) concurrent programs using integer maps. First, we define a notion of most-general-client ${\sf MGC}$ which maintains the counters defined above for each interval $[i, j]$. Then, given a library implementation $L$ and its specification $S$, we build two programs $P_1$ and $P_2$ such that $P_1$ (resp. $P_2$) is obtained by composing ${\sf MGC}$ with $L$ (resp. with $S$). 
+
+This reduction opens the door to mechanization using existing analysis and verification tools able to handle this kind of programs.
+In our work, we exploit this reduction by defining an under-approximate analysis for efficient bug detection that is based on bounding the number of shared-memory-writes in computations. This is somehow in the spirit of recent approaches for bounded analysis of concurrent programs using concepts such as context-bounding~\citep{conf/tacas/QadeerR05}. 
+
+In fact, by bounding the number of shared-memory writes, we bound the number of possible operation intervals. Therefore, the programs $P_1$ and $P_2$ mentioned above need only a bounded numbers of counters instead of unbounded integer maps. Interestingly, this allows to reduce effectively the entailment problem between their sets of reachable states to a reachability problem is a single concurrent program. This is due to the fact that it is possible to compute an assertion $\varphi$ characterizing the allowed operation counts in $P_2$, and then to insert this assertion in $P_1$ to ensure that all reachable states in the latter satisfy it. The assertion $\varphi$ can be computed precisely (as a formula in Presburger arithmetics) when the specification $S$ is regular.  In other words, by adopting the notion of operation counting, we have effectively reduced checking observational refinement (for a bounded number of shared-memory writes) to state reachability.
+
+
+%Operation counting leads to effective mechanization for verifying the
+%equivalent notion, observational refinement, by computing the allowed operation
+%counts~$\varphi$ for a given specification~$S$ on a given program~$P$, and
+%\emph{monitoring} the counters attained in $P$ paired with a given
+%implementation~$L$. At each step, the counter valuations of $P$ with $L$ must
+%lie within the set~$\varphi$ allowed by $S$, otherwise observational refinement
+%is violated, by the aforementioned equivalence. To enable this monitoring
+%scheme, we show that there exists a \emph{most general client} program~$P$
+%which witnesses any possible violation. Furthermore, we show that the set of
+%operation counts~$\varphi$ allowed by $S$ for program~$P$ is computable, and
+%representable as a formula in Presburger arithmetic, so long as $S$ is
+%sequential, and defines a regular set of operation sequences. Our mechanization
+%of verifying observational refinement thus amounts to exploring the reachable
+%states of a single client program $P$ paired with $L$, and ensuring all
+%reachable states satisfy $\varphi$. In other words, we have reduced checking
+%observational refinement to state reachability.
+
+To validate the efficacy of operation counting, we have implemented a prototype
+which is able to detect violations to observational refinement in several
+realistic implementations of concurrent data structures. Our prototype is based
+on an incremental program exploration which prioritizes executions with fewer
+inter-thread interactions. Still, the obtained concurrent program to analyze may have a huge number of schedules.
+%in the spirit of context bounding~\citep{conf/tacas/QadeerR05}. 
+%By limiting the number of shared-memory writes, we bound
+%the number of possible operation intervals, and thus operation counters. 
+By limiting the number of concurrent thread schedules explored, via delay
+bounding~\citep{ conf/popl/EmmiQR11}, we are able to efficiently detect
+counting violations. Interestingly, combining our reduction from observational
+refinement to reachability, and the reduction from concurrent to sequential
+reachability given by delay bounding~\citep{ conf/popl/EmmiQR11}, we
+effectively reduce (underapproximate) observational refinement checking to
+sequential program reachability, thus enabling the reuse of existing
+verification technology.
+
+\subsection{Related Work}
+\label{sec:related}
+
+Existing work on automated verification of concurrent library implementations
+have focused on the criterion of
+\emph{linearizability}~\citep{journals/toplas/HerlihyW90}, which has recently
+been shown to coincide with observational
+refinement~\citep{journals/tcs/FilipovicORY10}. By definition, an execution
+involving concurrent operations is \emph{linearizable} with respect to a
+sequential specification $S$ if there exists some linear order $\sigma$ of
+those operations (consistent with the partial order defined by the concurrent execution), 
+which is executable by $S$. This criterion leads to automation
+either by determining the \emph{linearization
+point}~\citep{journals/toplas/HerlihyW90} of each operation, thus determining
+the linear order of operations by that in which their linearization points were
+executed, or by exhausting every possible linearization. While, on the one
+hand, considering linearization points has led to several semi-automated
+approaches for proving observational refinement~\citep{DBLP:conf/cav/AmitRRSY07,conf/fm/LiuCLS09, conf/podc/OHearnRVYY10,
+conf/cav/Vafeiadis10, conf/icse/Zhang11a, conf/pldi/LiangF13,
+conf/cav/DragoiGH13}, manual human effort is often necessary in annotating
+methods with their linearization point. On the other hand, while additional
+automation can be had for detecting violations of observational refinement 
+by exhaustively considering all possible linearizations,
+for instance via the testing-based tools LineUp~\citep{conf/pldi/BurckhardtDMT10} and COLT~\citep{DBLP:conf/oopsla/ShachamBASVY11}, exponential
+explosion in the number of linearizations severely limits the number of
+executed operations for which exploration is possible. 
+
+Others have considered the theoretical limits in verifying linearizability.
+\citet{journals/siamcomp/GibbonsK97} showed that the linearizability of a
+single execution is NP-complete, while \citet{journals/iandc/AlurMP00} showed
+that determining linearizability of a library implementation with respect to a
+given regular sequential specification is in EXPSPACE, so long as the number of
+concurrent operations is bounded. \citet{conf/esop/BouajjaniEEH13} has shown that the same
+problem becomes undecidable once the number of concurrent operations becomes
+unbounded. The same work has introduced a decidable variant of linearizability, which
+considers only executions where the number of temporal separations between non-overlapping 
+operations is bounded.
+%
+% The proof of this undecidability
+%ultimately led us to a decidable variant, by leveraging operation counting,
+%where the number of shared-memory writes is bounded. Whereas the aim of this
+%previous work was to establish theoretical boundaries, the goal of the current
+%work is to establish operation counting as an effective means of automating
+%observational refinement.
+
+\subsection{Outline}
+\label{sec:outline}
+
+Section~\ref{sec:prelim} presents the required background notions and notation.
+Section~\ref{sec:counting} introduces \emph{operation-counting refinement}, and
+Section~\ref{sec:state} defines a program instrumentation scheme which reduces this refinement to a
+reachable-state inclusion check, over all possible library-client programs.
+Section~\ref{sec:equiv} establishes an equivalence between operation counting
+refinement and observational refinement, while Section~\ref{sec:client} shows
+that it is sufficient to perform the reachable-state inclusion check for one
+particular most-general library client. Section~\ref{sec:reach} then
+demonstrates how this reachable-state inclusion check can be further reduced to
+state reachability in the most-general client program. In order to reduce
+the high degree of nondeterminism in this program, Section~\ref{sec:ranking} presents
+a complete exploration scheme of simpler library clients.
+Finally,
+Section~\ref{sec:exp} describes our experience with a prototype implementation
+of our operation-counting refinement check.

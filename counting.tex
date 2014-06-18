@@ -1,57 +1,94 @@
 %!TEX root = draft.tex
 \section{Operation Counting for Bounded Histories}
 
-We have shown that observational refinement is equivalent to an inclusion between sets of histories. 
-However, in general, deciding this inclusion is undecidable even for libraries with a bounded number of 
-states~\cite{conf/esop/BouajjaniEEH13}.
-In the following, we consider an under-approximation of this problem, that decides the inclusion between
-bounded sets of histories. This under-approximation can be reduced to a reachability problem and enables
-several applications: symbolic and dynamic analyses for detecting violations to observational refinement, and 
-runtime monitoring (see Section~\ref{} for more details).
+TODO THIS SECTION SHOULD BE ABOUT OUR DESIRE TO CHECK O.R.
+EFFICIENTLY/EFFECTIVELY, AND THUS ABOUT A GENERAL TECHNIQUE WHICH MAKES USE OF
+A GIVEN CLOSED-FORM EXPRESSION FOR THE HISTORY-INCLUSION CHECK, E.G. A
+PRESBURGER FORMULA. HERE WE SHOULD TALK ABOUT ALL OF THE STUFF WE WILL DO GIVEN
+SUCH A FORMULA, WITH APPLICATIONS TO STATIC/SYMBOLIC ANALYSIS, TESTING, AND
+RUNTIME MONITORING. NOTE THAT WHILE ``COUNTING'' ISN'T STRICTLY NECESSARY IN
+THIS VIEW OF THINGS, IT IS SIMPLY A CANONICAL REPRESENTATION ON WHICH TO
+IMPLEMENT THINGS.
 
-Our technical development is based on the observation that histories of library executions are \emph{interval orders},
-a particular class of partial orders. Intuitively, histories come from executions where operations have access to a notion
-of global time and therefore, for every two operations in a history, their 
-\emph{pasts} (the set of operations that finished before an operation starts) cannot be incomparable. Then,
-the bound that we consider on histories is actually a bound on their \emph{length}, defined as the number of
-distinct pasts that an operation can have. 
+TODO SHOW THE NP-HARDNESS RESULT TO SET OUR GOAL FOR POLYNOMIAL-TIME THINGS;
+ALSO MAYBE THE UNDECIDABILITY RESULT TO SET OUR GOAL FOR STATIC/SYMBOLIC CASE
+
+We have shown that observational refinement is equivalent to an inclusion
+between sets of histories. However, in general, deciding this inclusion is
+undecidable even for libraries with a bounded number of
+states~\cite{conf/esop/BouajjaniEEH13}. In the following, we consider an
+under-approximation of this problem, that decides the inclusion between bounded
+sets of histories. This under-approximation can be reduced to a reachability
+problem and enables several applications: symbolic and dynamic analyses for
+detecting violations to observational refinement, and runtime monitoring (see
+Section~\ref{} for more details).
+
+Our technical development is based on the observation that histories of library
+executions are \emph{interval orders}, a particular class of partial orders.
+Intuitively, histories come from executions where operations have access to a
+notion of global time and therefore, for every two operations in a history,
+their \emph{pasts} (the set of operations that finished before an operation
+starts) cannot be incomparable. Then, the bound that we consider on histories
+is actually a bound on their \emph{length}, defined as the number of distinct
+pasts that an operation can have.
 
 We show that this bound is important in the process of detecting violations to
-history inclusion and thus, observational refinement, in several ways. First, we provide a complexity result stating
-that deciding if the history of a concurrent register (a library with $\<read>$ and $\<write>$ methods) of bounded length
-is included in the histories of an atomic register (where method bodies are executed atomically in one step) 
-is polynomial time. Deciding this fact for arbitrary histories is known to be NP-complete~\cite{journals/siamcomp/GibbonsK97}.
-Therefore, bounding histories provides an efficiency gain, in theory but even in practice as we demonstrate in Section~\ref{}, if we 
-are interested in defining dynamic analyses for detecting violations to observational refinement or runtime monitors for 
-ensuring observational refinement. 
+history inclusion and thus, observational refinement, in several ways. First,
+we provide a complexity result stating that deciding if the history of a
+concurrent register (a library with $\<read>$ and $\<write>$ methods) of
+bounded length is included in the histories of an atomic register (where method
+bodies are executed atomically in one step) is polynomial time. Deciding this
+fact for arbitrary histories is known to be
+NP-complete~\cite{journals/siamcomp/GibbonsK97}. Therefore, bounding histories
+provides an efficiency gain, in theory but even in practice as we demonstrate
+in Section~\ref{}, if we are interested in defining dynamic analyses for
+detecting violations to observational refinement or runtime monitors for
+ensuring observational refinement.
 
-Second, we provide theoretical results stating that
-for an important class of executions of common concurrent data structures, e.g.., stacks and queues, a bound of 2 on
-the length of their histories is enough to detect \emph{all possible violations}. These results are strengthened by the experiments
-in Section~\ref{}, which show that even for other classes violations, small bounds of at most 2 on the length of histories is enough
-in order to discover them.
+Second, we provide theoretical results stating that for an important class of
+executions of common concurrent data structures, e.g.., stacks and queues, a
+bound of 2 on the length of their histories is enough to detect \emph{all
+possible violations}. These results are strengthened by the experiments in
+Section~\ref{}, which show that even for other classes violations, small bounds
+of at most 2 on the length of histories is enough in order to discover them.
 
-Deciding the inclusion between sets of \emph{bounded} histories is reduced to a reachability problem. This reduction
-is based on a canonical representation of histories/interval orders with integer maps. In this representation, each operation $o$ in the history
-is associated to an interval $I(o)$ on the integer line whose bounds are smaller than the length of the history. A history is then 
-represented by a map, which associates to each interval $I$ and method $m$ an integer that counts the number of operations 
-$o$ with $I(o)=I$, which are instances of $m$. Based on this representation, the problem of deciding $H_K(L_1)\subseteq H_K(L_2)$, where
-$L_1$ and $L_2$ are two libraries and $H_K(L_1)$, resp., $H_K(L_2)$, is the set of histories of $L_1$, resp., $L_2$, of length at most $K$, can be reduced to
-a reachability problem as follows:
+Deciding the inclusion between sets of \emph{bounded} histories is reduced to a
+reachability problem. This reduction is based on a canonical representation of
+histories/interval orders with integer maps. In this representation, each
+operation $o$ in the history is associated to an interval $I(o)$ on the integer
+line whose bounds are smaller than the length of the history. A history is then
+represented by a map, which associates to each interval $I$ and method $m$ an
+integer that counts the number of operations $o$ with $I(o)=I$, which are
+instances of $m$. Based on this representation, the problem of deciding
+$H_K(L_1)\subseteq H_K(L_2)$, where $L_1$ and $L_2$ are two libraries and
+$H_K(L_1)$, resp., $H_K(L_2)$, is the set of histories of $L_1$, resp., $L_2$,
+of length at most $K$, can be reduced to a reachability problem as follows:
 \begin{itemize}
-	\item define a most general client of $L_1$ (that calls arbitrarily methods of $L_1$ with an arbitrary number of threads), annotated 
-with a set of counters that record the canonical representations of $H_K(L_1)$,
-	\item construct a formula (e.g., in Presburger arithmetic) $\varphi[K,L_2]$ describing the canonical representations of the histories in $H_K(L_2)$,
-	\item history inclusion holds iff the formula $\varphi[K,L_2]$ is true in all reachable states of the annotated most general client of $L_1$.
+
+	\item define a most general client of $L_1$ (that calls arbitrarily methods
+of $L_1$ with an arbitrary number of threads), annotated with a set of counters
+that record the canonical representations of $H_K(L_1)$,
+
+	\item construct a formula (e.g., in Presburger arithmetic) $\varphi[K,L_2]$
+describing the canonical representations of the histories in $H_K(L_2)$,
+
+	\item history inclusion holds iff the formula $\varphi[K,L_2]$ is true in all
+reachable states of the annotated most general client of $L_1$.
+
 \end{itemize}
 
-In general, the difficulty in defining this reduction is to construct the formula $\varphi[K,L_2]$. 
-Note that a formula that over-approximates $\varphi[K,L_2]$ could still be useful in defining a reduction to reachability 
-that is precise for discovering violations to history inclusion. Actually, $\varphi[K,L_2]$ describes the counter values reachable
-in the annotated most general client of $L_2$ and any inductive invariant for this program is an over-approximation of $\varphi[K,L_2]$. 
+In general, the difficulty in defining this reduction is to construct the
+formula $\varphi[K,L_2]$. Note that a formula that over-approximates
+$\varphi[K,L_2]$ could still be useful in defining a reduction to reachability
+that is precise for discovering violations to history inclusion. Actually,
+$\varphi[K,L_2]$ describes the counter values reachable in the annotated most
+general client of $L_2$ and any inductive invariant for this program is an
+over-approximation of $\varphi[K,L_2]$.
 
-We show how to construct the formula $\varphi[K,L_2]$ for particular but widely-used specifications of concurrent data structures, 
-e.g., atomic stacks and atomic queues, and for regular atomic specifications with a bounded number of states.
+We show how to construct the formula $\varphi[K,L_2]$ for particular but
+widely-used specifications of concurrent data structures, e.g., atomic stacks
+and atomic queues, and for regular atomic specifications with a bounded number
+of states.
 
 \subsection{Histories are interval orders}
 
@@ -85,10 +122,11 @@ called \emph{interval orders}.
 
 \end{proof}
 
-Interval orders have a canonical representation which basically, associates to each
-element an interval on the integer line. In general, there may exist several ways to associate
-intervals to elements of the interval order but, in the canonical representation, the limits
-of these intervals are bounded by an integer called the \emph{length} of the interval order.
+Interval orders have a canonical representation which basically, associates to
+each element an interval on the integer line. In general, there may exist
+several ways to associate intervals to elements of the interval order but, in
+the canonical representation, the limits of these intervals are bounded by an
+integer called the \emph{length} of the interval order.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
   \label{lem:representation}
@@ -98,7 +136,8 @@ of these intervals are bounded by an integer called the \emph{length} of the int
   = (i,j) \subseteq (0,n)$, where $o_1 < o_2$ iff $\sup I(o_1) \leq \inf I(o_2)$.
 
 \end{lemma}
-The integer $n$ in Lemma~\ref{lem:representation} is called the \emph{length} of $\tup{O,<}$.
+The integer $n$ in Lemma~\ref{lem:representation} is called the \emph{length}
+of $\tup{O,<}$.
 
 Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
 order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
@@ -128,28 +167,30 @@ TODO EXPLAIN BETTER THE SIGNIFICANCE OF THIS REDUCTION.
 
 \end{proof}
 
-Note that Lemma~\ref{lem:representation} doesn't provide an effective way of constructing the
-canonical representation. In the following, we show that the canonical representation of
-an interval order $\tup{O,<}$ can be defined effectively by considering for each element $o\in O$, 
-the set of elements which are ordered before $o$ w.r.t. $<$, called the \emph{past} of $o$, and 
-the set of elements which appear after $o$ in $<$, called the \emph{future} of $o$.
+Note that Lemma~\ref{lem:representation} doesn't provide an effective way of
+constructing the canonical representation. In the following, we show that the
+canonical representation of an interval order $\tup{O,<}$ can be defined
+effectively by considering for each element $o\in O$, the set of elements which
+are ordered before $o$ w.r.t. $<$, called the \emph{past} of $o$, and the set
+of elements which appear after $o$ in $<$, called the \emph{future} of $o$.
 Formally, for every $o\in O$, we define
 \[
 \past{o}=\{o' < o\mid o'\in A\}\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
 \]
 
-The following result states that every two pasts or futures in an interval order are ordered by set inclusion.
+The following result states that every two pasts or futures in an interval
+order are ordered by set inclusion.
 
 \begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
 
   Given $\tup{O,<}$ an interval order, the sets $\past{o}$ with $o\in O$ are
-  linearly ordered by set inclusion. The same holds for the sets 
-  $\future{o}$ with $o\in O$.
+  linearly ordered by set inclusion. The same holds for the sets $\future{o}$
+  with $o\in O$.
 
 \end{lemma}
 
-The canonical representation of an interval order $\tup{O,<}$ can be defined effectively 
-as follows:
+The canonical representation of an interval order $\tup{O,<}$ can be defined
+effectively as follows:
 \begin{itemize}
 
 	\item let $\past{o_0}\subset \past{o_1}\subset \ldots\subset
@@ -165,57 +206,49 @@ $\future{o}=\future{o_j'}$.
 
 \begin{lemma}
 
-  The function $I$ defined above is the canonical representation of $\tup{O,<}$.
-  The \emph{length} of an interval order $\tup{O,<}$ is the number of distinct sets $\past{o}$ with $o\in O$.
+  The function $I$ defined above is the canonical representation of
+  $\tup{O,<}$. The \emph{length} of an interval order $\tup{O,<}$ is the number
+  of distinct sets $\past{o}$ with $o\in O$.
 
 \end{lemma}
 
+% THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
+% STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
 
-\input bounding_histories
+% Next, we introduce a procedure for checking the equivalence between two
+% histories, which exploits the fact that they are interval orders. This
+% procedure is based on a symbolic encoding of interval orders using counters,
+% which roughly count operations of a history that are invocations of the same
+% method.
 
-\input checking_inclusion
+% A first condition that two histories $h_1$ and $h_2$ must satisfy in order to
+% be equivalent is that there exists a bijection between their operations that
+% preserves the labelling with method names. Said otherwise, the multiset of
+% labels in $h_1$ equals the multiset of labels in $h_2$. To check this
+% condition, one can define a representation of histories using counters, one
+% for each method, that counts the number of occurrences of that label, and
+% then, test equality between counters that correspond to the same label.
 
+% However, history equivalence also requires that the bijection between
+% operations preserves the order constraints from one history to another. This
+% can be checked by refining the counter-based representation above.
+% Essentially, we will define a partition over the operations in a history such
+% that for every two classes $C_1$ and $C_2$ of the partition, either (1) every
+% element of $C_1$ is incomparable to every element of $C_2$, (2) every element
+% of $C_1$ is smaller than every element of $C_2$ or (3) every element of $C_1$
+% is greater than every element of $C_2$. Therefore, one can extend the order
+% relation to classes of the partition in a conservative and complete way. Then,
+% we will associate a counter for each class and each method, that counts the
+% number of invocations of that method in that class. History equivalence now
+% corresponds to the fact that the order relations on classes of operations are
+% isomorphic and that the counters associated to isomorphic classes and the same
+% method are equal.
 
-
-%THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
-%STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
-%
-%
-%Next, we introduce a procedure for checking the equivalence between two
-%histories, which exploits the fact that they are interval orders. This
-%procedure is based on a symbolic encoding of interval orders using counters,
-%which roughly count operations of a history that are invocations of the same
-%method.
-%
-%A first condition that two histories $h_1$ and $h_2$ must satisfy in order to
-%be equivalent is that there exists a bijection between their operations that
-%preserves the labelling with method names. Said otherwise, the multiset of
-%labels in $h_1$ equals the multiset of labels in $h_2$. To check this
-%condition, one can define a representation of histories using counters, one for
-%each method, that counts the number of occurrences of that label, and then,
-%test equality between counters that correspond to the same label.
-%
-%However, history equivalence also requires that the bijection between
-%operations preserves the order constraints from one history to another. This
-%can be checked by refining the counter-based representation above. Essentially,
-%we will define a partition over the operations in a history such that for every
-%two classes $C_1$ and $C_2$ of the partition, either (1) every element of $C_1$
-%is incomparable to every element of $C_2$, (2) every element of $C_1$ is
-%smaller than every element of $C_2$ or (3) every element of $C_1$ is greater
-%than every element of $C_2$. Therefore, one can extend the order relation to
-%classes of the partition in a conservative and complete way. Then, we will
-%associate a counter for each class and each method, that counts the number of
-%invocations of that method in that class. History equivalence now corresponds
-%to the fact that the order relations on classes of operations are isomorphic
-%and that the counters associated to isomorphic classes and the same method are
-%equal.
-%
-%The definition of history partitions is strongly based on the fact that they
-%are interval orders. Moreover, the order relation on classes of the partition
-%is also an interval order. This allows us to define a representation for
-%histories using integer maps, that encode the values of the counters but also
-%the order relation between classes of the partition. Basically, the classes of
-%the partition are represented in the domain of the integer map using intervals
-%on the integer line. Now, history equivalence can be decided by checking the
-%equality between the corresponding integer maps.
-
+% The definition of history partitions is strongly based on the fact that they
+% are interval orders. Moreover, the order relation on classes of the partition
+% is also an interval order. This allows us to define a representation for
+% histories using integer maps, that encode the values of the counters but also
+% the order relation between classes of the partition. Basically, the classes of
+% the partition are represented in the domain of the integer map using intervals
+% on the integer line. Now, history equivalence can be decided by checking the
+% equality between the corresponding integer maps.

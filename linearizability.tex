@@ -1,0 +1,103 @@
+\section{Comparison with Linearizability}
+\label{sec:lin}
+
+We show that the observational refinement between two libraries can be simply
+expressed as the inclusion between their sets of histories.This result reduces
+the burden of reasoning about the universal quantifier over programs and it is
+similar to the relation between observational refinement and
+linearizability~\cite{journals/tcs/FilipovicORY10}: linearizability implies
+observational refinement and observational refinement implies linearizability
+but only for executions where every operation is completed (see the discussion
+below). To explain the differences we first recall the notion of
+linearizability. Thus, a library execution $e_1$ is linearizable w.r.t. a
+library $L_2$ iff there exists an execution $e_1'$ obtained from $e_1$ by
+appending return actions (for unmatched call actions) or deleting call actions
+and an execution $e_2$ of $L_2$ such that $e_1'$ doesn't contain pending
+operations, $e_1'$ and $e_2$ contain exactly the same set of actions and $e_2$
+is a permutation of $e_1'$ that preserves the order between return and call
+actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$
+in $e_1'$ then the same holds in $e_2$). Then, a library $L_1$ is linearizable
+w.r.t. a library $L_2$ iff every execution $e_1\in L_1$ is linearizable w.r.t.
+$L_2$. %
+
+If we consider that libraries are defined as arbitrary sets of well-formed
+sequences of call and return actions with possibly pending operations, then
+observational refinement does not imply linearizability. For example, this
+holds for two libraries $L_1$ and $L_2$ containing a method $m$ that never
+finishes. Intuitively, a program can observe that it called the method $m$ with
+both libraries but the library execution of $L_1$ that allowed this observation
+is not linearizable. More precisely, let $L_1$ and $L_2$ be two libraries that
+contain a single execution $\tup{m,o}$ and $P$ a program with a single
+execution $\print{\tup{m,o}} \cdot \tup{m,o}$, where $\print{\tup{m,o}}$ is a
+program action. The observation of $P$ is $\print{\tup{m,o}}$ and it is
+possible when composing $P$ with both $L_1$ and $L_2$ but the library execution
+$\tup{m,o}$ is not linearizable w.r.t. $L_2$ because $L_2$ doesn't contain an
+execution where $m$ finishes.
+
+When considering two real libraries $L_1$ and $L_2$, which must satisfy the
+closure properties in Section~\ref{sec:obsref}, we show that observational
+refinement between $L_1$ and $L_2$ is actually \emph{equivalent} to a plain
+inclusion between histories. Compared to the result in
+\citet{journals/tcs/FilipovicORY10}, we give a property that is equivalent to
+observation refinement irrespectively of the presence of pending operations, we
+consider a comparison between histories, which are more abstract than library
+executions (see Example~\ref{}), and we consider a universal model of
+computation for programs (the result in \citet{journals/tcs/FilipovicORY10} is
+proved only for programs with shared variables).
+
+Our result can be explained by the following relation between linearizability
+and the ``weaker than'' comparison between histories.
+
+\begin{proposition}
+  \label{prop:lin}
+
+  An execution $e_1$ is linearizable w.r.t. a library $L_2$ iff there exists an
+  execution $e_2\in L_2$, where every operation is completed, such that
+  $H(e_1)\preceq H(e_2)$.
+
+\end{proposition}
+
+% Then, linearizability between an execution $e_1$ and a library $L_2$ is
+% equivalent to the fact that the history of $e_1$, where some pending
+% operations may be deleted, is weaker than a history of $L_2$ with no pending
+% operations. Linearizability between two libraries $L_1$ and $L_2$ means that
+% every execution of $L_1$ is linearizable w.r.t. $L_2$.
+
+Thus, if an execution $e_1$ is linearizable w.r.t. a library $L_2$, hence the
+comparison between their histories stated in Proposition~\ref{prop:lin} holds,
+then by Lemma~\ref{lemma:lib_closure}, there exists a history of $L_2$ which is
+actually equivalent to the history of $e_1$.
+
+\paragraph{Linearizability w.r.t. sequential specifications.}
+
+Concurrent implementations of data structures are usually considered to be
+correct if they are linearizable w.r.t. the sequential version of the same data
+structure, e.g., a concurrent stack should be linearizable w.r.t. the
+sequential stack. In our framework, we consider only concurrent libraries,
+therefore, this correctness condition translates to the fact that the
+concurrent implementation is an observational refinement of the atomic
+implementation, where, intuitively, method bodies execute in one single atomic
+step but, method calls and returns can still overlap.
+
+Given a \emph{sequential} library $L_{seq}$, i.e., whose executions are all
+sequential, the set of executions allowed by the \emph{atomic} concurrent
+library $L_{at}$ where method bodies are exactly the same as in $L_{seq}$
+(modulo the fact that they are surrounded by synchronization actions, e.g.,
+locks, in order to ensure that they are executed atomically) can be defined as
+the least set of executions that contains all the executions of $L_{seq}$ and
+that satisfies the closure properties in Section~\ref{sec:obsref}. Then, the
+following result is a direct consequence of the definitions.
+
+\begin{proposition}
+  \label{prop:atom}
+
+  An execution $e_1$ is linearizable w.r.t. a sequential library $L_{seq}$ iff
+  $H(e_1)\in H(L_{at})$, where $L_{at}$ is the atomic concurrent library
+  corresponding to $L_{seq}$.
+
+\end{proposition}
+
+The extension of Proposition~\ref{prop:atom} to libraries is straightforward,
+i.e., a library $L$ is linearizable w.r.t. a sequential library $L_{seq}$ iff
+$H(L)\subseteq H(L_{at})$, where $L_{at}$ is as above (or equivalently, by
+Theorem~\ref{th:equiv}, $L$ is an observational refinement of $L_{at}$).
