@@ -39,6 +39,7 @@ E(A_1)|@S_2 \n E(A_2)|@S_1$.
 
 \end{example}
 
+\paragraph{Libraries.}
 Programs interact with libraries by calling named library \emph{methods}, which
 receive parameter values and yield return values upon completion. For
 simplicity yet without loss of generality, we fix an arbitrary set $\<Methods>$ of
@@ -171,6 +172,12 @@ $\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pendi
 An execution is called 
 \emph{sequential} if all call actions are immediately followed by their matching return action. %except possibly the last one,
 
+\paragraph{Atomic libraries.}
+A library is called \emph{atomic} if its set of executions is the least set that contains some given set of sequential executions.
+
+\todo{Examples:atomic register, stack, queue}
+
+\paragraph{Programs}
 Complementary to libraries, programs control their execution outside of method
 call and return points.
 %% MOVED TO THE DEFINITION OF REFINEMENT.

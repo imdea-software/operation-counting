@@ -1,27 +1,39 @@
 %!TEX root = draft.tex
 \section{Operation Counting for Bounded Histories}
 
-TODO THIS SECTION SHOULD BE ABOUT OUR DESIRE TO CHECK O.R.
-EFFICIENTLY/EFFECTIVELY, AND THUS ABOUT A GENERAL TECHNIQUE WHICH MAKES USE OF
-A GIVEN CLOSED-FORM EXPRESSION FOR THE HISTORY-INCLUSION CHECK, E.G. A
-PRESBURGER FORMULA. HERE WE SHOULD TALK ABOUT ALL OF THE STUFF WE WILL DO GIVEN
-SUCH A FORMULA, WITH APPLICATIONS TO STATIC/SYMBOLIC ANALYSIS, TESTING, AND
-RUNTIME MONITORING. NOTE THAT WHILE ``COUNTING'' ISN'T STRICTLY NECESSARY IN
-THIS VIEW OF THINGS, IT IS SIMPLY A CANONICAL REPRESENTATION ON WHICH TO
-IMPLEMENT THINGS.
+In this section, we consider the problem of checking observational refinement between two libraries $L_1$ and $L_2$, 
+which by Theorem~\ref{th:equiv}, is equivalent to checking the inclusion between the histories of $L_1$ and respectively $L_2$.
+Essentially, the approach we consider is to compute a \emph{closed-form expression} that represents histories of $L_2$
+and then, check that histories of $L_1$ satisfy this closed-form expression. 
+Since closed-form expressions are supposed to contain only elementary operations, the satisfaction test can be done in 
+polynomial time.
+The undecidability of observational 
+refinement~\cite{conf/esop/BouajjaniEEH13} implies that such a closed-form expression does not exist in general.
+Therefore, we consider an under-approximation of this problem, that decides the inclusion between bounded
+sets of histories. This under-approximation enables several applications: static and dynamic analyses for
+detecting violations to observational refinement, and runtime monitoring (see Section~\ref{} for more details).
 
-TODO SHOW THE NP-HARDNESS RESULT TO SET OUR GOAL FOR POLYNOMIAL-TIME THINGS;
-ALSO MAYBE THE UNDECIDABILITY RESULT TO SET OUR GOAL FOR STATIC/SYMBOLIC CASE
+%TODO THIS SECTION SHOULD BE ABOUT OUR DESIRE TO CHECK O.R.
+%EFFICIENTLY/EFFECTIVELY, AND THUS ABOUT A GENERAL TECHNIQUE WHICH MAKES USE OF
+%A GIVEN CLOSED-FORM EXPRESSION FOR THE HISTORY-INCLUSION CHECK, E.G. A
+%PRESBURGER FORMULA. HERE WE SHOULD TALK ABOUT ALL OF THE STUFF WE WILL DO GIVEN
+%SUCH A FORMULA, WITH APPLICATIONS TO STATIC/SYMBOLIC ANALYSIS, TESTING, AND
+%RUNTIME MONITORING. NOTE THAT WHILE ``COUNTING'' ISN'T STRICTLY NECESSARY IN
+%THIS VIEW OF THINGS, IT IS SIMPLY A CANONICAL REPRESENTATION ON WHICH TO
+%IMPLEMENT THINGS.
+%
+%TODO SHOW THE NP-HARDNESS RESULT TO SET OUR GOAL FOR POLYNOMIAL-TIME THINGS;
+%ALSO MAYBE THE UNDECIDABILITY RESULT TO SET OUR GOAL FOR STATIC/SYMBOLIC CASE
 
-We have shown that observational refinement is equivalent to an inclusion
-between sets of histories. However, in general, deciding this inclusion is
-undecidable even for libraries with a bounded number of
-states~\cite{conf/esop/BouajjaniEEH13}. In the following, we consider an
-under-approximation of this problem, that decides the inclusion between bounded
-sets of histories. This under-approximation can be reduced to a reachability
-problem and enables several applications: symbolic and dynamic analyses for
-detecting violations to observational refinement, and runtime monitoring (see
-Section~\ref{} for more details).
+%We have shown that observational refinement is equivalent to an inclusion
+%between sets of histories. However, in general, deciding this inclusion is
+%undecidable even for libraries with a bounded number of
+%states~\cite{conf/esop/BouajjaniEEH13}. In the following, we consider an
+%under-approximation of this problem, that decides the inclusion between bounded
+%sets of histories. This under-approximation can be reduced to a reachability
+%problem and enables several applications: symbolic and dynamic analyses for
+%detecting violations to observational refinement, and runtime monitoring (see
+%Section~\ref{} for more details).
 
 Our technical development is based on the observation that histories of library
 executions are \emph{interval orders}, a particular class of partial orders.
@@ -32,63 +44,40 @@ starts) cannot be incomparable. Then, the bound that we consider on histories
 is actually a bound on their \emph{length}, defined as the number of distinct
 pasts that an operation can have.
 
-We show that this bound is important in the process of detecting violations to
-history inclusion and thus, observational refinement, in several ways. First,
-we provide a complexity result stating that deciding if the history of a
-concurrent register (a library with $\<read>$ and $\<write>$ methods) of
-bounded length is included in the histories of an atomic register (where method
-bodies are executed atomically in one step) is polynomial time. Deciding this
-fact for arbitrary histories is known to be
-NP-complete~\cite{journals/siamcomp/GibbonsK97}. Therefore, bounding histories
-provides an efficiency gain, in theory but even in practice as we demonstrate
-in Section~\ref{}, if we are interested in defining dynamic analyses for
-detecting violations to observational refinement or runtime monitors for
-ensuring observational refinement.
-
-Second, we provide theoretical results stating that for an important class of
-executions of common concurrent data structures, e.g.., stacks and queues, a
-bound of 2 on the length of their histories is enough to detect \emph{all
-possible violations}. These results are strengthened by the experiments in
-Section~\ref{}, which show that even for other classes violations, small bounds
-of at most 2 on the length of histories is enough in order to discover them.
-
-Deciding the inclusion between sets of \emph{bounded} histories is reduced to a
-reachability problem. This reduction is based on a canonical representation of
-histories/interval orders with integer maps. In this representation, each
-operation $o$ in the history is associated to an interval $I(o)$ on the integer
+We show that for many important classes of libraries, e.g., atomic registers and containers, there exists an effectively
+computable closed-form expression that represents their bounded-length histories. More precisely, this
+expression represents the \emph{canonical form} of these histories, which is defined as an integer map.
+Thus, each operation $o$ in the history is associated to an interval $I(o)$ on the integer
 line whose bounds are smaller than the length of the history. A history is then
 represented by a map, which associates to each interval $I$ and method $m$ an
 integer that counts the number of operations $o$ with $I(o)=I$, which are
-instances of $m$. Based on this representation, the problem of deciding
-$H_K(L_1)\subseteq H_K(L_2)$, where $L_1$ and $L_2$ are two libraries and
-$H_K(L_1)$, resp., $H_K(L_2)$, is the set of histories of $L_1$, resp., $L_2$,
-of length at most $K$, can be reduced to a reachability problem as follows:
-\begin{itemize}
+instances of $m$. The closed-form expressions representing a set of canonical forms of histories 
+will be usually written in quantifier-free Presburger arithmetic. In such a case, 
+the domains of the integer maps are bounded, by assuming another bound 
+on the number of methods in the library.
 
-	\item define a most general client of $L_1$ (that calls arbitrarily methods
-of $L_1$ with an arbitrary number of threads), annotated with a set of counters
-that record the canonical representations of $H_K(L_1)$,
+%When the length of the history is bounded, the number of intervals is also bounded and if the
+%number of methods in the library is bounded, a set of integer maps can be represented 
+%
+%We show that this bound is important in the process of detecting violations to
+%history inclusion and thus, observational refinement, in several ways. First,
+%we provide a complexity result stating that deciding if the history of a
+%concurrent register (a library with $\<read>$ and $\<write>$ methods) of
+%bounded length is included in the histories of an atomic register (where method
+%bodies are executed atomically in one step) is polynomial time. Deciding this
+%fact for arbitrary histories is known to be
+%NP-complete~\cite{journals/siamcomp/GibbonsK97}. Therefore, bounding histories
+%provides an efficiency gain, in theory but even in practice as we demonstrate
+%in Section~\ref{}, if we are interested in defining dynamic analyses for
+%detecting violations to observational refinement or runtime monitors for
+%ensuring observational refinement.
 
-	\item construct a formula (e.g., in Presburger arithmetic) $\varphi[K,L_2]$
-describing the canonical representations of the histories in $H_K(L_2)$,
+We even show that for an important class of executions of common concurrent containers, e.g.., stacks and queues, a
+bound of 2 on the length of their histories is enough to detect \emph{all
+possible violations}. These results are strengthened by the experiments in
+Section~\ref{}, which show that even for other classes violations, small bounds
+of at most ??? on the length of histories is enough in order to discover them.
 
-	\item history inclusion holds iff the formula $\varphi[K,L_2]$ is true in all
-reachable states of the annotated most general client of $L_1$.
-
-\end{itemize}
-
-In general, the difficulty in defining this reduction is to construct the
-formula $\varphi[K,L_2]$. Note that a formula that over-approximates
-$\varphi[K,L_2]$ could still be useful in defining a reduction to reachability
-that is precise for discovering violations to history inclusion. Actually,
-$\varphi[K,L_2]$ describes the counter values reachable in the annotated most
-general client of $L_2$ and any inductive invariant for this program is an
-over-approximation of $\varphi[K,L_2]$.
-
-We show how to construct the formula $\varphi[K,L_2]$ for particular but
-widely-used specifications of concurrent data structures, e.g., atomic stacks
-and atomic queues, and for regular atomic specifications with a bounded number
-of states.
 
 \subsection{Histories are interval orders}
 
@@ -125,7 +114,7 @@ called \emph{interval orders}.
 Interval orders have a canonical representation which basically, associates to
 each element an interval on the integer line. In general, there may exist
 several ways to associate intervals to elements of the interval order but, in
-the canonical representation, the limits of these intervals are bounded by an
+the canonical representation, the limits of these intervals are bounded by a minimal 
 integer called the \emph{length} of the interval order.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
