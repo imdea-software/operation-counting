@@ -199,34 +199,34 @@ order are ordered by set inclusion.
 Then, the length of an interval order $\tup{O,<}$ equals the number of \emph{distinct} pasts in $\tup{O,<}$ but also,
 the number of distinct futures in $\tup{O,<}$.
 
-\begin{lemma}
+\begin{lemma}[Greenough~\cite{phd/Greenough76}]\label{lemma:len}
 Let $\tup{O,<}$ be an interval order of length $n$. Then,
 \[
-n=|\set{\past{o}:o\in O}|=|\set{\future{o}:o\in O}|.
+n=|\set{\past{o}:o\in O}| = |\set{\future{o}:o\in O}|.
 \]
 \end{lemma}
+
+In the following, we describe a procedure for computing the canonical representation of an interval order $\tup{O,<}$ 
+(note that Lemma~\ref{lem:representation} proves only its existence).
+%We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
+%which demonstrates that its , respectively futures.
+Thus, the lower bound of the interval $(i,j)$ associated to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
+and the upper bound equals the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$, plus one.
+Note that this construction is an alternative proof for the fact that the length of an interval order equals the number of distinct pasts.
+Formally, let $I : O -> (n)^2$ be a function s.t. for every $o\in O$, $I(o)=(i,j)$, where 
+\[
+i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
+\] 
+
+\begin{lemma}
+
+For every interval order $\tup{O,<}$, the function $I$ defined above is the canonical representation.
+
+\end{lemma}
+
 \begin{proof}
-We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
-which demonstrates that its length equals the number of distinct pasts, respectively futures.
-Thus, let $I : O -> (n)^2$ be a function defined as follows:
-\begin{enumerate}
-
-	\item let $\past{o_0}\subset \past{o_1}\subset \ldots\subset
-\past{o_n}$ be the set of distinct pasts in $\tup{O,<}$;
-
-	\item let $\future{o_1'}\supset \future{o_2'}\supset \ldots\supset
-\future{o_n'}$ be the set of distinct futures in $\tup{O,<}$;
-
-	\item for every $o\in O$, let $I(o)=(i,j)$ s.t. $\past{o}=\past{o_i}$ and
-$\future{o}=\future{o_j'}$.
-
-\end{enumerate}
-
-\todo{Prove that $I$ is the canonical representation}
-
+\todo{}
 \end{proof}
-
-
 
 
 Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
@@ -253,36 +253,22 @@ $\Psi_K(L_2)$ is an invariant for the program $\Xi[L,K]$.
 
 \subsection{Generating counting representations}
 
+We define the program $\Xi[L,K]$, that generates the counting representations
+of all the histories of the library $L$ of length at most $K$. This program is obtained by adding supplementary transitions to
+the LTS defining the library $L$. Concretely, it is an \emph{annotated most general client} of the 
+library $L$, that non-deterministically calls methods of $L$ with an arbitrary number of threads. 
 
-In this section, we show how to construct a program $\Xi[L]$, that generates the counting representations
-of all the histories of $L$. Then, given two libraries $L_1$ and $L_2$ and a closed-form expression $\Psi(L_2)$ 
-representing the multisets $\Pi[L_2]$, $\Pi(L_1) \subseteq \Pi(L_2)$ holds iff $\Psi(L_2)$ is an invariant for $\Xi[L]$.
+Essentially, the definition of $\Xi[L,K]$ is based on the following procedure for computing the counting 
+representation of an execution $e$'s history. Thus, given a library execution $e$, we consider 
+
+$e\in (C\cup R)^*$, an index $i$ of $e$
+such that $e_i\in R$ and $e_{i+1}\in C$ is called a \emph{barrier}. 
 
 
-Note that Lemma~\ref{lem:representation} doesn't provide an effective way of
-constructing the canonical representation. 
-The canonical representation of an interval order $\tup{O,<}$ can be defined
-effectively as follows:
-\begin{itemize}
+let $i_1$,$\ldots$,$i_n$ be the 
+set of indices of $e$ such that 
 
-	\item let $\past{o_0}\subset \past{o_1}\subset \ldots\subset
-\past{o_n}$ be the set of different pasts in $\tup{O,<}$. 
-
-	\item let $\future{o_1'}\supset \future{o_2'}\supset \ldots\supset
-\future{o_n'}$ be the set of different futures in $\tup{O,<}$.
-
-	\item for any $o\in O$, let $I(o)=(i,j)$ s.t. $\past{o}=\past{o_i}$ and
-$\future{o}=\future{o_j'}$.
-
-\end{itemize}
-
-\begin{lemma}
-
-  The function $I$ defined above is the canonical representation of
-  $\tup{O,<}$. The \emph{length} of an interval order $\tup{O,<}$ is the number
-  of distinct sets $\past{o}$ with $o\in O$.
-
-\end{lemma}
+that given an execution $e$, computes . 
 
 \subsection{Checking bounded history inclusion}
 
