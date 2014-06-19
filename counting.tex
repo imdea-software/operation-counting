@@ -92,29 +92,6 @@ called \emph{interval orders}.
 
 \end{definition}
 
-In the results that follow, we will use a characterization of interval orders 
-in terms of \emph{pasts} and \emph{futures} associated to elements in the partial order.
-Thus, given a partial order $\tup{O,<}$ and $o\in O$, the set of elements which
-are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$, and the set
-of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
-Formally, for every $o\in O$, we define
-\[
-\past{o}=\{o' < o\mid o'\in A\}\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
-\]
-
-\todo{Example of pasts and futures}
-
-The following result states that every two pasts or futures in an interval
-order are ordered by set inclusion.
-
-\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
-
-  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with $o\in O$ and respectively,  the sets $\future{o}$
-  with $o\in O$, are
-  linearly ordered by set inclusion. 
-
-\end{lemma}
-
 \begin{lemma}
   \label{lem:intervals}
 
@@ -134,9 +111,10 @@ order are ordered by set inclusion.
 
 \end{proof}
 
+\paragraph{Counting representations.}
 Interval orders have a canonical representation which basically, associates to
 each element an interval on the integer line. In general, there may exist
-several ways to associate intervals to elements of the interval order but, in
+several ways to associate intervals to elements of an interval order but, in
 the canonical representation, the limits of these intervals are bounded by a minimal 
 integer called the \emph{length} of the interval order.
 
@@ -165,7 +143,7 @@ H(L) }$.
 \todo{example of counting representations}
 
 Counting representations give an effective way 
-of computing closed-form expressions representing sets of histories 
+of computing closed-form expressions representing sets of histories. 
 %an expression will represent the counting representations of a set of histories.
 %
 This representation reduces the problem of ensuring that each history $h \in
@@ -190,9 +168,67 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 
 \end{proof}
 
+\paragraph{Histories of bounded length.}
 Since the closed-form expression $\Psi(L_2)$ may not exist in general, we consider the problem of deciding
 $H_K(L_1) \subseteq H_K(L_2)$, where for any library $L$, $H_K(L)$ is the set of histories of $L$ of length at most $K$.
 Note that the length of a history is unique and thus, $H_K(L_1) \subseteq H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
+
+The length of an interval order can be characterized 
+in terms of \emph{pasts} and \emph{futures} associated to elements in the partial order.
+Thus, given a partial order $\tup{O,<}$ and $o\in O$, the set of elements which
+are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$, and the set
+of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
+Formally, for every $o\in O$, we define
+\[
+\past{o}=\{o' < o\mid o'\in A\}\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
+\]
+
+\todo{Example of pasts and futures}
+
+The following result states that every two pasts or futures in an interval
+order are ordered by set inclusion.
+
+\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
+
+  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with $o\in O$ and respectively,  the sets $\future{o}$
+  with $o\in O$, are
+  linearly ordered by set inclusion. 
+
+\end{lemma}
+
+Then, the length of an interval order $\tup{O,<}$ equals the number of \emph{distinct} pasts in $\tup{O,<}$ but also,
+the number of distinct futures in $\tup{O,<}$.
+
+\begin{lemma}
+Let $\tup{O,<}$ be an interval order of length $n$. Then,
+\[
+n=|\set{\past{o}:o\in O}|=|\set{\future{o}:o\in O}|.
+\]
+\end{lemma}
+\begin{proof}
+We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
+which demonstrates that its length equals the number of distinct pasts, respectively futures.
+Thus, let $I : O -> (n)^2$ be a function defined as follows:
+\begin{enumerate}
+
+	\item let $\past{o_0}\subset \past{o_1}\subset \ldots\subset
+\past{o_n}$ be the set of distinct pasts in $\tup{O,<}$;
+
+	\item let $\future{o_1'}\supset \future{o_2'}\supset \ldots\supset
+\future{o_n'}$ be the set of distinct futures in $\tup{O,<}$;
+
+	\item for every $o\in O$, let $I(o)=(i,j)$ s.t. $\past{o}=\past{o_i}$ and
+$\future{o}=\future{o_j'}$.
+
+\end{enumerate}
+
+\todo{Prove that $I$ is the canonical representation}
+
+\end{proof}
+
+
+
+
 Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
 The next results states that the inclusion between bounded histories is equivalent to ensuring that each multiset 
 $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
@@ -209,12 +245,13 @@ $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 \end{proof}
 
-To decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[L,K]$ that generates the counting representations of $\Pi_K(L_1)$
-and a closed-form expression $\Psi_K(L_2)$ modeling all counting representations in $\Pi_K(L_2)$. Then, $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
-$\Psi_K(L_2)$ is an invariant for the program $\Xi[L,K]$.
+In Section~\ref{}, we show that for important classes of libraries $L_2$, there exists an effectively computable 
+closed-form expression $\Psi_K(L_2)$ modeling all the counting representations in $\Pi_K(L_2)$. 
+Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[L,K]$ that generates the counting 
+representations in $\Pi_K(L_1)$ such that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
+$\Psi_K(L_2)$ is an invariant for the program $\Xi[L,K]$. 
 
 \subsection{Generating counting representations}
-
 
 
 In this section, we show how to construct a program $\Xi[L]$, that generates the counting representations
