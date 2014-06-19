@@ -174,63 +174,42 @@ $H_K(L_1) \subseteq H_K(L_2)$, where for any library $L$, $H_K(L)$ is the set of
 Note that the length of a history is unique and thus, $H_K(L_1) \subseteq H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
 
 The length of an interval order can be characterized 
-in terms of \emph{pasts} and \emph{futures} associated to elements in the partial order.
+in terms of \emph{pasts} %and \emph{futures} 
+associated to elements in the partial order.
 Thus, given a partial order $\tup{O,<}$ and $o\in O$, the set of elements which
-are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$, and the set
-of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
-Formally, for every $o\in O$, we define
+are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$:
+%, and the set
+%of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
+%Formally, for every $o\in O$, we define
 \[
-\past{o}=\{o' < o\mid o'\in A\}\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
+\past{o}=\{o' < o\mid o'\in A\}.%\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
 \]
 
-\todo{Example of pasts and futures}
+\todo{Example of pasts }
 
-The following result states that every two pasts or futures in an interval
+The following result states that every two pasts %or futures 
+in an interval
 order are ordered by set inclusion.
 
 \begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
 
-  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with $o\in O$ and respectively,  the sets $\future{o}$
-  with $o\in O$, are
-  linearly ordered by set inclusion. 
+  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with $o\in O$ %and respectively,  the sets $\future{o}$ with $o\in O$, 
+  are linearly ordered by set inclusion. 
 
 \end{lemma}
 
-Then, the length of an interval order $\tup{O,<}$ equals the number of \emph{distinct} pasts in $\tup{O,<}$ but also,
-the number of distinct futures in $\tup{O,<}$.
+Then, the length of an interval order $\tup{O,<}$ equals the number of \emph{distinct} pasts in $\tup{O,<}$. 
+%but also, the number of distinct futures in $\tup{O,<}$.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]\label{lemma:len}
 Let $\tup{O,<}$ be an interval order of length $n$. Then,
 \[
-n=|\set{\past{o}:o\in O}| = |\set{\future{o}:o\in O}|.
+n=|\set{\past{o}:o\in O}|. %= |\set{\future{o}:o\in O}|.
 \]
 \end{lemma}
 
-In the following, we describe a procedure for computing the canonical representation of an interval order $\tup{O,<}$ 
-(note that Lemma~\ref{lem:representation} proves only its existence).
-%We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
-%which demonstrates that its , respectively futures.
-Thus, the lower bound of the interval $(i,j)$ associated to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
-and the upper bound equals the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$, plus one.
-Note that this construction is an alternative proof for the fact that the length of an interval order equals the number of distinct pasts.
-Formally, let $I : O -> (n)^2$ be a function s.t. for every $o\in O$, $I(o)=(i,j)$, where 
-\[
-i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
-\] 
-
-\begin{lemma}
-
-For every interval order $\tup{O,<}$, the function $I$ defined above is the canonical representation.
-
-\end{lemma}
-
-\begin{proof}
-\todo{}
-\end{proof}
-
-
 Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
-The next results states that the inclusion between bounded histories is equivalent to ensuring that each multiset 
+The next result states that the inclusion between bounded histories is equivalent to ensuring that each multiset 
 $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 \begin{lemma}
@@ -259,7 +238,32 @@ the LTS defining the library $L$. Concretely, it is an \emph{annotated most gene
 library $L$, that non-deterministically calls methods of $L$ with an arbitrary number of threads. 
 
 Essentially, the definition of $\Xi[L,K]$ is based on the following procedure for computing the counting 
-representation of an execution $e$'s history. Thus, given a library execution $e$, we consider 
+representation of an execution $e$'s history. 
+
+In the following, we describe a procedure for computing the canonical representation of an interval order $\tup{O,<}$ 
+(note that Lemma~\ref{lem:representation} proves only its existence).
+%We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
+%which demonstrates that its , respectively futures.
+Thus, the lower bound of the interval $(i,j)$ associated to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
+and the upper bound equals the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$, plus one.
+Note that this construction is an alternative proof for the fact that the length of an interval order equals the number of distinct pasts.
+Formally, let $I : O -> (n)^2$ be a function s.t. for every $o\in O$, $I(o)=(i,j)$, where 
+\[
+i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
+\] 
+
+\begin{lemma}
+
+For every interval order $\tup{O,<}$, the function $I$ defined above is the canonical representation.
+
+\end{lemma}
+
+\begin{proof}
+\todo{}
+\end{proof}
+
+
+Thus, given a library execution $e$, we consider 
 
 $e\in (C\cup R)^*$, an index $i$ of $e$
 such that $e_i\in R$ and $e_{i+1}\in C$ is called a \emph{barrier}. 
