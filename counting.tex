@@ -165,7 +165,8 @@ H(L) }$.
 \todo{example of counting representations}
 
 Counting representations give an effective way 
-of computing closed-form expressions representing sets of histories.
+of computing closed-form expressions representing sets of histories 
+%an expression will represent the counting representations of a set of histories.
 %
 This representation reduces the problem of ensuring that each history $h \in
 H(L_1)$ of some library is included in the histories $H(L_2)$ of another, to
@@ -189,7 +190,37 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 
 \end{proof}
 
+Since the closed-form expression $\Psi(L_2)$ may not exist in general, we consider the problem of deciding
+$H_K(L_1) \subseteq H_K(L_2)$, where for any library $L$, $H_K(L)$ is the set of histories of $L$ of length at most $K$.
+Note that the length of a history is unique and thus, $H_K(L_1) \subseteq H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
+Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
+The next results states that the inclusion between bounded histories is equivalent to ensuring that each multiset 
+$\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
+
+\begin{lemma}
+
+  $H_K(L_1) \subseteq H_K(L_2)$ iff $\Pi_K(L_1) \subseteq \Pi_K(L_2)$.
+
+\end{lemma}
+
+\begin{proof}
+
+  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
+
+\end{proof}
+
+To decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[L,K]$ that generates the counting representations of $\Pi_K(L_1)$
+and a closed-form expression $\Psi_K(L_2)$ modeling all counting representations in $\Pi_K(L_2)$. Then, $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
+$\Psi_K(L_2)$ is an invariant for $\Xi[L,K]$.
+
 \subsection{Generating counting representations}
+
+
+
+In this section, we show how to construct a program $\Xi[L]$, that generates the counting representations
+of all the histories of $L$. Then, given two libraries $L_1$ and $L_2$ and a closed-form expression $\Psi(L_2)$ 
+representing the multisets $\Pi[L_2]$, $\Pi(L_1) \subseteq \Pi(L_2)$ holds iff $\Psi(L_2)$ is an invariant for $\Xi[L]$.
+
 
 Note that Lemma~\ref{lem:representation} doesn't provide an effective way of
 constructing the canonical representation. 
