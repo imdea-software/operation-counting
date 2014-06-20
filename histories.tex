@@ -120,65 +120,42 @@ history $h'\in H'$ s.t. $h$ and $h'$ are equivalent.
 \end{theorem}
 
 \begin{proof}
+  
+  ($=>$) Let $h = \tup{O,<,f} \in H(L_1)$; we show $h \in H(L_2)$ by
+  constructing a program $P_h$ which only admits executions with histories
+  stronger than $h$:
+  \begin{align*}
+    \forall e \in E(P_h).\ |(e|@S)| = n => h \preceq H(e) \text{,}
+  \end{align*}
+  where $n = |\set{ o \in O : f(o) = \tup{\_,\<true>}}|$ is the number of
+  completed operations in $h$.
+  Given such a program $P_h$, taking any execution $e_1 \in E(P_h \x L_1)$
+  with $|(e_1|@S)| = n$, we must also have an execution $e_2 \in E(P_h \x L_2)$
+  such that $(e_2|@S) = (e_1|@S)$ by definition of $L_1 <= L_2$. Since
+  $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$,\footnote{Technically, $e_2$ may contain
+  internal actions of $P_h$ and $L_2$ both, so by writing $e_2 \in E(P_h)$,
+  resp., $e_2 \in E(L_2)$, we mean the projection of $e_2$ to $P_h$'s actions,
+  resp., $L_2$'s actions.}
+  we also know that $h \preceq H(e_2)$, and since $e_2 \in E(L_2)$, we have
+  $H(e_2) \in H(L_2)$, along with any history weaker than $H(e_2)$, namely $h$.
 
-  ($\Rightarrow$) Let $h\in H(L_1)$ be a history of the library $L_1$ and let
-  $e$ be an execution of the library $L_1$ such that $H(e)=h$.
-  
-  The annotation of $e$, denoted $\overline{e}$, is an execution obtained from
-  $e$ by adding the following program actions:
-  \begin{itemize}
+  We construct $P_h = \tup{Q,@S,q_0,@d}$ over alphabet $@S = C \u R \u \set{a}$
+  whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
+  state is $q_0 = \set{ o |-> \<false> : o \in O}$. Transitions are given by,
+  \begin{align*}
+    & \text{for each } q,o,m \text{ such that } \lnot q(o)
+      \text{, and } q(o') \text{ for all } o' < o \text{:} \\
+    & \qquad q \xrightarrow{\tup{m,o}} q \\
+    & \text{for each } q,o,m \text{ such that } f(o) = \tup{m,\<true>} \text{:} \\
+    & \qquad q[o |-> \<false>] \xrightarrow{\tup{o,m}; a} q[o |-> \<true>]
+  \end{align*}
+  In any execution $e \in E(P_h)$, the call action $\tup{o,\_}$ of any
+  operation $o$ must come after the return action $\tup{\_,o'}$ of each $o'<o$.
+  Furthermore, all completed operations of $h$ are completed in $e$ if and
+  only if $(e|@S) = a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
 
-  	\item $\print{\tup{m,o}}$ immediately before every call action $\tup{m,o}$,
-
-    \item $\print{\tup{o,m}}$ immediately after every return action $\tup{o,m}$,
-
-    \item $\sync{o}{o'}$ between every two actions $r=\tup{o,m}\in R$ and
-    $c=\tup{m,o}\in C$ such that $r$ occurs before $c$ in $e$.
-
-  \end{itemize}
-  
-  Let $P$ be a program such that $E(P)$ is the minimal set of executions that
-  contains $\overline{e}$. 
-  % and satisfies all the closure properties required for a program.
-  The set of program actions in $P$, $\Sigma_P$, consists of symbols
-  $\print{\tup{m,o}}$, $\print{\tup{o,m}}$, and $\sync{o}{o'}$ with $o,o'\in
-  \<Ops>$ and $m\in\<Methods>$.
-  
-  Note that for any execution $e'$ obtained from $\overline{e}$ by applying the
-  closure properties, $\sync{o}{o'}$ still occurs in between the return action
-  $\tup{o,m}$ and the call action $\tup{m,o}$. This is because actions
-  occurring after a return action $r$ cannot be moved to the left of $r$ and
-  actions occurring before a call action $c$ cannot be moved to the right of
-  $c$. Therefore, for any execution $e'\in E(P)$, that contains all the program
-  actions in $\overline{e}$, $h\preceq H(e')$. Moving call actions to the right
-  and return actions to the left may imply that the history $H(e')$ contains
-  more order constraints on operations than $h$ and adding return actions of
-  the end may imply that the history $H(e')$ contains more completed operations
-  than $h$. Also, prefix-closure implies that $h$ may have more pending
-  operations.
-  
-  % Let 
-  % \[
-  %   \overline{E}(L_1,h)=\{\overline{e}\mid e\in E(L_1,h)\}
-  % \]
-  % be the set of all the annotated executions in $E(L_1,h)$.
-      
-  Because $L_1 \leq L_2$ any sequence that contains all the program actions in
-  $\overline{e}$ belongs to $E(P \x L_2)|@S_P$. Therefore, there exists an
-  execution $e'\in E(P \x L_2)$ such that $h\preceq H(e')$ with $H(e')\in
-  H(L_2)$. By Lemma~\ref{lemma:lib_closure}, the set of histories of $L_2$ is
-  downward closed and consequently, $h\in H(L_2)$.
-  
-  The same proof holds also if we consider multi-threaded programs as in
-  Example~\ref{ex:threads:1}. In this case, the $\<print>$ actions are
-  considered to be local to the thread that executes the corresponding call or
-  return action while $\sync{o}{o'}$ is replaced by two actions:
-  $(t,x[o,o']=\<true>)$ immediately after the return action $r=\tup{o,m}$ and
-  $(t',\<assume> (x[o,o'] = = \<true>))$ immediately before the call action
-  $c=\tup{m,o}$, where $t$ is the thread executing $r$ and $t'$ is the thread
-  executing $c$.
-  
-  ($\Leftarrow$) Let $P$ be a program and let $e$ be an execution in the
+  ($\Leftarrow$) TODO MIKE IS NOT CONVINCED OF THIS DIRECTION...
+  Let $P$ be a program and let $e$ be an execution in the
   composition of $P$ with $L_1$, $P\times L_1$. We show that $e$ is also an
   execution of $P\times L_2$, which implies that the projection of $e$ on
   program actions $e|@S_P$ belongs to $E(P \x L_2)|@S_P$.
