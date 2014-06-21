@@ -33,11 +33,7 @@ operations, according to:
   \right.$
 
 \end{itemize}
-The \emph{histories} of a library $L$ are those of its admitted executions:
-$H(L) = \set{ H(e) : e \in E(L) }$.
-
-The \emph{histories} of a program $P$ are the histories of its admitted executions projected on call and return actions:
-$H(P) = \set{ H(e|(C\cup R)) : e \in E(P) }$.
+$H(L) = \set{ H(e) : e \in E(L) }$ denotes the histories admitted by $L$.
 
 \begin{example}
   \label{ex:histories}
@@ -48,69 +44,53 @@ $H(P) = \set{ H(e|(C\cup R)) : e \in E(P) }$.
 
 \end{example}
 
-
-A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{weaker than} another history $h_2
-= \tup{O_2,<_2,f_2}$ written $h_1 \preceq h_2$, when there exists a bijection
-$g : O_1' -> O_2$, where $O_1'$ is a subset of $O_1$ that contains all the completed
-operations in $O_1$, i.e., 
-$O_1=O_1\cup\set{o : f_1(o)=\tup{m,\<false>}\mbox{ with $m\in\<Methods>$}}$, such that
-TODO WHY MUST WE ALLOW OMITTING OPERATIONS??
+Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
+\emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
+injection $g: O_2 -> O_1$ such that
 \begin{itemize}
-  
-  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1'$, and
-  
-  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1'$.
+
+  \item $f_1(o) = \tup{\_,\<true>}$ implies $o \in \<range>(g)$
+  for each $o \in O_1$,
+
+  \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
+
+  \item $f_1(g(o)) \preceq f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
 where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
-Two histories $h_1$ and $h_2$ are \emph{equivalent}, denoted by $h_1 \equiv h_2$ iff
-$h_1 \preceq h_2$ and $h_2 \preceq h_1$.
+We say $h_1$ and $h_2$ are \emph{equivalent} when $h_1 \preceq h_2$ and $h_2
+\preceq h_1$. Throughout this work we do not distinguish between equivalent
+histories, and we assume every set $H$ of histories is closed under inclusion
+of equivalent histories, i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in
+H$, then $h_2 \in H$ as well.
 
-%A history $h_1 = \tup{O_1,<_1,f_1}$ is \emph{quasi-equivalent} to another history $h_2
-%= \tup{O_2,<_2,f_2}$ written $h_1 \sim h_2$, when there exists a bijection
-%$g : O_1 -> O_2$ such that
-%\begin{itemize}
-%  
-%  \item $o_1 <_1 o_2$ implies $g(o_1) <_2 g(o_2)$ for each $o_1, o_2 \in O_1$, and
-%
-%  \item $o_1 <_2 o_2$ implies $g^{-1}(o_1) <_1 g^{-1}(o_2)$ for each $o_1, o_2 \in O_2$, and
-%  
-%  \item $f_1(o) \preceq f_2(g(o))$ for each $o \in O_1$.
-%
-%\end{itemize}
-%%where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
+\begin{lemma}
+  \label{lemma:lib_closure}
 
-
-\begin{lemma}\label{lemma:lib_closure}
-  
-The set of histories $H(L)$ of a library $L$ is downward closed under $\preceq$, i.e., whenever some history $h$ belongs to $H(L)$ all the histories $h'$ with $h'\preceq h$ belong also to $H(L)$. %Moreover, if a history $h$ belongs to $H(L)$ then all the histories $h'=\tup{O,<,f}$ obtained from $h$ by adding pending operations, i.e., operations $o$ with $f(o)=\<false>$, belong also to $H(L)$.
+  Library histories $H(L)$ are closed under weakening,
+  i.e.,~$h_1 \in H(L)$ and $h_2 \preceq h_1$ implies $h_2 \in H(L)$.
 
 \end{lemma}
 
 \begin{proof}
 
-  From the closure properties on $E(L)$.
+  TODO GIVE A PROPER PROOF
 
 \end{proof}
 
-\begin{lemma}\label{lemma:lib_exec}
-  
-  $E(L)$ contains all executions with histories in $H(L)$:
-  \begin{align*}
-    h \in H(L) \text{ if and only if } \set{ e \in @S^* : H(e) = h } \subseteq E(L)
-  \end{align*}
+\begin{lemma}
+  \label{lemma:lib_exec}
+
+  $E(L)$ contains all executions with histories in $H(L)$,
+  i.e.,~$H(e) \in H(L)$ implies $e \in E(L)$.
 
 \end{lemma}
 
 \begin{proof}
 
-  From the closure properties on $E(L)$.
+  TODO GIVE A PROPER PROOF
 
 \end{proof}
-
-To avoid an overload of notation, for any two sets of histories $H$ and $H'$,
-$H\subseteq H'$ denotes the fact that for every history $h\in H$ there exists a
-history $h'\in H'$ s.t. $h$ and $h'$ are equivalent.
 
 \begin{theorem}
   \label{th:equiv}
@@ -132,12 +112,10 @@ history $h'\in H'$ s.t. $h$ and $h'$ are equivalent.
   Given such a program $P_h$, taking any execution $e_1 \in E(P_h \x L_1)$
   with $|(e_1|@S)| = n$, we must also have an execution $e_2 \in E(P_h \x L_2)$
   such that $(e_2|@S) = (e_1|@S)$ by definition of $L_1 <= L_2$. Since
-  $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$,\footnote{Technically, $e_2$ may contain
-  internal actions of $P_h$ and $L_2$ both, so by writing $e_2 \in E(P_h)$,
-  resp., $e_2 \in E(L_2)$, we mean the projection of $e_2$ to $P_h$'s actions,
-  resp., $L_2$'s actions.}
+  $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$,
   we also know that $h \preceq H(e_2)$, and since $e_2 \in E(L_2)$, we have
-  $H(e_2) \in H(L_2)$, along with any history weaker than $H(e_2)$, namely $h$.
+  $H(e_2) \in H(L_2)$, along with any history weaker than $H(e_2)$
+  by Lemma~\ref{lemma:lib_closure}, namely $h$.
 
   We construct $P_h = \tup{Q,@S,q_0,@d}$ over alphabet $@S = C \u R \u \set{a}$
   whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
