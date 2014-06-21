@@ -123,9 +123,9 @@ integer called the \emph{length} of the interval order.
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
   \label{lem:representation}
 
-  An interval order $\tup{O,<}$ has a canonical representation $I : O -> (n)^2$
+  An interval order $\tup{O,<}$ has a canonical representation $I : O -> [n]^2$
   for some minimal $n \in \<Nats>$ mapping each $o \in O$ to the interval $I(o)
-  = (i,j) \subseteq (0,n)$, where $o_1 < o_2$ iff $\sup I(o_1) \leq \inf I(o_2)$.
+  = [i,j] \subseteq [0,n]$, where $o_1 < o_2$ iff $\sup I(o_1) < \inf I(o_2)$.
 
 \end{lemma}
 The integer $n$ in Lemma~\ref{lem:representation} is called the \emph{length}
@@ -134,11 +134,11 @@ of $\tup{O,<}$.
 \todo{Example of canonical representations}
 
 Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
-order, and let $I : O -> (n)^2$ be its minimal representation. We extend $I$ to
+order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
 a representation $\pi$ including operations' methods, by $\pi(o) =
 \tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
 of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-interval pairs
-$\tup{m,(i,j)}$. Finally we lift $\Pi$ to libraries, defining the set of
+$\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
 counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
 H(L) }$.
 
@@ -171,15 +171,17 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 \end{proof}
 
 \paragraph{Histories of bounded length.}
-Since the closed-form expression $\Psi(L_2)$ may not exist in general, we consider the problem of deciding
-$H_K(L_1) \subseteq H_K(L_2)$, where for any library $L$, $H_K(L)$ is the set of histories of $L$ of length at most $K$.
-Note that the length of a history is unique and thus, $H_K(L_1) \subseteq H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
 
-The length of an interval order can be characterized 
-in terms of \emph{pasts} %and \emph{futures} 
-associated to elements in the partial order.
-Thus, given a partial order $\tup{O,<}$ and $o\in O$, the set of elements which
-are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$:
+Since the closed-form expression $\Psi(L_2)$ may not exist in general, we
+consider the problem of deciding $H_K(L_1) \subseteq H_K(L_2)$, where for any
+library $L$, $H_K(L)$ is the set of histories of $L$ of length at most $K$.
+Note that the length of a history is unique and thus, $H_K(L_1) \subseteq
+H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
+
+The length of an interval order can be characterized in terms of \emph{pasts}
+associated to elements in the partial order. Thus, given a partial order
+$\tup{O,<}$ and $o\in O$, the set of elements which are ordered before $o$
+w.r.t. $<$ is called the \emph{past} of $o$:
 %, and the set
 %of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
 %Formally, for every $o\in O$, we define
@@ -189,25 +191,25 @@ are ordered before $o$ w.r.t. $<$ is called the \emph{past} of $o$:
 
 \todo{Example of pasts }
 
-The following result states that every two pasts %or futures 
-in an interval
-order are ordered by set inclusion.
+The following result states that every two pasts in an interval order are
+ordered by set inclusion.
 
 \begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
 
-  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with $o\in O$ %and respectively,  the sets $\future{o}$ with $o\in O$, 
-  are linearly ordered by set inclusion. 
+  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with
+  $o\in O$ are linearly ordered by set inclusion.
 
 \end{lemma}
 
-Then, the length of an interval order $\tup{O,<}$ equals the number of \emph{distinct} pasts in $\tup{O,<}$. 
+Then, the length of an interval order $\tup{O,<}$ is one less than the number
+of \emph{distinct} pasts in $\tup{O,<}$.
+
 %but also, the number of distinct futures in $\tup{O,<}$.
 
-\begin{lemma}[Greenough~\cite{phd/Greenough76}]\label{lemma:len}
-Let $\tup{O,<}$ be an interval order of length $n$. Then,
-\[
-n=|\set{\past{o}:o\in O}|. %= |\set{\future{o}:o\in O}|.
-\]
+\begin{lemma}[Greenough~\cite{phd/Greenough76}]
+  \label{lemma:len}
+  An interval order $\tup{O,<}$ has length
+  \[ |\set{\past{o}:o\in O}| - 1 \text{.} \]
 \end{lemma}
 
 Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
@@ -245,21 +247,21 @@ correspond to a particular construction of the counting representation of a hist
 
 We first give a construction for the canonical representation of an interval order, which extends straightforwardly to counting
 representations of histories.
-Thus, in the canonical representation of an interval order, the lower, resp., upper, bound of the interval $(i,j)$ associated 
+Thus, in the canonical representation of an interval order, the lower, resp., upper, bound of the interval $[i,j]$ associated 
 to some element $o$ is defined in function of the number of distinct pasts $\past{o'}$ with $o'<o$, resp., $o'<o$ or 
 $o'$ incomparable to $o$.
 %
-% $i$ of the interval $(i,j)$ associated by the canonical 
+% $i$ of the interval $[i,j]$ associated by the canonical 
 %representation of $\tup{O,<}$ to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
 %and the upper bound $j$ equals one plus the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$.
 This property is also an explanation for the fact that the length of an interval order equals the number of distinct pasts.
 
 \begin{lemma}\label{lemma:norm_form}
 
-Let $\tup{O,<}$ be an interval order and $I : O -> (n)^2$ its canonical representation. Then,
-for every $o\in O$, $I(o)=(i,j)$, where 
+Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical representation. Then,
+for every $o\in O$, $I(o)=[i,j]$, where 
 \[
-i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
+i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|.
 \] 
 
 \end{lemma}
@@ -285,12 +287,13 @@ past of all operations in $H(e)$ is $\emptyset$).
 The index in $e$ of such a return action is called a \emph{barrier} of the execution $e$.
 \todo{For example,}
 
-Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called a \emph{barrier} if 
-$e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be the number of barriers of $e$. Then,
+Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is
+called a \emph{barrier} if $e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be
+the number of barriers of $e$. Then,
 
 \begin{lemma}\label{lemma:nb_barr}
 
-For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ is $1+\nbbarr{e}$.
+For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ is $\nbbarr{e}$.
 
 \end{lemma}
 
@@ -308,16 +311,18 @@ the action $a$. Then,
 \begin{lemma}\label{lemma:counting_executions}
 
 Let $e\in (C\cup R)^*$ be a library execution and 
-$I : O -> (n)^2$ the canonical representation of $H(e)$. 
-Then, for every $o\in O$, $I(o)=(i,j)$, where 
+$I : O -> [n]^2$ the canonical representation of $H(e)$. 
+Then, for every $o\in O$, $I(o)=[i,j]$, where 
 \[
 i = \nbbarr{e,\tup{m,o}},\mbox{ and }
 \]
-\[
-j= \left\{\begin{array}{ll}1+\nbbarr{e,\tup{o,m}},&\mbox{ if $\tup{o,m}$ occurs in $e$}\\
-				    1+\nbbarr{e},&\mbox{ otherwise}.
-	    \end{array}\right.
-\]
+\begin{align*}
+  j= \left\{
+  \begin{array}{ll}
+    \nbbarr{e,\tup{o,m}}  & \mbox{ if $\tup{o,m}$ occurs in $e$} \\
+  	\nbbarr{e}            & \mbox{ otherwise.}
+  \end{array}\right.
+\end{align*}
 
 \end{lemma}
 
@@ -343,19 +348,19 @@ The next lemma states the correctness of this algorithm.
             
 for every call action $c=\tup{m,o}$,
 \begin{program}
-   $\pi(m)(\<time>$,K)++;
-   $\theta(o)$ = $\<time>$;
    if ($\<finished>$) {
       $\<time>$++;
-      assume($\<time>$ <= K-1);
+      assume($\<time>$ <= K);
       $\<finished>$ = $\<false>$;
    }
+   $\theta(o)$ = $\<time>$;
+   $\pi(m)(\theta(o)$,K)++;
 \end{program}
 
 for every return action $r=\tup{o,m}$,
 \begin{program}
    $\pi(m)(\theta(o)$,K)--;
-   $\pi(m)(\theta(o)$,$\<time>$+1)++;
+   $\pi(m)(\theta(o)$,$\<time>$)++;
    $\<finished>$ = $\<true>$;
 \end{program}
 \caption{Online algorithm for computing the counting representation of a given execution's history.}
