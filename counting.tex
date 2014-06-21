@@ -228,53 +228,115 @@ $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 In Section~\ref{}, we show that for important classes of libraries $L_2$, there exists an effectively computable 
 closed-form expression $\Psi_K(L_2)$ modeling all the counting representations in $\Pi_K(L_2)$. 
-Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[L,K]$ that generates the counting 
+Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[K]\times L_1$ that generates the counting 
 representations in $\Pi_K(L_1)$ such that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
-$\Psi_K(L_2)$ is an invariant for the program $\Xi[L,K]$. 
+$\Psi_K(L_2)$ is an invariant for the program $\Xi[K]\times L_1$. 
 
 \subsection{Generating counting representations}
 
-We define the program $\Xi[L,K]$, that generates the counting representations
-of all the histories of the library $L$ of length at most $K$. This program is obtained by adding supplementary transitions to
-the LTS defining the library $L$. Concretely, it is an \emph{annotated most general client} of the 
-library $L$, that non-deterministically calls methods of $L$ with an arbitrary number of threads. 
+We define the program $\Xi[K]$, that generates the counting representations
+of all the histories of length at most $K$. When composed with a particular library $L$, 
+$\Xi[K]\times L$ generates only counting representations of histories of $L$.
 
-Essentially, the definition of $\Xi[L,K]$ is based on the following procedure for computing the counting 
-representation of an execution $e$'s history. 
+The program $\Xi[K]$ stores the counting representation of the 
+current execution's history in an integer map 
+$\pi:\<Methods>\times \<Nats>^2\rightarrow \<Nats>$. It updates the function $\pi$ at every call and return action. These updates
+correspond to a particular construction of the counting representation of a history~\footnote{Lemma~\ref{lem:representation} proves only the existence of the canonical form (counting representation) of a history, without giving an effective construction.} and respectively, of a given execution's history.
 
-In the following, we describe a procedure for computing the canonical representation of an interval order $\tup{O,<}$ 
-(note that Lemma~\ref{lem:representation} proves only its existence).
-%We define a procedure for constructing the canonical representation of the interval order $\tup{O,<}$,
-%which demonstrates that its , respectively futures.
-Thus, the lower bound of the interval $(i,j)$ associated to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
-and the upper bound equals the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$, plus one.
-Note that this construction is an alternative proof for the fact that the length of an interval order equals the number of distinct pasts.
-Formally, let $I : O -> (n)^2$ be a function s.t. for every $o\in O$, $I(o)=(i,j)$, where 
+Thus, in the canonical representation of an interval order, the lower, resp., upper, bound of the interval $(i,j)$ associated 
+to some element $o$ is defined in function of the number of distinct pasts $\past{o'}$ with $o'<o$, resp., $o'<o$ or 
+$o'$ incomparable to $o$.
+%
+% $i$ of the interval $(i,j)$ associated by the canonical 
+%representation of $\tup{O,<}$ to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
+%and the upper bound $j$ equals one plus the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$.
+This property is also an explanation for the fact that the length of an interval order equals the number of distinct pasts.
+
+\begin{lemma}\label{lemma:norm_form}
+
+Let $\tup{O,<}$ be an interval order and $I : O -> (n)^2$ its canonical representation. Then,
+for every $o\in O$, $I(o)=(i,j)$, where 
 \[
 i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
 \] 
 
+\end{lemma}
+
+\begin{proof}
+
+\todo{}
+
+\end{proof}
+
+Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the counting representation of a history.
+
+Now, given an execution $e$, we define an online algorithm for computing the counting representation of $H(e)$, that
+avoids constructing the history itself. This algorithm is based on the following observation: if there is no return action
+between the call actions of two operations $o_1$ and $o_2$, then these two operations have the same past in $H(e)$.
+Therefore, the number of distinct pasts in the history of an execution corresponds to the number of occurrences of 
+a return action immediately followed by a call action. Such a return action is called a \emph{barrier} of the execution $e$.
+\todo{For example,}
+Also, given an operation $o$, the lower bound of the interval associated to $o$ in the canonical representation of $H(e)$
+equals the number of barriers before the call action of $o$ 
+(which corresponds to the number of distinct pasts of operations finishing before $o$).
+Moreover, the upper bound of this interval equals one plus the number of barriers before the return action of $o$
+(the latter corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$).
+\todo{For example,}
+
+Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called a \emph{barrier} if 
+$e_i\in R$ and $e_{i+1}\in C$. The online algorithm for computing the counting representation of $H(e)$ 
+maintains the integer map $\pi:\<Methods>\times \<Nats>^2\rightarrow \<Nats>$, 
+a map $\theta:O\rightarrow \<Nats>$ storing the number of barriers before each operation $o$, 
+a boolean $\<finished>$ which becomes $\<true>$ when the algorithm reads a return action 
+(this is used to detect barriers of $e$), and an integer $\<time>$ storing the number of observed barriers.
+Initially, the values of the maps $\pi$ and $\theta$ are 0, $\<time>=0$, and $\<finished>=\<false>$.
+The algorithm reads successive actions of $e$ and it applies the updates in Figure~\ref{fig:online_alg}.
+The next lemma states the correctness of this algorithm.
+
+\begin{figure}
+%\lstset{numbers=left, 
+%            numberstyle=\tiny\tt, 
+%            stepnumber=1, 
+%            firstnumber=1,
+%            % numberfirstline=true,
+%            numbersep=4pt}
+            
+for every call action $c=\tup{m,o}$,
+\begin{program}
+   $\pi(m)(\<time>$,K+1)++;
+   $\theta(o)$ = $\<time>$;
+   if ($\<finished>$) {
+      $\<time>$++;
+      $\<finished>$ = $\<false>$;
+   }
+\end{program}
+
+for every return action $r=\tup{o,m}$,
+\begin{program}
+   $\pi(m)(\theta(o)$,K+1)--;
+   $\pi(m)(\theta(o)$,$\<time>$)++;
+   $\<finished>$ = $\<true>$;
+\end{program}
+\caption{Online algorithm for computing the counting representation of a given execution's history.}
+\label{fig:online_alg}
+\end{figure}
+
+
+
 \begin{lemma}
 
-For every interval order $\tup{O,<}$, the function $I$ defined above is the canonical representation.
+Let $e\in (C\cup R)^*$ be a library execution. The function $\pi$ at the end of the algorithm in Figure~\ref{fig:online_alg}
+equals the counting representation of $H(e)$.
 
 \end{lemma}
 
 \begin{proof}
+
 \todo{}
+
 \end{proof}
 
-
-Thus, given a library execution $e$, we consider 
-
-$e\in (C\cup R)^*$, an index $i$ of $e$
-such that $e_i\in R$ and $e_{i+1}\in C$ is called a \emph{barrier}. 
-
-
-let $i_1$,$\ldots$,$i_n$ be the 
-set of indices of $e$ such that 
-
-that given an execution $e$, computes . 
+The program $\Xi[K]$ is defined starting from the universal LTS over $(C\cup R)$ by adding a transition
 
 \subsection{Checking bounded history inclusion}
 
