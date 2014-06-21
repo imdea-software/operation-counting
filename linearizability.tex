@@ -1,6 +1,16 @@
 \section{Comparison with Linearizability}
 \label{sec:lin}
 
+TODO FIND OUT WHETHER TO KEEP THE FOLLOWING TEXT AND IF SO WHERE TO PUT IT
+Given a library execution $e$, an operation $o$ is called \emph{completed} if both the call and the return actions of $o$, 
+$\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pending}. 
+An execution is called 
+\emph{sequential} if all call actions are immediately followed by their matching return action. %except possibly the last one,
+A library is called \emph{atomic} if its set of executions is the least set
+that contains some given set of sequential executions.
+
+\todo{Examples:atomic register, stack, queue}
+
 We show that the observational refinement between two libraries can be simply
 expressed as the inclusion between their sets of histories.This result reduces
 the burden of reasoning about the universal quantifier over programs and it is

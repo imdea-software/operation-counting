@@ -161,17 +161,6 @@ executions in which method calls and returns overlap.
   \todo{Add an example on removing return actions}
 \end{example}
 
-TODO WHERE IS THIS NECESSARY? SHOULD ONLY BE MENTIONED THERE.
-Given a library execution $e$, an operation $o$ is called \emph{completed} if both the call and the return actions of $o$, 
-$\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pending}. 
-An execution is called 
-\emph{sequential} if all call actions are immediately followed by their matching return action. %except possibly the last one,
-
-\paragraph{Atomic libraries.}
-A library is called \emph{atomic} if its set of executions is the least set that contains some given set of sequential executions.
-
-\todo{Examples:atomic register, stack, queue}
-
 \paragraph{Programs}
 
 Complementary to libraries, programs control their execution outside of method
