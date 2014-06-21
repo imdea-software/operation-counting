@@ -82,7 +82,7 @@ H$, then $h_2 \in H$ as well.
   \label{lemma:lib_exec}
 
   $E(L)$ contains all executions with histories in $H(L)$,
-  i.e.,~$H(e) \in H(L)$ implies $e \in E(L)$.
+  i.e.,~$e \in (C \u R)^*$ and $H(e) \in H(L)$ implies $e \in E(L)$.
 
 \end{lemma}
 
@@ -132,22 +132,11 @@ H$, then $h_2 \in H$ as well.
   Furthermore, all completed operations of $h$ are completed in $e$ if and
   only if $(e|@S) = a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
 
-  ($\Leftarrow$) TODO MIKE IS NOT CONVINCED OF THIS DIRECTION...
-  Let $P$ be a program and let $e$ be an execution in the
-  composition of $P$ with $L_1$, $P\times L_1$. We show that $e$ is also an
-  execution of $P\times L_2$, which implies that the projection of $e$ on
-  program actions $e|@S_P$ belongs to $E(P \x L_2)|@S_P$.
-
-  By hypothesis, the history of $e$ is also a history of the library $L_2$,
-  i.e., $H(e)\in H(L_2)$. Let $l$ be the projection of $e$ on library actions.
-
-  % and $l'$ an execution of $L_2$ whose history is $h$.   
- 
-  By Lemma~\ref{lemma:lib_exec}, $l$ is also an execution of $L_2$. Therefore,
-  $e$ is also an execution of $P\times L_2$. \hfill $\Box$
-
-  % Note that the projection of $e$ on library actions may be different than
-  % $w'$. We must show that by the closure properties on $P$, $E(P)$ contains 
-  % the interleaving of $w'$ and the projection of $e$ on client actions.
+  ($\Leftarrow$)
+  Let $P$ be a program over actions $@S$, and $e \in E(P \x L_1)$; we show that
+  $e \in E(P \x L_2)$. Since $(e | C \cup R) \in E(L_1)$, we know $H(e) \in
+  H(L_1)$ by definition of $H(L_1)$, and then $H(e) \in H(L_2)$ by hypothesis.
+  By Lemma~\ref{lemma:lib_exec} we deduce $(e | C \cup R) \in E(L_2)$, and
+  thus by definition of LTS composition, $e \in E(P \x L_2)$.
 
 \end{proof}
