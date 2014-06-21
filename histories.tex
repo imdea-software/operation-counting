@@ -102,20 +102,19 @@ H$, then $h_2 \in H$ as well.
 \begin{proof}
   
   ($=>$) Let $h = \tup{O,<,f} \in H(L_1)$; we show $h \in H(L_2)$ by
-  constructing a program $P_h$ which only admits executions with histories
-  stronger than $h$:
+  constructing a program $P_h$ over actions $@S$ which only admits executions
+  with histories stronger than $h$:
   \begin{align*}
     \forall e \in E(P_h).\ |(e|@S)| = n => h \preceq H(e) \text{,}
   \end{align*}
   where $n = |\set{ o \in O : f(o) = \tup{\_,\<true>}}|$ is the number of
-  completed operations in $h$.
-  Given such a program $P_h$, taking any execution $e_1 \in E(P_h \x L_1)$
-  with $|(e_1|@S)| = n$, we must also have an execution $e_2 \in E(P_h \x L_2)$
-  such that $(e_2|@S) = (e_1|@S)$ by definition of $L_1 <= L_2$. Since
-  $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$,
-  we also know that $h \preceq H(e_2)$, and since $e_2 \in E(L_2)$, we have
-  $H(e_2) \in H(L_2)$, along with any history weaker than $H(e_2)$
-  by Lemma~\ref{lemma:lib_closure}, namely $h$.
+  completed operations in $h$. Given such a program $P_h$, taking any execution
+  $e_1 \in E(P_h \x L_1)$ with $|(e_1|@S)| = n$, we must also have an execution
+  $e_2 \in E(P_h \x L_2)$ such that $(e_2|@S) = (e_1|@S)$ by definition of $L_1
+  <= L_2$. Since $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$, we also know that $h
+  \preceq H(e_2)$, and since $(e_2 | C \u R) \in E(L_2)$, we have $H(e_2) \in
+  H(L_2)$, along with any history weaker than $H(e_2)$ by
+  Lemma~\ref{lemma:lib_closure}, namely $h$.
 
   We construct $P_h = \tup{Q,@S,q_0,@d}$ over alphabet $@S = C \u R \u \set{a}$
   whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
