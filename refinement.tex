@@ -39,7 +39,8 @@ E(A_1)|@S_2 \n E(A_2)|@S_1$.
 
 \end{example}
 
-\paragraph{Libraries.}
+\paragraph{Libraries}
+
 Programs interact with libraries by calling named library \emph{methods}, which
 receive parameter values and yield return values upon completion. For
 simplicity yet without loss of generality, we fix an arbitrary set $\<Methods>$ of
@@ -112,12 +113,9 @@ points. Accordingly, a library cannot prevent a method from being called,
 though it can decide not to return. Furthermore, any library action performed
 in the interval between call and return points can also be performed should the
 call have been made earlier, and/or the return made later. Our technical
-results rely on these properties.
-
-A library $L$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
+results rely on these properties. Formally, a library $L$ is an LTS over
+alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
 \begin{itemize}
-
-  \item Each execution $e \in E(L)$ is well formed.
 
   \item Call actions $c \in C$ cannot be disabled: \\
   $e \cdot e' \in E(L)$ implies $e \cdot c \cdot e' \in E(L)$
@@ -128,9 +126,6 @@ A library $L$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
   
   \item Return actions $r \in R$ cannot enable other actions: \\
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
-  
-  \item Return actions $r \in R$ can be removed: \\
-  $e \cdot r \cdot e' \in E(L)$ implies $e \cdot e' \in E(L)$.
   
 \end{itemize}
 Note that even a library that implements \emph{atomic methods} --- i.e.,~in
@@ -178,45 +173,31 @@ A library is called \emph{atomic} if its set of executions is the least set that
 \todo{Examples:atomic register, stack, queue}
 
 \paragraph{Programs}
-Complementary to libraries, programs control their execution outside of method
-call and return points.
-%% MOVED TO THE DEFINITION OF REFINEMENT.
-% \alert{We assume that the program communicates with the library only through
-% call and return actions, i.e., the actions performed by the program outside of
-% method invocations involve a part of the memory state which is disjoint from
-% the one touched by the library.}
-Accordingly, any program action performed in the interval between call and
-return points can also be performed should the call have been made later,
-and/or the return made earlier.
 
-A program $P$ is an LTS over some $@S$ such that $C, R \subseteq @S$, and
+Complementary to libraries, programs control their execution outside of method
+call and return points. Accordingly, any program action performed in the
+interval between call and return points can also be performed should the call
+have been made later, and/or the return made earlier. Formally, a program $P$
+over actions $@S$ such that $@S \cap (C \cup R) = @0$ is an LTS over alphabet
+$(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
 \begin{itemize}
-  
-  \item Each execution $e \in E(P)$ is well formed.
-  
+
 	\item Call actions $c \in C$ cannot enable other actions: \\
   $e \cdot c \cdot a \cdot e' \in E(P)$ implies
   $c \match a$ or $e \cdot a \cdot c \cdot e' \in E(P)$.
-  
+
   \item Return actions $r \in R$ cannot disable other actions: \\
   $e \cdot a \cdot r \cdot e' \in E(P)$ implies
   $a \match r$ or $e \cdot r \cdot a \cdot e \in E(P)$.
- 
- \item Return actions $r \in R$ that correspond to unmatched call actions $c\in C$ can be added at the end of an execution: \\
- $e \cdot c \cdot e' \in E(P)$, $c=\tup{m,o}$, and $e'$ does not contain $r=\tup{o,m}$ implies
- $e \cdot c \cdot e' \cdot r \in E(P)$.
- TODO WHY IS THIS NECESSARY?
-  
- 
-\end{itemize}
 
+  \item Return actions $r \in R$ cannot be disabled: \\
+  $e \cdot e' \in E(P)$ implies $e \cdot r \cdot e' \in E(L)$
+  if $e \cdot r \cdot e'$ is well formed.
+
+\end{itemize}
 Note that since even call actions specify return values, if a program allows
 methods to return different values, then call actions for each possible return
 value should be enabled, in order to accept any returned value.
-
-% An action in $@S$ which is not a call or a return action is called a
-% \emph{program action}. The set of program actions of $P$ is denoted by $@S_P$,
-% i.e., $@S_P=@S\setminus(C\cup R)$.
 
 \begin{example}
   \label{ex:programs}
@@ -244,14 +225,14 @@ execution possible in its composition with $L_1$ is also possible with $L_2$.
 
   The library $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
   \begin{align*}
-    (E(P \x L_1)|@S) \subseteq (E(P \x L_2)|@S)
+    E(P \x L_1)|@S \ \subseteq \ E(P \x L_2)|@S
   \end{align*}
-  for all programs $P$ with alphabet $@S \uplus C \uplus R$ such that $@S \cap
-  @S_1 = @S \cap @S_2 = @0$, where $@S_i$ is the alphabet of library $L_i$.
+  for all programs $P$ over actions $@S$.
 
 \end{definition}
-%We assume without loss of generality that $P$'s alphabet $@S_P$ only overlaps
-%with $@S_{L_1}$ and $@S_{L_1}$ on call and return actions.
+Since library and program alphabets only intersect on call and return actions
+$C \cup R$, our formal development does not directly capture other means of
+communication, e.g., through shared random-access memory.
 
 \begin{example}
 
