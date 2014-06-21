@@ -2,36 +2,124 @@
 
 \section{Atomic Registers}
 
-We show that there exists an effectively computable formula $\Psi_{reg}[K]$ representing
-the counting representations in $\Pi_K(\alert{L_{reg}})$.
+We construct a formula $\Psi_{reg}(K)$ characterizing precisely 
+the counting representations in $\Pi_K(\alert{L_{reg}})$. 
+This formula is based on a characterization of canonical representations of 
+histories of $\alert{L_{reg}}$ described hereafter.
 
-Thus, let $h$ be a history of $\alert{L_{reg}}$. The definition of $\alert{L_{reg}}$ implies that
-$h$ is weaker than a sequential history $h'$, i.e., that there exists a total order
+Let $h=\tup{O,<,f}$ be a history of $\alert{L_{reg}}$ and $I$ its canonical representation. By definition,
+$h$ is weaker than a sequential history $h'$, i.e., there exists a total order $h'$ 
 on the operations in $h$ consistent with $h$'s order relation such that the last write before 
-every read operation $\<read>(a)$ is $\<write>(a)$. In the history $h$, this $\<write>(a)$ operation finishes
-before or it is overlapping with 
+a read operation $\<read>(a)$ is $\<write>(a)$. 
+%Deciding if $h$ is a history of $\alert{L_{reg}}$
+%is an NP-complete problem~\cite{journals/siamcomp/GibbonsK97}. Intuitively, this holds because
+The difficulty in characterizing such histories $h$ (or their canonical representations) 
+is that for every read operation $\<read>(a)$, there may exist several $\<write>(a)$ operations 
+finishing before or overlapping with $\<read>(a)$ in $h$, that could be chosen to be the last 
+$\<write>$ operation before $\<read>(a)$ in $h'$. \todo{For example,}
+
+We define an equivalence relation on read operations of $h$ such that $h$ is weaker than a sequential history $h'$, where 
+the last writes before two equivalent reads are always mapped by $I$ to the same interval. Roughly, this equivalence relation 
+relates two reads mapped by $I$ to the same interval for which the operations that write the same value are again 
+mapped by $I$ to the same intervals. \todo{For example,}
+
+Formally, for every $\<read>(a)$ operation $o$ of $h$, let $\mathcal{I}_{\<w>}(o)$ be the set of intervals associated by $I$ to
+$\<write>(a)$ operations, that finish before or overlap with $o$, i.e.,
+\[
+\mathcal{I}_{\<w>}(o)=\set{I(o'):\mbox{$o'$ a $\<write>(a)$ operation and $\lnot o' > o$}}.
+\]
+
+\todo{For example,}
+The operations whose intervals are in $\mathcal{I}_{\<w>}(o)$
+are the only possible candidates for being the last write operation before $o$ in a sequential history stronger than $h$.
+Let $\sim$ be an equivalence relation on read operations such that
+\[
+o_1\sim o_2\mbox{ iff }I(o_1)=I(o_2)\mbox{ and }\mathcal{I}_{\<w>}(o_1)=\mathcal{I}_{\<w>}(o_2).
+\]
+
+We prove that $h$ is a history of $\alert{L_{reg}}$ iff the history $h_1$ obtained from $h$ by 
+keeping only one representative for each equivalence class of $\sim$ is a history of $\alert{L_{reg}}$.
+Clearly, the former implies the latter. For the other direction, one can use a sequential history $h_1'$ stronger than $h_1$
+to build a sequential history $h'$ stronger than $h$. Let $o_1$ be a $\<read>(a)$ operation of $h_1$ and $o_1'$ the 
+$\<write>(a)$ operation,which is the last write operation before $o_1$ in $h_1'$. Now, consider a $\<read>(b)$ operation $o_2$ of $h_1$,
+which is equivalent to $o_1$, i.e., $I(o_1)=I(o_2)$ and there exists a $\<write>(b)$ operation $o_2'$ of $h_1$ such that $I(o_2')=I(o_1')$.
+Then, one can build a history $h'=\tup{O,<',f}$ stronger than $h$ where $o_1'<o_1<o_2'<o_2$.
+
+This result is stated in the next lemma. The history $h_1'$ is encoded by a mapping $f$ that associates to each equivalence 
+class of $\sim$ an interval in the image of $I$. Given an equivalence class $e$, $f(e)$ is the interval of the last write
+operation occurring before the representative of $e$ in $h_1'$.
+
+For every equivalence class $e$ of $\sim$, let $I_{\<r>}(e)$ be the interval associated by $I$ to the
+read operations in $e$ and $\mathcal{I}_{\<w>}(e)=\mathcal{I}_{\<w>}(o)$, for some $o\in e$. 
+Also, let $EC(\sim)$ be the set of non-empty equivalence classes of $\sim$.
 
 
- In the following, we give a property 
-of the canonical representation of $h$ which is equivalent to this fact.
+\begin{lemma}\label{lemma:register}
+Let $h$ be a history and $I$ its canonical representation. Then, 
+$h$ is a history of $\alert{L_{reg}}$ iff the following formula holds 
+\[
+\begin{array}{l}
+\exists f:EC(\sim) -> img(I)\big( \\
+\hspace{2.7cm}\forall e.\ f(e)\in \mathcal{I}_{\<w>}(e)\ \land \\
+\hspace{2.7cm}\forall e\neq e'.\ \big(\neg (f(e) < f(e') < I_{\<r>}(e))\ \land  \\
+\hspace{4.05cm} \neg (f(e) < I_{\<r>}(e') < I_{\<r>}(e)) \big) \\
+\hspace{2.7cm}\big)
+\end{array}
+\]
+\end{lemma}
 
+\begin{proof}
 
-deciding if a history of a concurrent register, of bounded length,
-is correct w.r.t. the atomic register, i.e., it is also a history of the atomic
-register, is decidable in polynomial time. The same problem for arbitrary
-histories is NP-complete since it is equivalent to deciding if an execution of
-the concurrent register is linearizable w.r.t. a sequential register (by
-Proposition~\ref{prop:atom}).
+\todo{}
 
-\begin{theorem}
+\end{proof}
 
-  Let $h$ be a history of a concurrent register, of bounded length. Deciding if
-  $h\in At[Reg]$ is polynomial time.
+In the formula above, the second row states that $f(e)$ is the interval of a write operation,  
+which writes a value read by one of the read operations in $e$. The last two rows state that 
+it is not possible to separate $f(e)$ from the interval of the reads in $e$ using $f(e')$ or $I_{\<r>}(e')$, for some
+other equivalence class $e'$. Otherwise, in the history $h_1'$ encoded by $f$, the write operation represented
+by $f(e)$ is not the last write operation before the representative of $e$.
+
+Based on Lemma~\ref{lemma:register}, we prove that there exists an effectively computable formula 
+$\Psi_{reg}(K)$ characterizing the counting representations in $\Pi_K(\alert{L_{reg}})$.
+This result is based on the fact that for every history $h$ of $\alert{L_{reg}}$,
+the non-empty equivalence classes of $\sim$ can be determined from the counting representation of $h$.
+The formula $\Psi_{reg}(K)$ contains several quantifiers but the satisfaction problem can still be solved
+in polynomial time.
+
+\begin{theorem}\label{th:register}
+
+There exists an effectively computable formula 
+$\Psi_{reg}(K)$ such that $[\Psi_{reg}(K)]=\Pi_K(\alert{L_{reg}})$.
+The satisfaction problem for $\Psi_{reg}(K)$ can be solved in polynomial time.
 
 \end{theorem}
 
 \begin{proof}
 
-  Let $h$ be a history of a concurrent register of length $K$.
+\todo{}
 
 \end{proof}
+
+Theorem~\ref{th:register} implies that deciding if a history of length at most $K$ belongs to $\alert{L_{reg}}$
+is in polynomial time. Note that the same problem is NP-complete for arbitrary histories~\cite{journals/siamcomp/GibbonsK97}.
+
+%Deciding if a history of a concurrent register, of bounded length,
+%is correct w.r.t. the atomic register, i.e., it is also a history of the atomic
+%register, is decidable in polynomial time. The same problem for arbitrary
+%histories is NP-complete since it is equivalent to deciding if an execution of
+%the concurrent register is linearizable w.r.t. a sequential register (by
+%Proposition~\ref{prop:atom}).
+%
+%\begin{theorem}
+%
+%  Let $h$ be a history of a concurrent register, of bounded length. Deciding if
+%  $h\in At[Reg]$ is polynomial time.
+%
+%\end{theorem}
+%
+%\begin{proof}
+%
+%  Let $h$ be a history of a concurrent register of length $K$.
+%
+%\end{proof}
