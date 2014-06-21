@@ -2,7 +2,21 @@
 
 \section{Atomic Registers}
 
-We show that deciding if a history of a concurrent register, of bounded length,
+We show that there exists an effectively computable formula $\Psi_{reg}[K]$ representing
+the counting representations in $\Pi_K(\alert{L_{reg}})$.
+
+Thus, let $h$ be a history of $\alert{L_{reg}}$. The definition of $\alert{L_{reg}}$ implies that
+$h$ is weaker than a sequential history $h'$, i.e., that there exists a total order
+on the operations in $h$ consistent with $h$'s order relation such that the last write before 
+every read operation $\<read>(a)$ is $\<write>(a)$. In the history $h$, this $\<write>(a)$ operation finishes
+before or it is overlapping with 
+
+
+ In the following, we give a property 
+of the canonical representation of $h$ which is equivalent to this fact.
+
+
+deciding if a history of a concurrent register, of bounded length,
 is correct w.r.t. the atomic register, i.e., it is also a history of the atomic
 register, is decidable in polynomial time. The same problem for arbitrary
 histories is NP-complete since it is equivalent to deciding if an execution of

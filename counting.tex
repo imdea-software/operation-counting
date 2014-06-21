@@ -228,14 +228,14 @@ $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 In Section~\ref{}, we show that for important classes of libraries $L_2$, there exists an effectively computable 
 closed-form expression $\Psi_K(L_2)$ modeling all the counting representations in $\Pi_K(L_2)$. 
-Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[K]\times L_1$ that generates the counting 
+Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[K]\times L_1$ that generates all the counting 
 representations in $\Pi_K(L_1)$ such that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
 $\Psi_K(L_2)$ is an invariant for the program $\Xi[K]\times L_1$. 
 
 \subsection{Generating counting representations}
 
 We define the program $\Xi[K]$, that generates the counting representations
-of all the histories of length at most $K$. When composed with a particular library $L$, 
+of all histories of length at most $K$. When composed with a particular library $L$, 
 $\Xi[K]\times L$ generates only counting representations of histories of $L$.
 
 The program $\Xi[K]$ stores the counting representation of the 
@@ -243,6 +243,8 @@ current execution's history in an integer map
 $\pi:\<Methods>\times \<Nats>^2\rightarrow \<Nats>$. It updates the function $\pi$ at every call and return action. These updates
 correspond to a particular construction of the counting representation of a history~\footnote{Lemma~\ref{lem:representation} proves only the existence of the canonical form (counting representation) of a history, without giving an effective construction.} and respectively, of a given execution's history.
 
+We first give a construction for the canonical representation of an interval order, which extends straightforwardly to counting
+representations of histories.
 Thus, in the canonical representation of an interval order, the lower, resp., upper, bound of the interval $(i,j)$ associated 
 to some element $o$ is defined in function of the number of distinct pasts $\past{o'}$ with $o'<o$, resp., $o'<o$ or 
 $o'$ incomparable to $o$.
@@ -269,6 +271,8 @@ i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|+1.
 \end{proof}
 
 Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the counting representation of a history.
+One can determine the interval of an operation by counting the distinct pasts of the other operations and then, it counts
+operations which are instances of the same method and in the same interval.
 
 Now, given an execution $e$, we define an online algorithm for computing the counting representation of $H(e)$, that
 avoids constructing the history itself. This algorithm is based on the following observation: the past of an operation $o$ in $H(e)$ 
@@ -360,7 +364,7 @@ for every return action $r=\tup{o,m}$,
 
 
 
-\begin{lemma}
+\begin{lemma}\label{lemma:alg}
 
 Let $e\in (C\cup R)^*$ be a library execution. The algorithm in Figure~\ref{fig:online_alg} terminates
 iff the length of $H(e)$ is at most $K$ and the function $\pi$ at the end of the algorithm 
@@ -374,7 +378,30 @@ Follows from Lemmas~\ref{lemma:nb_barr} and~\ref{lemma:counting_executions}.
 
 \end{proof}
 
-The program $\Xi[K]$ is defined starting from the universal LTS over $(C\cup R)$ by adding a transition
+The program $\Xi[K]$ is built according to the online algorithm in Figure~\ref{fig:online_alg}. 
+Its states are formed of values for the mappings $\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$.
+The set of executions of $\Xi[K]$, projected on call and return actions, is exactly the set of all well-formed
+sequences $e$ over $C\cup R$ such that $H(e)$ is of length at most $K$. 
+Every call action is preceded by a \alert{program action} corresponding to 
+the updates in the top part of Figure~\ref{fig:online_alg} and every return action is followed by a \alert{program action}
+corresponding to the updates in the bottom part of Figure~\ref{fig:online_alg}.
+The following theorem states that $\Xi[K]$ generates the counting representations of all histories of length at most $K$.
+
+\begin{theorem}
+
+Let $K\in\<Nats>$ and $Q[K]$ the set of states of $\Xi[K]$. Also, let $H_K$ be the set of all histories of length at most $K$. Then,
+\[
+\set{\Pi(h):h\in H_K}=\set{\pi:(\pi,\theta,\<time>,\<finished>)\in Q[K]}.
+\]
+
+\end{theorem}
+
+\begin{proof}
+
+Follows from Lemma~\ref{lemma:alg}.
+
+\end{proof}
+
 
 \subsection{Checking bounded history inclusion}
 
