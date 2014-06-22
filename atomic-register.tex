@@ -23,21 +23,22 @@ the last writes before two equivalent reads are always mapped by $I$ to the same
 relates two reads mapped by $I$ to the same interval for which the operations that write the same value are again 
 mapped by $I$ to the same intervals. \todo{For example,}
 
-Formally, for every $\<read>(a)$ operation $o$ of $h$, let $\mathcal{I}_{\<w>}(o)$ be the set of intervals associated by $I$ to
+Formally, for every $\<read>(a)$ operation $o$ of $h$, let $I_{\<w>}(o)$ be the set of intervals associated by $I$ to
 $\<write>(a)$ operations, that finish before or overlap with $o$, i.e.,
 \[
-\mathcal{I}_{\<w>}(o)=\set{I(o'):\mbox{$o'$ a $\<write>(a)$ operation and $\lnot o< o' $}}.
+I_{\<w>}(o)=\set{I(o'):\mbox{$o'$ a $\<write>(a)$ operation and $\lnot o< o' $}}.
 \]
 
 \todo{For example,}
-The write operations whose intervals are in $\mathcal{I}_{\<w>}(o)$
+The write operations whose intervals are in $I_{\<w>}(o)$
 are the only possible candidates for being the last write before $o$ in a sequential history stronger than $h$.
 Let $\sim$ be an equivalence relation on read operations such that
 \[
-o_1\sim o_2\mbox{ iff }I(o_1)=I(o_2)\mbox{ and }\mathcal{I}_{\<w>}(o_1)=\mathcal{I}_{\<w>}(o_2).
+o_1\sim o_2\mbox{ iff }I(o_1)=I(o_2)\mbox{ and }I_{\<w>}(o_1)=I_{\<w>}(o_2).
 \]
 
-We prove that $h$ is a history of $\alert{L_{reg}}$ iff the history $h_1$ obtained from $h$ by 
+We prove that $h$ is a history of $\alert{L_{reg}}$ iff for every completed $\<read>(a)$ operation $o$ there exists
+a $\<write>(a)$ operation which finishes before or overlaps with $o$ and the history $h_1$ obtained from $h$ by 
 keeping only one representative for each equivalence class of $\sim$ is a history of $\alert{L_{reg}}$.
 Clearly, the former implies the latter. For the other direction, one can use a sequential history $h_1'$ stronger than $h_1$
 to build a sequential history $h'$ stronger than $h$. Let $o_1$ be a $\<read>(a)$ operation of $h_1$ and $o_1'$ the 
@@ -49,20 +50,22 @@ This result is stated in the next lemma. The history $h_1'$ is encoded by a mapp
 class $e$ of $\sim$ an interval in the image of $I$. Thus, $f(e)$ is the interval of the last write
 operation occurring before the representative of $e$ in $h_1'$.
 
-For every equivalence class $e$ of $\sim$, let $I_{\<r>}(e)$ be the interval associated by $I$ to the
-read operations in $e$ (which by definition is unique) and $\mathcal{I}_{\<w>}(e)=\mathcal{I}_{\<w>}(o)$, for some $o\in e$. 
-Also, let $EC(\sim)$ be the set of non-empty equivalence classes of $\sim$.
+For every equivalence class $e$ of $\sim$, let $\mathcal{I}_{\<r>}(e)$ be the interval associated by $I$ to the
+read operations in $e$ (which by definition is unique) and $\mathcal{I}_{\<w>}(e)=I_{\<w>}(o)$, for some $o\in e$. 
+Also, let $E_\sim$ be the set of non-empty equivalence classes of $\sim$.
 
 
 \begin{lemma}\label{lemma:register}
-Let $h$ be a history and $I$ its canonical representation. Then, 
-$h$ is a history of $\alert{L_{reg}}$ iff the following formula holds 
+Let $h=\tup{O,<,f}$ be a history and $I$ its canonical representation. Then, 
+$h$ is a history of $\alert{L_{reg}}$ iff the following two formulas hold:
 \[
 \begin{array}{l}
-\exists f:EC(\sim) -> img(I)\big( \\
-\hspace{2.7cm}\forall e.\ f(e)\in \mathcal{I}_{\<w>}(e)\ \land \\
-\hspace{2.7cm}\forall e\neq e'.\ \big(\neg (f(e) < f(e') < I_{\<r>}(e))\ \land  \\
-\hspace{4.05cm} \neg (f(e) < I_{\<r>}(e') < I_{\<r>}(e)) \big) \\
+\bullet\ \forall a\,\forall o\in O.\ f(o)=(\<read>(a),\<true>) \\[.5mm]
+\hspace{1.7cm}\Rightarrow \exists o'\in O.\  f(o')=(\<write>(a),\_)\land \neg I(o) < I(o')\\[1mm]
+\bullet\ \exists\ f:E_\sim -> img(I)\big( \\[.5mm]
+\hspace{2.3cm}\forall\ e\in E_\sim.\ f(e)\in \mathcal{I}_{\<w>}(e)\ \land \\[.5mm]
+\hspace{2.3cm}\forall\ e\neq e'\in E_\sim.\ \big(\neg (f(e) < f(e') < \mathcal{I}_{\<r>}(e))\ \land  \\[.5mm]
+\hspace{4.55cm} \neg (f(e) < \mathcal{I}_{\<r>}(e') < \mathcal{I}_{\<r>}(e)) \big) \\
 \hspace{2.7cm}\big)
 \end{array}
 \]
@@ -74,7 +77,9 @@ $h$ is a history of $\alert{L_{reg}}$ iff the following formula holds
 
 \end{proof}
 
-In the formula above, the second row states that $f(e)$ is the interval of a write operation,  
+The first formula states that for every completed $\<read>(a)$ operation $o$ there exists
+a $\<write>(a)$ operation whose interval is either before or overlaps with $I(o)$.
+In the second formula, the second row states that $f(e)$ is the interval of a write operation,  
 which writes a value read by one of the read operations in $e$. The last two rows state that 
 it is not possible to separate $f(e)$ from the interval of the reads in $e$ using $f(e')$ or $I_{\<r>}(e')$, for some
 other equivalence class $e'$. Otherwise, in the history $h_1'$ encoded by $f$, the write operation represented
@@ -82,8 +87,9 @@ by $f(e)$ is not the last write operation before the representative of $e$.
 
 Based on Lemma~\ref{lemma:register}, we prove that there exists an effectively computable formula 
 $\Psi_{reg}(K)$ characterizing the counting representations in $\Pi_K(\alert{L_{reg}})$.
-This result is based on the fact that for every history $h$ of $\alert{L_{reg}}$,
-the non-empty equivalence classes of $\sim$ can be determined from the counting representation of $h$.
+This result is based on the fact that (1) the first formula in Lemma~\ref{lemma:register} can be rewritten
+in terms of counting representations and (2) for every history $h$, the non-empty equivalence classes of 
+$\sim$ can be determined from the counting representation of $h$.
 The formula $\Psi_{reg}(K)$ contains several quantifiers but the satisfaction problem can still be solved
 in polynomial time.
 
@@ -97,8 +103,53 @@ The satisfaction problem for $\Psi_{reg}(K)$ can be solved in polynomial time.
 
 \begin{proof}
 
-\todo{}
+Basically, $\Psi_{reg}(K)$ is obtained by rewriting the first formula in Lemma~\ref{lemma:register} in terms
+of counting representations and by adding a disjunction in front of the second formula 
+(called $\Psi$ in the following), over all equivalence relations $\sim$. Actually, $\Psi$ characterizes only the intervals
+associated to some non-empty equivalence class $e$, i.e., $\mathcal{I}_{\<r>}(e)$ and $\mathcal{I}_{\<w>}(e)$. Hence, 
+the disjunction ranges over sets of pairs interval -- sets of intervals and since the goal is to characterize 
+histories of length at most $K$ the limits of the intervals are bounded by $K$.
 
+%Note that the canonical representation of a history of length at most $K$ uses intervals whose limits are bounded by $K$. 
+Thus, let $\mathcal{I}_{K}$ be the set of intervals $[i,j]$ with $0\leq i\leq j\leq K$ and 
+$\mathcal{E}_K=\mathcal{I}_{K}\times 2^{\mathcal{I}_{K}}$ the set of pairs interval -- sets of intervals.
+
+The formula $\Psi_{reg}(K)$ is defined by:
+\[
+\begin{array}{l}
+\forall a.\ (\exists \iota\in \mathcal{I}_{K}.\ \counting{\<read>(a)}{\iota}>0)\Rightarrow \\[.5mm]
+\hspace{2cm}\big(\exists \iota'\in \mathcal{I}_{K}.\ (\counting{\<write>(a)}{\iota'} > 0 \land \neg \iota < \iota')\big)\\[1mm]
+\land \\[-3mm]
+\end{array}
+\]
+\[
+\bigvee_{E\subseteq \mathcal{E}_K} \Psi[E_\sim\mapsto E]\land \forall e\in \mathcal{E}_K.\ e\in E \Leftrightarrow NonEmpty(e),
+\]
+where $\Psi[E_\sim\mapsto E]$ denotes the formula $\Psi$ where $E_\sim$ is substituted by $E$ and 
+$NonEmpty(e)$ states that the equivalence class $e$ is non-empty, i.e., there exists a read operation $o$ with $I(o)=e|_1$
+and $I_{\<w>}(o)=e|_2$ ($e|_1$, resp., $e|_2$, is the projection of $e$ on the first, resp., second, component).
+Formally, $NonEmpty(e)$ is defined by
+\[
+\begin{array}{l}
+\exists\ a.\ \big(\ \counting{\<read>(a)}{e|_1} > 0\ \land \\[.5mm]
+\hspace{.9cm}\forall\ \iota\in \mathcal{I}_{K}.\ \iota\in e|_2 \Leftrightarrow \counting{\<write>(a)}{\iota} > 0\ \land \\[.5mm]
+\hspace{.9cm}\exists\ \iota \in e|_2\land \forall\ \iota\in \mathcal{I}_{K}.\ \iota\in e|_2 \Rightarrow \neg e|_1 < \iota \big)
+\end{array}
+\]
+
+The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $e$
+and one $\<write>(a)$ operation in each interval from the second component of $e$. The last row states that the second
+component of $e$ is non-empty (i.e., there exists a write operation  the intervals
+in the second component of $e$ (corresponding to write operations) are not ordered after the first component of $e$
+(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
+
+The fact that $\Psi_{reg}(K)$ characterizes precisely the counting representations in $\Pi_K(\alert{L_{reg}})$ is 
+a direct consequence of Lemma~\ref{lemma:register}. The satisfaction problem for this formula is in polynomial time
+because %(1) the nesting of quantifiers is bounded and (2) 
+the quantifiers over values ($\forall a$ and $\exists a$) need to be instantiated only over
+values $a$ for which there exists at least one instantiation of $\<read>(a)$ or $\<write>(a)$ in the input 
+counting representation. Note that the range of the other quantifiers (e.g., $\forall\ \iota\in \mathcal{I}_{K}$ and 
+$\forall e\in \mathcal{E}_K$) is a domain of constant size.\hfill $\Box$
 \end{proof}
 
 Theorem~\ref{th:register} implies that deciding if a history of length at most $K$ belongs to $\alert{L_{reg}}$
