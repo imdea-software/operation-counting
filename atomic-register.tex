@@ -2,7 +2,7 @@
 
 \section{Atomic Registers}
 
-We construct a formula $\Psi_{reg}(K)$ characterizing precisely 
+We construct a formula $\Psi_{reg}(K)$ characterizing  
 the counting representations in $\Pi_K(\alert{L_{reg}})$. 
 This formula is based on a characterization of canonical representations of 
 histories of $\alert{L_{reg}}$ described hereafter.
@@ -10,7 +10,7 @@ histories of $\alert{L_{reg}}$ described hereafter.
 Let $h=\tup{O,<,f}$ be a history of $\alert{L_{reg}}$ and $I$ its canonical representation. By definition,
 $h$ is weaker than a sequential history $h'$, i.e., there exists a total order $h'$ 
 on the operations in $h$ consistent with $h$'s order relation such that the last write before 
-a read operation $\<read>(a)$ is $\<write>(a)$. 
+a $\<read>(a)$ operation is $\<write>(a)$. 
 %Deciding if $h$ is a history of $\alert{L_{reg}}$
 %is an NP-complete problem~\cite{journals/siamcomp/GibbonsK97}. Intuitively, this holds because
 The difficulty in characterizing such histories $h$ (or their canonical representations) 
@@ -26,12 +26,12 @@ mapped by $I$ to the same intervals. \todo{For example,}
 Formally, for every $\<read>(a)$ operation $o$ of $h$, let $\mathcal{I}_{\<w>}(o)$ be the set of intervals associated by $I$ to
 $\<write>(a)$ operations, that finish before or overlap with $o$, i.e.,
 \[
-\mathcal{I}_{\<w>}(o)=\set{I(o'):\mbox{$o'$ a $\<write>(a)$ operation and $\lnot o' > o$}}.
+\mathcal{I}_{\<w>}(o)=\set{I(o'):\mbox{$o'$ a $\<write>(a)$ operation and $\lnot o< o' $}}.
 \]
 
 \todo{For example,}
-The operations whose intervals are in $\mathcal{I}_{\<w>}(o)$
-are the only possible candidates for being the last write operation before $o$ in a sequential history stronger than $h$.
+The write operations whose intervals are in $\mathcal{I}_{\<w>}(o)$
+are the only possible candidates for being the last write before $o$ in a sequential history stronger than $h$.
 Let $\sim$ be an equivalence relation on read operations such that
 \[
 o_1\sim o_2\mbox{ iff }I(o_1)=I(o_2)\mbox{ and }\mathcal{I}_{\<w>}(o_1)=\mathcal{I}_{\<w>}(o_2).
@@ -46,11 +46,11 @@ which is equivalent to $o_1$, i.e., $I(o_1)=I(o_2)$ and there exists a $\<write>
 Then, one can build a history $h'=\tup{O,<',f}$ stronger than $h$ where $o_1'<o_1<o_2'<o_2$.
 
 This result is stated in the next lemma. The history $h_1'$ is encoded by a mapping $f$ that associates to each equivalence 
-class of $\sim$ an interval in the image of $I$. Given an equivalence class $e$, $f(e)$ is the interval of the last write
+class $e$ of $\sim$ an interval in the image of $I$. Thus, $f(e)$ is the interval of the last write
 operation occurring before the representative of $e$ in $h_1'$.
 
 For every equivalence class $e$ of $\sim$, let $I_{\<r>}(e)$ be the interval associated by $I$ to the
-read operations in $e$ and $\mathcal{I}_{\<w>}(e)=\mathcal{I}_{\<w>}(o)$, for some $o\in e$. 
+read operations in $e$ (which by definition is unique) and $\mathcal{I}_{\<w>}(e)=\mathcal{I}_{\<w>}(o)$, for some $o\in e$. 
 Also, let $EC(\sim)$ be the set of non-empty equivalence classes of $\sim$.
 
 
