@@ -149,29 +149,31 @@ there are various ways to define such a function $A_k$, any such function
 enables the polynomial-time inclusion check $A_k(h) \in H(L)$ which we
 demonstrate in the following subsections. Subsection~\ref{sec:counting:approx}
 describes concrete definitions that are useful in practice for detecting
-observational refinement violations.
+observational refinement  violations.
 
 
 \subsection{Representing Histories with Counters}
 
 Interval orders have a canonical representation which basically, associates to
-each element an interval on the integer line. In general, there may exist
-several ways to associate intervals to elements of an interval order but, in
-the canonical representation, the limits of these intervals are bounded by a minimal 
-integer called the \emph{length} of the interval order.
+each element an interval on the integer line. While in general there may exist
+several ways to associate intervals to elements of an interval order, in the
+canonical representation the limits of intervals are natural numbers bounded
+by the length of the interval order.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
   \label{lem:representation}
-
-  An interval order $\tup{O,<}$ has a canonical representation $I : O -> [n]^2$
-  for some minimal $n \in \<Nats>$ mapping each $o \in O$ to the interval $I(o)
+  
+  An interval order $\tup{O,<}$ of length $n \in \<Nats>$ has a canonical
+  representation $I : O -> [n]^2$ mapping each $o \in O$ to the interval $I(o)
   = [i,j] \subseteq [0,n]$, where $o_1 < o_2$ iff $\sup I(o_1) < \inf I(o_2)$.
 
 \end{lemma}
-The integer $n$ in Lemma~\ref{lem:representation} is called the \emph{length}
-of $\tup{O,<}$.
 
-\todo{Example of canonical representations}
+\begin{example}
+
+  TODO EXAMPLE OF CANONICAL REPRESENTATION
+
+\end{example}
 
 Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
 order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
@@ -182,25 +184,24 @@ $\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
 counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
 H(L) }$.
 
-\todo{example of counting representations}
+\begin{example}
 
-Counting representations give an effective way 
-of computing closed-form expressions representing sets of histories. 
-%an expression will represent the counting representations of a set of histories.
-%
-This representation reduces the problem of ensuring that each history $h \in
-H(L_1)$ of some library is included in the histories $H(L_2)$ of another, to
-ensuring that each multiset $\Pi(h) \in \Pi(L_1)$ is also included in
-$\Pi(L_2)$. 
-%
-Therefore, if we were given a closed-form expression $\Psi(L_2)$ representing the 
-multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $\Psi(L_2)$.
+  TODO EXAMPLE OF COUNTING REPRESENTATIONS
 
-%TODO EXPLAIN BETTER THE SIGNIFICANCE OF THIS REDUCTION.
+\end{example}
+
+Counting representations give an effective way of computing closed-form
+expressions representing sets of histories. This representation reduces the
+problem of ensuring that each history $h \in H(L_1)$ of some library is
+included in the histories $H(L_2)$ of another, to ensuring that each multiset
+$\Pi(h) \in \Pi(L_1)$ is also included in $\Pi(L_2)$. Therefore, if we were
+given a closed-form expression $\Psi(L_2)$ representing the multisets
+$\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies
+$\Psi(L_2)$.
 
 \begin{lemma}
 
-  $H(L_1) \subseteq H(L_2)$ iff $\Pi(L_1) \subseteq \Pi(L_2)$.
+  $H(e) \in H(L_2)$ if and only if $\Pi(H(e)) \in \Pi(L_2)$.
 
 \end{lemma}
 
@@ -210,23 +211,25 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 
 \end{proof}
 
-
-Let $\Pi_K(L) = \set{ \Pi(h) : h\in H_K(L) }$ be the set of counting
-representations of all the histories of length $K$ of $L$. The next result
-states that the inclusion between bounded histories is equivalent to ensuring
-that each multiset $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
+A \emph{$k$-interval-length history predicate} $@Y$ is a Boolean-valued
+expression over $m(k+1)^2$ integer variables
+\begin{align*}
+  \set{ x_{m,i,j} : m \in \<Methods> \text{ and } 0 \le i \le j \le k } \text{.}
+\end{align*}
+We say $@Y$ is in \emph{closed form} when $@Y$ consists of a finite number of
+elementary arithmetic operations (e.g.,~addition, subtraction) and
+inequalities. We say $@Y$ \emph{represents} a library $L$ when $h \in H(L) <=>
+@Y(\Pi(h))$ for every history $h$ of interval length at most $k$.
 
 \begin{lemma}
 
-  $H_K(L_1) \subseteq H_K(L_2)$ iff $\Pi_K(L_1) \subseteq \Pi_K(L_2)$.
+  ``The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
+  polynomial time for fixed $k$ and $L$, given a closed-form
+  $k$-interval-length history predicate $@Y$ for $L$.''
 
 \end{lemma}
 
-\begin{proof}
-
-  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
-
-\end{proof}
+\subsection{Something Else...}
 
 We define the program $P_K$, that generates the counting representations of all
 histories of length at most $K$. When composed with a particular library $L$,
