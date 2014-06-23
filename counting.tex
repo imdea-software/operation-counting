@@ -69,17 +69,18 @@ $A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:formula}).
 Finally, we describe concrete instantiations of our approximation schema which
 we have found to behave well in practice~(\S\ref{sec:counting:approx}).
 
+XXX CAREFUL BECAUSE THE FOLLOWING IS IN FLUX
+
+
 \subsection{Histories are Interval Orders}
 \label{sec:counting:intervals}
 
 While the general definition of histories allows arbitrary partial orders of
-operations, histories which arise from LTS executions fall into a special class
-called \emph{interval orders}. Intuitively, histories come from executions
-where operations have access to a notion of global time and therefore, for
-every two operations in a history, their \emph{pasts} (the set of operations
-that finished before an operation starts) cannot be incomparable. Then, the
-bound that we consider on histories is actually a bound on their \emph{length},
-defined as the number of distinct pasts that an operation can have.
+operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
+restricted class called \emph{interval orders}. Intuitively, this is because
+our execution model assumes that operations share a common notion of global
+time: the \emph{pasts} of any two operations (defined by the set of operations
+that have completed before a given operation starts) cannot be incomparable.
 
 \begin{definition}
 
@@ -107,7 +108,42 @@ defined as the number of distinct pasts that an operation can have.
 
 \end{proof}
 
-\paragraph{Counting representations.}
+The length of an interval order can be characterized in terms of \emph{pasts}
+associated to elements in the partial order. Thus, given a partial order
+$\tup{O,<}$ and $o\in O$, the set of elements which are ordered before $o$
+w.r.t. $<$ is called the \emph{past} of $o$:
+\[
+  \past{o}=\{o' < o\mid o'\in A\}.
+\]
+
+\todo{Example of pasts }
+
+The following result states that every two pasts in an interval order are
+ordered by set inclusion.
+
+\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
+
+  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with
+  $o\in O$ are linearly ordered by set inclusion.
+
+\end{lemma}
+
+Then, the length of an interval order $\tup{O,<}$ is one less than the number
+of \emph{distinct} pasts in $\tup{O,<}$.
+
+
+\begin{lemma}[Greenough~\cite{phd/Greenough76}]
+  \label{lemma:len}
+  An interval order $\tup{O,<}$ has length
+  \[ |\set{\past{o}:o\in O}| - 1 \text{.} \]
+\end{lemma}
+
+
+TODO SPECIFY $A_k(h)$ AS SOME $k$-BOUNDED INTERVAL-LENGTH HISTORY WEAKER THAN $h$
+
+
+\subsection{Representing Histories with Counters}
+
 Interval orders have a canonical representation which basically, associates to
 each element an interval on the integer line. In general, there may exist
 several ways to associate intervals to elements of an interval order but, in
@@ -164,52 +200,11 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 
 \end{proof}
 
-\subsection{Bounded Interval-Length Histories}
-\label{sec:counting:bounding}
 
-Since the closed-form expression $\Psi(L_2)$ may not exist in general, we
-consider the problem of deciding $H_K(L_1) \subseteq H_K(L_2)$, where for any
-library $L$, $H_K(L)$ is the set of histories of $L$ of length at most $K$.
-Note that the length of a history is unique and thus, $H_K(L_1) \subseteq
-H(L_2)$ iff $H_K(L_1) \subseteq H_K(L_2)$.
-
-The length of an interval order can be characterized in terms of \emph{pasts}
-associated to elements in the partial order. Thus, given a partial order
-$\tup{O,<}$ and $o\in O$, the set of elements which are ordered before $o$
-w.r.t. $<$ is called the \emph{past} of $o$:
-%, and the set
-%of elements which occur after $o$ in $<$ is called the \emph{future} of $o$.
-%Formally, for every $o\in O$, we define
-\[
-\past{o}=\{o' < o\mid o'\in A\}.%\mbox{ and }\future{o}=\{o < o'\mid o'\in A\}.
-\]
-
-\todo{Example of pasts }
-
-The following result states that every two pasts in an interval order are
-ordered by set inclusion.
-
-\begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
-
-  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with
-  $o\in O$ are linearly ordered by set inclusion.
-
-\end{lemma}
-
-Then, the length of an interval order $\tup{O,<}$ is one less than the number
-of \emph{distinct} pasts in $\tup{O,<}$.
-
-%but also, the number of distinct futures in $\tup{O,<}$.
-
-\begin{lemma}[Greenough~\cite{phd/Greenough76}]
-  \label{lemma:len}
-  An interval order $\tup{O,<}$ has length
-  \[ |\set{\past{o}:o\in O}| - 1 \text{.} \]
-\end{lemma}
-
-Let $\Pi_K(L)=\set{\Pi(h):h\in H_K(L)}$ be the set of counting representations of all the histories of length $K$ of $L$.
-The next result states that the inclusion between bounded histories is equivalent to ensuring that each multiset 
-$\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
+Let $\Pi_K(L) = \set{ \Pi(h) : h\in H_K(L) }$ be the set of counting
+representations of all the histories of length $K$ of $L$. The next result
+states that the inclusion between bounded histories is equivalent to ensuring
+that each multiset $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 \begin{lemma}
 
@@ -223,55 +218,59 @@ $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 \end{proof}
 
-In Section~\ref{}, we show that for important classes of libraries $L_2$, there exists an effectively computable 
-closed-form expression $\Psi_K(L_2)$ modeling all the counting representations in $\Pi_K(L_2)$. 
-Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $P_K\x L_1$ that generates all the counting 
-representations in $\Pi_K(L_1)$ such that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
-$\Psi_K(L_2)$ is an invariant for the program $P_K\x L_1$. 
-
-
-\subsection{Representing Bounded Interval-Length Histories}
-\label{sec:counting:counters}
-
-We define the program $P_K$, that generates the counting representations
-of all histories of length at most $K$. When composed with a particular library $L$, 
+We define the program $P_K$, that generates the counting representations of all
+histories of length at most $K$. When composed with a particular library $L$,
 $P_K\x L$ generates only counting representations of histories of $L$.
 
-The program $P_K$ stores the counting representation of the 
-current execution's history in an integer map 
-$\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It updates the function $\pi$ at every call and return action. These updates
-correspond to a particular construction of the counting representation of a history~\footnote{Lemma~\ref{lem:representation} proves only the existence of the canonical form (counting representation) of a history, without giving an effective construction.} and respectively, of a given execution's history.
+The program $P_K$ stores the counting representation of the current execution's
+history in an integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It
+updates the function $\pi$ at every call and return action. These updates
+correspond to a particular construction of the counting representation of a
+history~\footnote{Lemma~\ref{lem:representation} proves only the existence of
+the canonical form (counting representation) of a history, without giving an
+effective construction.} and respectively, of a given execution's history.
 
-We first give a construction for the canonical representation of an interval order, which extends straightforwardly to counting
-representations of histories.
-Thus, in the canonical representation of an interval order, the lower, resp., upper, bound of the interval $[i,j]$ associated 
-to some element $o$ is defined in function of the number of distinct pasts $\past{o'}$ with $o'<o$, resp., $o'<o$ or 
-$o'$ incomparable to $o$.
-%
-% $i$ of the interval $[i,j]$ associated by the canonical 
-%representation of $\tup{O,<}$ to some element $o$ equals the number of distinct pasts $\past{o'}$ with $o'<o$
-%and the upper bound $j$ equals one plus the number of distinct pasts $\past{o'}$ with $o'<o$ or $o'$ incomparable to $o$.
-This property is also an explanation for the fact that the length of an interval order equals the number of distinct pasts.
+We first give a construction for the canonical representation of an interval
+order, which extends straightforwardly to counting representations of
+histories. Thus, in the canonical representation of an interval order, the
+lower, resp., upper, bound of the interval $[i,j]$ associated to some element
+$o$ is defined in function of the number of distinct pasts $\past{o'}$ with
+$o'<o$, resp., $o'<o$ or $o'$ incomparable to $o$.
 
-\begin{lemma}\label{lemma:norm_form}
+This property is also an explanation for the fact that the length of an
+interval order equals the number of distinct pasts.
 
-Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical representation. Then,
-for every $o\in O$, $I(o)=[i,j]$, where 
-\[
-i= |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|.
-\] 
+\begin{lemma}
+  \label{lemma:norm_form}
+
+  Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical
+  representation. Then, for every $o\in O$, $I(o)=[i,j]$, where
+  \begin{align*}
+    i = |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|
+    \text{.}
+  \end{align*}
 
 \end{lemma}
 
 \begin{proof}
 
-\todo{}
+  TODO GIVE A PROOF
 
 \end{proof}
 
 Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the counting representation of a history.
 One can determine the interval of an operation by counting the distinct pasts of the other operations and then, it counts
 operations which are instances of the same method and in the same interval.
+
+
+\subsection{Representing Sets of Bounded Interval-Length Histories}
+\label{sec:counting:formula}
+
+TODO TALK ABOUT THIS MAGIC FORMULA AND HOW TO DO THE INCLUSION CHECK
+
+
+\subsection{History Approximation}
+\label{sec:counting:approx}
 
 Now, given an execution $e$, we define an online algorithm for computing the counting representation of $H(e)$, that
 avoids constructing the history itself. This algorithm is based on the following observation: the past of an operation $o$ in $H(e)$ 
@@ -404,55 +403,3 @@ Follows from Lemma~\ref{lemma:alg}.
 
 \end{proof}
 
-
-\subsection{Representing Sets of Bounded Interval-Length Histories}
-\label{sec:counting:formula}
-
-TODO TALK ABOUT THIS MAGIC FORMULA AND HOW TO DO THE INCLUSION CHECK
-
-% THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
-% STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
-
-% Next, we introduce a procedure for checking the equivalence between two
-% histories, which exploits the fact that they are interval orders. This
-% procedure is based on a symbolic encoding of interval orders using counters,
-% which roughly count operations of a history that are invocations of the same
-% method.
-
-% A first condition that two histories $h_1$ and $h_2$ must satisfy in order to
-% be equivalent is that there exists a bijection between their operations that
-% preserves the labelling with method names. Said otherwise, the multiset of
-% labels in $h_1$ equals the multiset of labels in $h_2$. To check this
-% condition, one can define a representation of histories using counters, one
-% for each method, that counts the number of occurrences of that label, and
-% then, test equality between counters that correspond to the same label.
-
-% However, history equivalence also requires that the bijection between
-% operations preserves the order constraints from one history to another. This
-% can be checked by refining the counter-based representation above.
-% Essentially, we will define a partition over the operations in a history such
-% that for every two classes $C_1$ and $C_2$ of the partition, either (1) every
-% element of $C_1$ is incomparable to every element of $C_2$, (2) every element
-% of $C_1$ is smaller than every element of $C_2$ or (3) every element of $C_1$
-% is greater than every element of $C_2$. Therefore, one can extend the order
-% relation to classes of the partition in a conservative and complete way. Then,
-% we will associate a counter for each class and each method, that counts the
-% number of invocations of that method in that class. History equivalence now
-% corresponds to the fact that the order relations on classes of operations are
-% isomorphic and that the counters associated to isomorphic classes and the same
-% method are equal.
-
-% The definition of history partitions is strongly based on the fact that they
-% are interval orders. Moreover, the order relation on classes of the partition
-% is also an interval order. This allows us to define a representation for
-% histories using integer maps, that encode the values of the counters but also
-% the order relation between classes of the partition. Basically, the classes of
-% the partition are represented in the domain of the integer map using intervals
-% on the integer line. Now, history equivalence can be decided by checking the
-% equality between the corresponding integer maps.
-
-\subsection{History Approximation}
-\label{sec:counting:approx}
-
-TODO SAY THAT WE INSTANTIATE THE APPROXIMATION SCHEME BY REMEMBERING THE LAST
-$K$ BARRIERS
