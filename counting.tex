@@ -16,14 +16,14 @@ $H(L_2)$ is undecidable, since it is equivalent to checking whether $L_1$ is
 linearizable with respect to $L_2$~\cite{conf/esop/BouajjaniEEH13}.
 
 These complexity obstacles suggest investigating approximations to the history
-inclusion problems --- i.e., both $h \in H(L_2)$ and its more general variation
+inclusion problems --- i.e.,~both $h \in H(L)$ and its more general variation
 $H(L_1) \subseteq H(L_2)$ --- in order to devise tractable algorithms.
 
 In this work, we focus on parameterized \emph{under approximations} for
 detecting violations to observational refinement, achieving increasing accuracy
 with decreasing efficiency. For this, we design a notion of parameterized
-history approximations such that if $A_k(h)$ is a $k$-approximation of history
-$h$, for $k \in \<Nats>$, then $A_k(h) \preceq h$; in general, $A_0(h)
+history approximations $A_k$ such that if $A_k(h)$ is a $k$-approximation of
+history $h$, for $k \in \<Nats>$, then $A_k(h) \preceq h$; in general, $A_0(h)
 \preceq A_1(h) \preceq .. \preceq A_k(h) \preceq h$. For any fixed $k \in
 \<Nats>$, any fixed set $H(L)$ of histories, and given history $h$, our
 algorithm checks in polynomial time whether $A_k(h)$ is included in $H(L)$; if
@@ -33,76 +33,28 @@ H(L)$, increasing $k$ increases the ability to detect violations to
 observational refinement; of course, this must come a decrease in efficiency
 since the problem is NP-hard when $k$ is not fixed. For the more general
 problem, given a library $L_1$, fixed $k \in \<Nats>$, and a fixed set $H(L_2)$
-of histories, our algorithm decides whether $A_k(h) \not\in H(L_2)$ for some
-$h \in H(L_1)$. Again, whenever $h \not\in H(L_2)$ for some $h \in H(L_1)$,
-there is always some $k \in \<Nats>$ such that $A_k(h) \not\in H(L_2)$.
+of histories, our algorithm decides whether $A_k(h) \not\in H(L_2)$ for some $h
+\in H(L_1)$. Again, whenever $h \not\in H(L_2)$ for some $h \in H(L_1)$, there
+is always some $k \in \<Nats>$ such that $A_k(h) \not\in H(L_2)$.
 
-The key to the design of our approximation function $A_k$ is that checking
-history inclusion can be easily computed for fixed $k$, and that violations to
+The key properties of an approximation function $A_k$ is that checking history
+inclusion can be easily computed for fixed $k$, and that violations to
 observational refinement surface for small $k$. We demonstrate the latter in
 Sections~\ref{sec:registers},~\ref{sec:containers}, and~\ref{sec:experiments}:
-small $k$ is effective in detecting violations. In this section we devise the
-approximation $A_k$ and demonstrate that $A_k(h) \in H(L)$ can be efficiently
-computed. Our development relies on (1)~identifying histories with a known
-mathematical concept called ``interval orders'', (2)~abstracting histories to
-interval orders of bounded length $k \in \<Nats>$, (3)~representing histories
-$A_k(h)$ with a fixed number of integer counters, and (4)~representing the set
-$H(L)$ of histories with a closed-form expression over counter values, against
-which $A_k(h)$ can be evaluated in polynomial time.
+small $k$ is effective in detecting violations. In this section we devise a
+scheme for approximation functions $A_k$ for which $A_k(h) \in H(L)$ can be
+efficiently computed. Our development relies on identifying histories with a
+known mathematical concept called ``interval
+orders''~(\S\ref{sec:counting:intervals}), abstracting histories to interval
+orders of bounded length $k \in \<Nats>$~(\S\ref{sec:counting:bounding}),
+representing histories $A_k(h)$ with a fixed number of integer
+counters~(\S\ref{sec:counting:counters}), and representing the set $H(L)$ of
+histories with a closed-form expression over counter values, against which
+$A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:formula}).
+Finally, we describe approximation schemes which we have found to behave well
+in practice~(\S\ref{sec:counting:approx}).
 
-TODO THE FOLLOWING TEXT IS OLD, AND MIKE SUGGESTS REPLACING IT WITH THE TEXT
-ABOVE
-
-\todo{I used ``closed-form expression'' but I begin to have doubts about this
-... I think that it's more appropriate the term ``symbolic representation'' ...
-because our closed-form expressions are always boolean ... and I feel that this
-is not the right spirit}
-
-In this section, we consider the problem of checking observational refinement
-between two libraries $L_1$ and $L_2$, which by Theorem~\ref{th:equiv}, is
-equivalent to checking the inclusion between the histories of $L_1$ and
-respectively $L_2$. Essentially, the approach we consider is to compute a
-\emph{closed-form expression} that represents histories of $L_2$ and then,
-check that histories of $L_1$ satisfy this closed-form expression. Since
-closed-form expressions are supposed to contain only elementary operations, the
-satisfaction test can be done in polynomial time. The undecidability of
-observational refinement~\cite{conf/esop/BouajjaniEEH13} implies that such a
-closed-form expression does not exist in general. Therefore, we consider an
-under-approximation of this problem, that decides the inclusion between bounded
-sets of histories. This under-approximation enables several applications:
-static and dynamic analyses for detecting violations to observational
-refinement, and runtime monitoring (see Section~\ref{} for more details).
-
-% TODO THIS SECTION SHOULD BE ABOUT OUR DESIRE TO CHECK O.R.
-% EFFICIENTLY/EFFECTIVELY, AND THUS ABOUT A GENERAL TECHNIQUE WHICH MAKES USE OF
-% A GIVEN CLOSED-FORM EXPRESSION FOR THE HISTORY-INCLUSION CHECK, E.G. A
-% PRESBURGER FORMULA. HERE WE SHOULD TALK ABOUT ALL OF THE STUFF WE WILL DO
-% GIVEN SUCH A FORMULA, WITH APPLICATIONS TO STATIC/SYMBOLIC ANALYSIS, TESTING,
-% AND RUNTIME MONITORING. NOTE THAT WHILE ``COUNTING'' ISN'T STRICTLY NECESSARY
-% IN THIS VIEW OF THINGS, IT IS SIMPLY A CANONICAL REPRESENTATION ON WHICH TO
-% IMPLEMENT THINGS.
-
-% TODO SHOW THE NP-HARDNESS RESULT TO SET OUR GOAL FOR POLYNOMIAL-TIME THINGS;
-% ALSO MAYBE THE UNDECIDABILITY RESULT TO SET OUR GOAL FOR STATIC/SYMBOLIC CASE
-
-% We have shown that observational refinement is equivalent to an inclusion
-% between sets of histories. However, in general, deciding this inclusion is
-% undecidable even for libraries with a bounded number of
-% states~\cite{conf/esop/BouajjaniEEH13}. In the following, we consider an
-% under-approximation of this problem, that decides the inclusion between
-% bounded sets of histories. This under-approximation can be reduced to a
-% reachability problem and enables several applications: symbolic and dynamic
-% analyses for detecting violations to observational refinement, and runtime
-% monitoring (see Section~\ref{} for more details).
-
-Our technical development is based on the observation that histories of library
-executions are \emph{interval orders}, a particular class of partial orders.
-Intuitively, histories come from executions where operations have access to a
-notion of global time and therefore, for every two operations in a history,
-their \emph{pasts} (the set of operations that finished before an operation
-starts) cannot be incomparable. Then, the bound that we consider on histories
-is actually a bound on their \emph{length}, defined as the number of distinct
-pasts that an operation can have.
+TODO WHERE DOES THIS GO?
 
 We show that for many important classes of libraries, e.g., atomic registers
 and containers, there exists an effectively computable closed-form expression
@@ -118,35 +70,17 @@ quantifier-free Presburger arithmetic. In such a case, the domains of the
 integer maps are bounded, by assuming another bound on the number of methods in
 the library.
 
-% When the length of the history is bounded, the number of intervals is also
-% bounded and if the number of methods in the library is bounded, a set of
-% integer maps can be represented
-
-% We show that this bound is important in the process of detecting violations to
-% history inclusion and thus, observational refinement, in several ways. First,
-% we provide a complexity result stating that deciding if the history of a
-% concurrent register (a library with $\<read>$ and $\<write>$ methods) of
-% bounded length is included in the histories of an atomic register (where
-% method bodies are executed atomically in one step) is polynomial time.
-% Deciding this fact for arbitrary histories is known to be
-% NP-complete~\cite{journals/siamcomp/GibbonsK97}. Therefore, bounding histories
-% provides an efficiency gain, in theory but even in practice as we demonstrate
-% in Section~\ref{}, if we are interested in defining dynamic analyses for
-% detecting violations to observational refinement or runtime monitors for
-% ensuring observational refinement.
-
-% We even show that for an important class of executions of common concurrent
-% containers, e.g.., stacks and queues, a bound of 2 on the length of their
-% histories is enough to detect \emph{all possible violations}. These results
-% are strengthened by the experiments in Section~\ref{}, which show that even
-% for other classes violations, small bounds of at most ??? on the length of
-% histories is enough in order to discover them.
-
-\subsection{Histories are interval orders}
+\subsection{Histories are Interval Orders}
+\label{sec:counting:intervals}
 
 While the general definition of histories allows arbitrary partial orders of
 operations, histories which arise from LTS executions fall into a special class
-called \emph{interval orders}.
+called \emph{interval orders}. Intuitively, histories come from executions
+where operations have access to a notion of global time and therefore, for
+every two operations in a history, their \emph{pasts} (the set of operations
+that finished before an operation starts) cannot be incomparable. Then, the
+bound that we consider on histories is actually a bound on their \emph{length},
+defined as the number of distinct pasts that an operation can have.
 
 \begin{definition}
 
@@ -231,7 +165,8 @@ multisets $\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies $
 
 \end{proof}
 
-\paragraph{Histories of bounded length.}
+\subsection{Bounded Interval-Length Histories}
+\label{sec:counting:bounding}
 
 Since the closed-form expression $\Psi(L_2)$ may not exist in general, we
 consider the problem of deciding $H_K(L_1) \subseteq H_K(L_2)$, where for any
@@ -291,19 +226,21 @@ $\Pi(h) \in \Pi_K(L_1)$ is also included in $\Pi_K(L_2)$.
 
 In Section~\ref{}, we show that for important classes of libraries $L_2$, there exists an effectively computable 
 closed-form expression $\Psi_K(L_2)$ modeling all the counting representations in $\Pi_K(L_2)$. 
-Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $\Xi[K]\times L_1$ that generates all the counting 
+Then, to decide that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$, we define a program $P_K\x L_1$ that generates all the counting 
 representations in $\Pi_K(L_1)$ such that $\Pi_K(L_1) \subseteq \Pi_K(L_2)$ iff 
-$\Psi_K(L_2)$ is an invariant for the program $\Xi[K]\times L_1$. 
+$\Psi_K(L_2)$ is an invariant for the program $P_K\x L_1$. 
 
-\subsection{Generating counting representations}
 
-We define the program $\Xi[K]$, that generates the counting representations
+\subsection{Representing Bounded Interval-Length Histories}
+\label{sec:counting:counters}
+
+We define the program $P_K$, that generates the counting representations
 of all histories of length at most $K$. When composed with a particular library $L$, 
-$\Xi[K]\times L$ generates only counting representations of histories of $L$.
+$P_K\x L$ generates only counting representations of histories of $L$.
 
-The program $\Xi[K]$ stores the counting representation of the 
+The program $P_K$ stores the counting representation of the 
 current execution's history in an integer map 
-$\pi:\<Methods>\times \<Nats>^2\rightarrow \<Nats>$. It updates the function $\pi$ at every call and return action. These updates
+$\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It updates the function $\pi$ at every call and return action. These updates
 correspond to a particular construction of the counting representation of a history~\footnote{Lemma~\ref{lem:representation} proves only the existence of the canonical form (counting representation) of a history, without giving an effective construction.} and respectively, of a given execution's history.
 
 We first give a construction for the canonical representation of an interval order, which extends straightforwardly to counting
@@ -388,7 +325,7 @@ i = \nbbarr{e,\tup{m,o}},\mbox{ and }
 \end{lemma}
 
 The online algorithm for computing the counting representation of $H(e)$ 
-maintains the integer map $\pi:\<Methods>\times \<Nats>^2\rightarrow \<Nats>$, 
+maintains the integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$, 
 a map $\theta:O\rightarrow \<Nats>$ storing the number of barriers before the call action of each operation $o$, 
 a boolean $\<finished>$ which becomes $\<true>$ when the algorithm reads a return action 
 (this is used to detect barriers of $e$), and an integer $\<time>$ storing the number of observed barriers.
@@ -444,18 +381,18 @@ Follows from Lemmas~\ref{lemma:nb_barr} and~\ref{lemma:counting_executions}.
 
 \end{proof}
 
-The program $\Xi[K]$ is built according to the online algorithm in Figure~\ref{fig:online_alg}. 
+The program $P_K$ is built according to the online algorithm in Figure~\ref{fig:online_alg}. 
 Its states are formed of values for the mappings $\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$.
-The set of executions of $\Xi[K]$, projected on call and return actions, is exactly the set of all well-formed
+The set of executions of $P_K$, projected on call and return actions, is exactly the set of all well-formed
 sequences $e$ over $C\cup R$ such that $H(e)$ is of length at most $K$. 
 Every call action is preceded by a \alert{program action} corresponding to 
 the updates in the top part of Figure~\ref{fig:online_alg} and every return action is followed by a \alert{program action}
 corresponding to the updates in the bottom part of Figure~\ref{fig:online_alg}.
-The following theorem states that $\Xi[K]$ generates the counting representations of all histories of length at most $K$.
+The following theorem states that $P_K$ generates the counting representations of all histories of length at most $K$.
 
 \begin{theorem}
 
-Let $K\in\<Nats>$ and $Q[K]$ the set of states of $\Xi[K]$. Also, let $H_K$ be the set of all histories of length at most $K$. Then,
+Let $K\in\<Nats>$ and $Q[K]$ the set of states of $P_K$. Also, let $H_K$ be the set of all histories of length at most $K$. Then,
 \[
 \set{\Pi(h):h\in H_K}=\set{\pi:(\pi,\theta,\<time>,\<finished>)\in Q[K]}.
 \]
@@ -469,7 +406,10 @@ Follows from Lemma~\ref{lemma:alg}.
 \end{proof}
 
 
-\subsection{Checking bounded history inclusion}
+\subsection{Representing Sets of Bounded Interval-Length Histories}
+\label{sec:counting:formula}
+
+TODO TALK ABOUT THIS MAGIC FORMULA AND HOW TO DO THE INCLUSION CHECK
 
 % THE POINT: REDUCING HISTORY INCLUSION/COMPARISON TO SOMETHING WITH A
 % STRAIGHTFORWARD REPRESENTATION/AUTOMATION: COUNTER INCLUSION/COMPARISON.
@@ -511,3 +451,9 @@ Follows from Lemma~\ref{lemma:alg}.
 % the partition are represented in the domain of the integer map using intervals
 % on the integer line. Now, history equivalence can be decided by checking the
 % equality between the corresponding integer maps.
+
+\subsection{History Approximation}
+\label{sec:counting:approx}
+
+TODO SAY THAT WE INSTANTIATE THE APPROXIMATION SCHEME BY REMEMBERING THE LAST
+$K$ BARRIERS
