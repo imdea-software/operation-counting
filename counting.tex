@@ -211,15 +211,20 @@ $\Psi(L_2)$.
 
 \end{proof}
 
-A \emph{$k$-interval-length history predicate} $@Y$ is a Boolean-valued
-expression over $m(k+1)^2$ integer variables
-\begin{align*}
-  \set{ x_{m,i,j} : m \in \<Methods> \text{ and } 0 \le i \le j \le k } \text{.}
-\end{align*}
-We say $@Y$ is in \emph{closed form} when $@Y$ consists of a finite number of
-elementary arithmetic operations (e.g.,~addition, subtraction) and
-inequalities. We say $@Y$ \emph{represents} a library $L$ when $h \in H(L) <=>
-@Y(\Pi(h))$ for every history $h$ of interval length at most $k$.
+
+Let $n = |\<Methods> (k+1)^2|$.
+We fix an enumeration $@n : \set{ 1,., n } -> (\<Methods> \x \_ \x \_)$, and
+define the \emph{counting vector} of a history $h$ as the $n$-length
+vector $\vec{x}$ such that $x_i = \Pi(h)(@n(i))$.
+
+
+A \emph{$k$-interval-length history predicate} $@Y(x_1, .., x_n)$ is a
+Boolean-valued expression over $n$ integer variables. We say $@Y$ is in
+\emph{closed form} when $@Y$ consists of a finite number of elementary
+arithmetic operations (e.g.,~addition, subtraction) and inequalities. We say
+$@Y$ \emph{represents} a library $L$ when $h \in H(L) <=> @Y(\vec{x})$ for
+every history $h$ of interval length at most $k$, where $\vec{x}$ is the
+counting vector of $h$.
 
 \begin{lemma}
 
@@ -274,12 +279,6 @@ interval order equals the number of distinct pasts.
 Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the counting representation of a history.
 One can determine the interval of an operation by counting the distinct pasts of the other operations and then, it counts
 operations which are instances of the same method and in the same interval.
-
-
-\subsection{Representing Sets of Bounded Interval-Length Histories}
-\label{sec:counting:formula}
-
-TODO TALK ABOUT THIS MAGIC FORMULA AND HOW TO DO THE INCLUSION CHECK
 
 
 \subsection{History Approximation}
