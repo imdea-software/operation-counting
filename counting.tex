@@ -108,38 +108,48 @@ that have completed before a given operation starts) cannot be incomparable.
 
 \end{proof}
 
-The length of an interval order can be characterized in terms of \emph{pasts}
-associated to elements in the partial order. Thus, given a partial order
-$\tup{O,<}$ and $o\in O$, the set of elements which are ordered before $o$
-w.r.t. $<$ is called the \emph{past} of $o$:
-\[
-  \past{o}=\{o' < o\mid o'\in A\}.
-\]
+The \emph{past} of an element $o \in O$ of a poset $\tup{O,<}$ is the set
+\begin{align*}
+  \<past>(o) = \set{ o' \in O : o' < o }
+\end{align*}
+of elements ordered before $o$.
 
-\todo{Example of pasts }
+\begin{example}
 
-The following result states that every two pasts in an interval order are
-ordered by set inclusion.
+  TODO EXAMPLE OF PASTS
+  
+\end{example}
+
+This notion of operations' pasts induces a linear notion of time into execution
+histories due to the following fact.
 
 \begin{lemma}[Rabinovitch~\cite{Rabinovitch197850}]
 
-  A partial order $\tup{O,<}$ is an interval order iff the sets $\past{o}$ with
-  $o\in O$ are linearly ordered by set inclusion.
+  The set $\set{ \<past>(o) : o \in O }$ of pasts of an interval order
+  $\tup{O,<}$ is linearly ordered by set inclusion.
 
 \end{lemma}
 
-Then, the length of an interval order $\tup{O,<}$ is one less than the number
-of \emph{distinct} pasts in $\tup{O,<}$.
+\noindent
+Furthermore, this linear notion of time has an associated notion of
+\emph{length}, which corresponds to the length of the linear order on
+operation's pasts.
 
-
-\begin{lemma}[Greenough~\cite{phd/Greenough76}]
+\begin{definition}[Greenough~\cite{phd/Greenough76}]
   \label{lemma:len}
-  An interval order $\tup{O,<}$ has length
-  \[ |\set{\past{o}:o\in O}| - 1 \text{.} \]
-\end{lemma}
+  
+  The \emph{length} of an interval order $\tup{O,<}$ is one less than the
+  number of its distinct pasts.
 
+\end{definition}
 
-TODO SPECIFY $A_k(h)$ AS SOME $k$-BOUNDED INTERVAL-LENGTH HISTORY WEAKER THAN $h$
+Our history-weakening approximation functions $A_k$ map histories to weaker
+histories whose corresponding interval orders have length at most $k$. While
+there are various ways to define such a function $A_k$, any such function
+enables the polynomial-time inclusion check $A_k(h) \in H(L)$ which we
+demonstrate in the following subsections. Subsection~\ref{sec:counting:approx}
+describes concrete definitions that are useful in practice for detecting
+observational refinement violations.
 
 
 \subsection{Representing Histories with Counters}
