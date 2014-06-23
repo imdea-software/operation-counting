@@ -22,53 +22,52 @@ $H(L_1) \subseteq H(L_2)$ --- in order to devise tractable algorithms.
 In this work, we focus on parameterized \emph{under approximations} for
 detecting violations to observational refinement, achieving increasing accuracy
 with decreasing efficiency. For this, we design a notion of parameterized
-history approximations $A_k$ such that if $A_k(h)$ is a $k$-approximation of
-history $h$, for $k \in \<Nats>$, then $A_k(h) \preceq h$; in general, $A_0(h)
-\preceq A_1(h) \preceq .. \preceq A_k(h) \preceq h$. For any fixed $k \in
-\<Nats>$, any fixed set $H(L)$ of histories, and given history $h$, our
-algorithm checks in polynomial time whether $A_k(h)$ is included in $H(L)$; if
-not, then neither is $h$, since $H(L)$ is closed under weakening. Since for any
-$h \not\in H(L)$ there exists some $k \in \<Nats>$ such that $A_k(h) \not\in
-H(L)$, increasing $k$ increases the ability to detect violations to
-observational refinement; of course, this must come a decrease in efficiency
-since the problem is NP-hard when $k$ is not fixed. For the more general
-problem, given a library $L_1$, fixed $k \in \<Nats>$, and a fixed set $H(L_2)$
-of histories, our algorithm decides whether $A_k(h) \not\in H(L_2)$ for some $h
-\in H(L_1)$. Again, whenever $h \not\in H(L_2)$ for some $h \in H(L_1)$, there
-is always some $k \in \<Nats>$ such that $A_k(h) \not\in H(L_2)$.
+history-weakening approximation functions $A_k$ which map any history $h$ to a
+weaker history $A_k(h) \preceq h$, and which have the following properties:
+\begin{description}
 
-The key properties of an approximation function $A_k$ is that checking history
-inclusion can be easily computed for fixed $k$, and that violations to
-observational refinement surface for small $k$. We demonstrate the latter in
-Sections~\ref{sec:registers},~\ref{sec:containers}, and~\ref{sec:experiments}:
-small $k$ is effective in detecting violations. In this section we devise a
-scheme for approximation functions $A_k$ for which $A_k(h) \in H(L)$ can be
-efficiently computed. Our development relies on identifying histories with a
-known mathematical concept called ``interval
-orders''~(\S\ref{sec:counting:intervals}), abstracting histories to interval
-orders of bounded length $k \in \<Nats>$~(\S\ref{sec:counting:bounding}),
-representing histories $A_k(h)$ with a fixed number of integer
+  \item[Strength-increasing:]
+  $A_0(h) \preceq A_1(h) \preceq .. \preceq A_k(h) \preceq h$.
+  
+  \item[Completeness:]
+  there exists $k \in \<Nats>$ such that $h \preceq A_k(h)$.
+  
+  \item[Tractable inclusion:]
+  $A_k(h) \in H(L)$ is computable in polynomial time when $k$ and $L$ are fixed.
+
+\end{description}
+This weakening-based approximation is convenient since whenever $A_k(h)$ is not
+included in $H(L)$, then neither is $h$, since $H(L)$ is closed under
+weakening. While completeness means that increasing $k$ increases the ability
+to detect observational refinement violations, this must incur a decrease in
+efficiency since the inclusion problem $A_k(h) \in H(L)$ is NP-hard when $k$ is
+not fixed. By design, the approximation function $A_k$ allows us to solve the
+approximate history inclusion problem $A_k(h) \in H(L)$ in polynomial time when
+$k$ and $L$ are fixed. For the more general problem of refinement between a
+given library $L_1$ and fixed library $L_2$, our approximation asks whether
+$A_k(h) \not\in H(L_2)$ for some $h \in H(L_1)$, and becomes decidable for
+fixed $k \in \<Nats>$. Completeness of $A_k$ ensures overall completeness,
+i.e.,~that for any $h \in H(L_1) @\ H(L_2)$ there is some $k \in \<Nats>$ such
+that $A_k(h) \not\in H(L_2)$.
+
+Our key challenge is to develop approximation functions $A_k$ for which history
+inclusion can be computed in polynomial time for fixed $k$, and for which
+observational refinement violations surface with small $k$. We demonstrate the
+latter in Sections~\ref{sec:registers},~\ref{sec:containers},
+and~\ref{sec:experiments}.
+
+In this section we develop a schema of approximation functions for which the
+approximate history inclusion problem is polynomial-time computable. Our
+development relies on identifying histories with a known mathematical concept
+called ``interval orders''~(\S\ref{sec:counting:intervals}), abstracting each
+history $h$ to a weaker history $A_k(h)$ whose interval-length is bounded by
+$k$~(\S\ref{sec:counting:bounding}), representing each weakened history
+$A_k(h)$ with a fixed number of integer
 counters~(\S\ref{sec:counting:counters}), and representing the set $H(L)$ of
 histories with a closed-form expression over counter values, against which
 $A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:formula}).
-Finally, we describe approximation schemes which we have found to behave well
-in practice~(\S\ref{sec:counting:approx}).
-
-TODO WHERE DOES THIS GO?
-
-We show that for many important classes of libraries, e.g., atomic registers
-and containers, there exists an effectively computable closed-form expression
-that represents their bounded-length histories. More precisely, this expression
-represents the \emph{canonical form} of these histories, which is defined as an
-integer map. Thus, each operation $o$ in the history is associated to an
-interval $I(o)$ on the integer line whose bounds are smaller than the length of
-the history. A history is then represented by a map, which associates to each
-interval $I$ and method $m$ an integer that counts the number of operations $o$
-with $I(o)=I$, which are instances of $m$. The closed-form expressions
-representing a set of canonical forms of histories will be usually written in
-quantifier-free Presburger arithmetic. In such a case, the domains of the
-integer maps are bounded, by assuming another bound on the number of methods in
-the library.
+Finally, we describe concrete instantiations of our approximation schema which
+we have found to behave well in practice~(\S\ref{sec:counting:approx}).
 
 \subsection{Histories are Interval Orders}
 \label{sec:counting:intervals}
