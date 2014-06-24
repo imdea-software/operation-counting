@@ -45,10 +45,11 @@ not fixed. By design, the approximation function $A_k$ allows us to solve the
 approximate history inclusion problem $A_k(h) \in H(L)$ in polynomial time when
 $k$ and $L$ are fixed. For the more general problem of refinement between a
 given library $L_1$ and fixed library $L_2$, our approximation asks whether
-$A_k(h) \not\in H(L_2)$ for some $h \in H(L_1)$, and becomes decidable for
-fixed $k \in \<Nats>$. Completeness of $A_k$ ensures overall completeness,
-i.e.,~that for any $h \in H(L_1) @\ H(L_2)$ there is some $k \in \<Nats>$ such
-that $A_k(h) \not\in H(L_2)$.
+$A_k(h) \in H(L_1) \setminus H(L_2)$, and becomes decidable for fixed $k \in
+\<Nats>$, so long as the set $\set{ A_k(h) : h \in H(L_1) }$ is computable.
+Completeness of $A_k$ ensures overall completeness, i.e.,~that for any $h \in
+H(L_1) \setminus H(L_2)$ there is some $k \in \<Nats>$ such that $A_k(h) \in
+H(L_1) \setminus H(L_2)$.
 
 Our key challenge is to develop approximation functions $A_k$ for which history
 inclusion can be computed in polynomial time for fixed $k$, and for which
@@ -59,15 +60,15 @@ and~\ref{sec:experiments}.
 In this section we develop a schema of approximation functions for which the
 approximate history inclusion problem is polynomial-time computable. Our
 development relies on identifying histories with a known mathematical concept
-called ``interval orders''~(\S\ref{sec:counting:intervals}), abstracting each
-history $h$ to a weaker history $A_k(h)$ whose interval-length is bounded by
-$k$~(\S\ref{sec:counting:bounding}), representing each weakened history
-$A_k(h)$ with a fixed number of integer
-counters~(\S\ref{sec:counting:counters}), and representing the set $H(L)$ of
-histories with a closed-form expression over counter values, against which
-$A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:formula}).
-Finally, we describe concrete instantiations of our approximation schema which
-we have found to behave well in practice~(\S\ref{sec:counting:approx}).
+called ``interval orders''~(\S\ref{sec:counting:intervals}). Leveraging the
+notion of \emph{length} of an interval order, we then abstract each history $h$
+to a weaker history $A_k(h)$ whose interval-length is bounded by $k$, and
+represent the set $H(L)$ of histories by a formula $@Y_k$ over bounded
+intervals against which $A_k(h)$ can be evaluated in polynomial
+time~(\S\ref{sec:counting:logic}). Finally, we exhibit a program monitoring
+scheme which can be used to decide our approximate observational refinement
+problem $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$, or as a general
+purpose runtime montior~(\S\ref{sec:counting:monitor}).
 
 XXX CAREFUL BECAUSE THE FOLLOWING IS IN FLUX
 
@@ -152,7 +153,8 @@ describes concrete definitions that are useful in practice for detecting
 observational refinement  violations.
 
 
-\subsection{Representing Histories with Counters}
+\subsection{An Operation-Counting Logic}
+\label{sec:counting:logic}
 
 Interval orders have a canonical representation which basically, associates to
 each element an interval on the integer line. While in general there may exist
@@ -190,15 +192,6 @@ of counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h
 
 \end{example}
 
-Counting representations give an effective way of computing closed-form
-expressions representing sets of histories. This representation reduces the
-problem of ensuring that each history $h \in H(L_1)$ of some library is
-included in the histories $H(L_2)$ of another, to ensuring that each multiset
-$\Pi(h) \in \Pi(L_1)$ is also included in $\Pi(L_2)$. Therefore, if we were
-given a closed-form expression $\Psi(L_2)$ representing the multisets
-$\Pi(L_2)$, a history $h$ belongs to $H(L_2)$ iff $\Pi(h)$ satisfies
-$\Psi(L_2)$.
-
 \begin{lemma}
 
   $H(e) \in H(L_2)$ if and only if $\Pi(H(e)) \in \Pi(L_2)$.
@@ -211,7 +204,10 @@ $\Psi(L_2)$.
 
 \end{proof}
 
-The signature of operation counting extends Presburger arithmetic with
+This canonical ``counting'' representation of histories leads to an effective
+logical characterization of sets of histories using arithmetic, inequalities,
+and an operation-counting function $\#$. Formally, \emph{operation counting
+logic} extends Presburger arithmetic with
 \begin{itemize}
   \item method-type variables $m, m_0, m_1, ..: \<Methods>$,
   \item a function $\#(m: \<Methods>, b: \<Bools>, i: \<Nats>, j:\<Nats>): \<Nats>$,
@@ -229,13 +225,24 @@ $k$.
 
 \begin{lemma}
 
-  ``The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
+  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
   polynomial time for fixed $k$ and $L$, given an operation counting formula
-  $@Y$ for $L$ up to $k$.''
+  $@Y$ for $L$ up to $k$.
 
 \end{lemma}
 
-\subsection{Something Else...}
+\begin{proof}
+
+  Since $A_k(h)$ is required to be polynomial-time computable, and deciding
+  $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
+  has interval length at most $k$, it remains only to show $A_k(h) |= @Y$ is
+  polynomial-time computable. This fact follows easily from \ldots
+  CONSTANTIN? HELP??
+
+\end{proof}
+
+\subsection{Monitoring Histories by Counting}
+\label{sec:counting:monitor}
 
 We define the program $P_K$, that generates the counting representations of all
 histories of length at most $K$. When composed with a particular library $L$,
@@ -281,9 +288,6 @@ Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the co
 One can determine the interval of an operation by counting the distinct pasts of the other operations and then, it counts
 operations which are instances of the same method and in the same interval.
 
-
-\subsection{History Approximation}
-\label{sec:counting:approx}
 
 Now, given an execution $e$, we define an online algorithm for computing the counting representation of $H(e)$, that
 avoids constructing the history itself. This algorithm is based on the following observation: the past of an operation $o$ in $H(e)$ 
