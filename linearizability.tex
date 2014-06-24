@@ -48,7 +48,7 @@ Let $L$ be the least library which contains the execution
 \[
 e=\tup{m_1,o_1}\tup{m_2,o_2}\tup{o_1,m_1},
 \] 
-where the call to $m_2$ is pending.
+where the call to $m_2$ is pending, i.e., $E(L)=\atLib{\{e\}}$.
 %(i.e., there exists no return action matching the call action $\tup{m_2,o_2}$). 
 
 Then, $L$ refines $L$
@@ -56,7 +56,10 @@ but $L$ is not linearizable w.r.t. $L$. The latter holds because the execution
 $e$ could be linearizable w.r.t. $L$ only if $L$ would contain one of the following
 executions:
 \[
-\tup{m_1,o_1}\tup{o_1,m_1}\mbox{ or }\tup{m_1,o_1}\tup{m_2,o_2}\tup{o_1,m_1}\tup{o_2,m_2}.
+\begin{array}{l}
+\tup{m_1,o_1}\tup{o_1,m_1},\ \tup{m_1,o_1}\tup{m_2,o_2}\tup{o_1,m_1}\tup{o_2,m_2}, \\ %\mbox{ or }
+\mbox{or }\tup{m_1,o_1}\tup{o_1,m_1}\tup{m_2,o_2}\tup{o_2,m_2}.
+\end{array}
 \]
 However, since $L$ is the least library that contains $e$, none of these executions belongs to $L$.
 
