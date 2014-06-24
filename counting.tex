@@ -211,26 +211,28 @@ $\Psi(L_2)$.
 
 \end{proof}
 
+The signature of operation counting is
+\begin{itemize}
+  \item variables $m: \<Methods>$
+  \item constants $@w: \<Nats>$
+  \item interpreted functions $\#(m: \<Methods>, i: \<Nats>, j:\<Nats>): \<Nats>$
+  \item uninterpreted functions $\<name>(m: \<Methods>)$, $\<value>(m: \<Methods>)$
+\end{itemize}
+where
+\begin{align*}
+  \db{\#(m,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{m,[i,\<min>(j,k)]} }|
+\end{align*}
+where $k$ is the interval length of $h$.
 
-Let $n = |\<Methods> (k+1)^2|$.
-We fix an enumeration $@n : \set{ 1,., n } -> (\<Methods> \x \_ \x \_)$, and
-define the \emph{counting vector} of a history $h$ as the $n$-length
-vector $\vec{x}$ such that $x_i = \Pi(h)(@n(i))$.
-
-
-A \emph{$k$-interval-length history predicate} $@Y(x_1, .., x_n)$ is a
-Boolean-valued expression over $n$ integer variables. We say $@Y$ is in
-\emph{closed form} when $@Y$ consists of a finite number of elementary
-arithmetic operations (e.g.,~addition, subtraction) and inequalities. We say
-$@Y$ \emph{represents} a library $L$ when $h \in H(L) <=> @Y(\vec{x})$ for
-every history $h$ of interval length at most $k$, where $\vec{x}$ is the
-counting vector of $h$.
+An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
+when $h \in H(L) <=> h |= @Y$ for every history $h$ of interval length at most
+$k$.
 
 \begin{lemma}
 
   ``The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
-  polynomial time for fixed $k$ and $L$, given a closed-form
-  $k$-interval-length history predicate $@Y$ for $L$.''
+  polynomial time for fixed $k$ and $L$, given an operation counting formula
+  $@Y$ for $L$ up to $k$.''
 
 \end{lemma}
 
