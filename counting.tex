@@ -215,14 +215,14 @@ The signature of operation counting is
 \begin{itemize}
   \item variables $m: \<Methods>$
   \item constants $@w: \<Nats>$
-  \item interpreted functions $\#(m: \<Methods>, i: \<Nats>, j:\<Nats>): \<Nats>$
+  \item interpreted functions $\#(m: \<Methods>, i: \<Nats>, j:\<Nats>\u\set{@w}): \<Nats>$
   \item uninterpreted functions $\<name>(m: \<Methods>)$, $\<value>(m: \<Methods>)$
 \end{itemize}
 where
 \begin{align*}
   \db{\#(m,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{m,[i,\<min>(j,k)]} }|
 \end{align*}
-where $k$ is the interval length of $h$.
+where $k$ and $\pi$ are the interval length and counting representation of $h$.
 
 An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
 when $h \in H(L) <=> h |= @Y$ for every history $h$ of interval length at most
