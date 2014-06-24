@@ -179,10 +179,10 @@ Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
 order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
 a representation $\pi$ including operations' methods, by $\pi(o) =
 \tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
-of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-interval pairs
-$\tup{m,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set of
-counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h \in
-H(L) }$.
+of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of method-status-interval
+triples $\tup{m,b,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set
+of counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h
+\in H(L) }$.
 
 \begin{example}
 
@@ -211,18 +211,17 @@ $\Psi(L_2)$.
 
 \end{proof}
 
-The signature of operation counting is
+The signature of operation counting extends Presburger arithmetic with
 \begin{itemize}
-  \item variables $m: \<Methods>$
-  \item constants $@w: \<Nats>$
-  \item interpreted functions $\#(m: \<Methods>, i: \<Nats>, j:\<Nats>\u\set{@w}): \<Nats>$
-  \item uninterpreted functions $\<name>(m: \<Methods>)$, $\<value>(m: \<Methods>)$
+  \item method-type variables $m, m_0, m_1, ..: \<Methods>$,
+  \item a function $\#(m: \<Methods>, b: \<Bools>, i: \<Nats>, j:\<Nats>): \<Nats>$,
 \end{itemize}
-where
+and any number of interpreted functions with polynomial-time decision
+procedures, where $\#$ is interpreted over histories $h$ as
 \begin{align*}
-  \db{\#(m,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{m,[i,\<min>(j,k)]} }|
+  \db{\#(m,b,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{m,b,[i,j]} }|
 \end{align*}
-where $k$ and $\pi$ are the interval length and counting representation of $h$.
+and $k$ and $\pi$ are the interval length and counting representation of $h$.
 
 An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
 when $h \in H(L) <=> h |= @Y$ for every history $h$ of interval length at most
