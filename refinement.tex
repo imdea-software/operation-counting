@@ -129,8 +129,12 @@ alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
   
 \end{itemize}
 Note that even a library that implements \emph{atomic methods} --- i.e.,~in
-which the actions of separate method calls do not interleave --- admits
+which the internal actions of separate method calls do not interleave --- admits
 executions in which method calls and returns overlap.
+
+The least set of executions which contains some given set $S$ and satisfies all the closure properties
+given above is denoted by $\atLib{S}$.
+
 
 \begin{example}
   \label{ex:libraries}
