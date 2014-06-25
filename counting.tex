@@ -33,7 +33,7 @@ weaker history $A_k(h) \preceq h$, and which have the following properties:
   there exists $k \in \<Nats>$ such that $h \preceq A_k(h)$.
   
   \item[Tractable inclusion:]
-  $A_k(h) \in H(L)$ is computable in polynomial time when $k$ and $L$ are fixed.
+  $A_k(h) \in H(L)$ is decidable in polynomial time when $k$ and $L$ are fixed.
 
 \end{description}
 This weakening-based approximation is convenient since whenever $A_k(h)$ is not
@@ -177,6 +177,33 @@ by the length of the interval order.
 
 \end{example}
 
+We give a construction for the canonical representation of an interval
+order, where the
+lower, resp., upper, bound of the interval $[i,j]$ associated to some element
+$o$ equals the number of distinct pasts $\past{o'}$ with
+$o'<o$, resp., $o'<o$ or $o'$ incomparable to $o$.
+
+%This property is also an explanation for the fact that the length of an
+%interval order equals the number of distinct pasts.
+
+\begin{lemma}
+  \label{lemma:norm_form}
+
+  Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical
+  representation. Then, for every $o\in O$, $I(o)=[i,j]$, where
+  \begin{align*}
+    i = |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|
+    \text{.}
+  \end{align*}
+
+\end{lemma}
+
+\begin{proof}
+
+  TODO GIVE A PROOF
+
+\end{proof}
+
 Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
 order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
 a representation $\pi$ including operations' methods, by $\pi(o) =
@@ -192,8 +219,16 @@ of counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h
 
 \end{example}
 
+Lemma~\ref{lemma:norm_form} gives a polynomial time procedure for constructing the counting representation of a history.
+One can determine the interval of an operation by counting the distinct pasts of the other operations and then, count
+operations which are instances of the same method and in the same interval.
+
+The next lemma states that checking the membership of a history into a set of histories can be done using
+only their counting representations.
+
 \begin{lemma}
 
+  Let $e$ be an execution and $L_2$ a library. Then, 
   $H(e) \in H(L_2)$ if and only if $\Pi(H(e)) \in \Pi(L_2)$.
 
 \end{lemma}
@@ -204,20 +239,50 @@ of counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h
 
 \end{proof}
 
+
+
+
+
 This canonical ``counting'' representation of histories leads to an effective
-logical characterization of sets of histories using arithmetic, inequalities,
+logical characterization of sets of histories using arithmetic operations, inequalities,
 and an operation-counting function $\#$. Formally, \emph{operation counting
-logic} extends Presburger arithmetic with
-\begin{itemize}
-  \item method-type variables $m, m_0, m_1, ..: \<Methods>$,
-  \item a function $\#(m: \<Methods>, b: \<Bools>, i: \<Nats>, j:\<Nats>): \<Nats>$,
-\end{itemize}
-and any number of interpreted functions with polynomial-time decision
-procedures, where $\#$ is interpreted over histories $h$ as
+logic} is a first-order logic with the following syntax:
+
+\[
+\begin{array}{c}
+\begin{array}{llll}
+b\in \<Bools> & \mbox{boolean constants} & i,j\in \<Nats> & \mbox{integer constants} 
+\end{array} \\[1mm]
+
+m\in \<Methods>\quad \mbox{method constants} \\[1mm]
+
+x, x_0, x_1,\ldots: \<Methods> \quad \mbox{method-type variables} \\[3mm]
+
+\begin{array}{ll}
+M ::= & \hspace{-2mm} m\mid x\\[2mm]
+T  ::= & \hspace{-2mm} i\mid \#(x, b, i, j)\mid T + T \\[2mm]
+F ::= & \hspace{-2mm} T \leq T \mid P(M_0,M_1,\ldots)\mid \neg F\mid F\land F\mid \exists x.\ F
+\end{array}
+\end{array}
+\]
+
+The function $\#$ is interpreted over histories $h$ as
 \begin{align*}
-  \db{\#(m,b,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{m,b,[i,j]} }|
+  \db{\#(x,b,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{x,b,[i,j]} }|,
 \end{align*}
-and $k$ and $\pi$ are the interval length and counting representation of $h$.
+where $\pi$ is the counting representation of $h$. The operation counting logic allows 
+predicates $P$ over methods (of any arity) as long as their evaluation can be done in polynomial-time.
+Also, the quantified method-type variables are interpreted only over methods occurring in 
+the history $h$ over which the formula is evaluated. Formally, the satisfaction relation $\models$
+for quantified formulas is defined by:
+\[
+\begin{array}{lll}
+h\models \exists x.\ F&\mbox{iff} &\mbox{there exists $m\in\<Methods>$ such that $f(o)=\tup{m,b}$,}\\
+&&\mbox{for some $o$ and $b$, and $h\models F[x\gets m]$}.
+\end{array}
+\]
+
+TODO SYNTACTIC SUGAR IF NECESSARY
 
 An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
 when $h \in H(L) <=> h |= @Y$ for every history $h$ of interval length at most
@@ -225,10 +290,10 @@ $k$.
 
 \begin{lemma}
 
-  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
-  polynomial time for fixed $k$ and $L$, given an operation counting formula
-  $@Y$ for $L$ up to $k$.
-
+  Let $k\in\<Nats>$ and $L$ a library such that there exists a counting formula $@Y$ representing $L$ up to $k$.
+  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in time 
+  polynomial in the size of $h$ and $@Y$. 
+  
 \end{lemma}
 
 \begin{proof}
@@ -236,8 +301,16 @@ $k$.
   Since $A_k(h)$ is required to be polynomial-time computable, and deciding
   $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
   has interval length at most $k$, it remains only to show $A_k(h) |= @Y$ is
-  polynomial-time computable. This fact follows easily from \ldots
-  CONSTANTIN? HELP??
+  polynomial-time computable. This follows easily from the following facts: 
+  (1) the counting representation of $A_k(h)$ is polynomial-time computable 
+  (cf. Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
+  can be evaluated in constant/polynomial time, and (3) quantified variables of $@Y$
+  are only instantiated over methods occurring in $h$. The latter implies that the
+  existential quantifiers can be replaced by a disjunction over all methods occurring in $h$, i.e.,
+  \[
+  h\models \exists x.\ F\quad \mbox{ iff }\quad h\models \bigvee_{m\in \<Methods>_h} F[x\gets m],
+  \]
+  where $\<Methods>_h=\set{m:\exists o,b.\ f(o)=\tup{m,b}}$.
 
 \end{proof}
 
