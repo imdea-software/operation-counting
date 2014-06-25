@@ -333,6 +333,24 @@ operations which have started after interval $n-k$. It follows by definition
 that $A_k^{\triangleleft}(h), A_k^{\triangleright}(h) \preceq h$,
 since ordering constraints are only removed from $<$.
 
+Now, given an execution $e$, we define an online algorithm for computing the
+counting representation of $H(e)$, that avoids constructing the history itself.
+This algorithm is based on the following observation: the past of an operation
+$o$ in $H(e)$ consists of operations that return before $o$ and consequently,
+if there is no return action between the call actions of two operations $o_1$
+and $o_2$, then these two operations have the same past in $H(e)$. A
+consequence of this observation is that the number of distinct pasts in the
+history of an execution corresponds to one plus the number of occurrences of a
+return action immediately followed by a call action (with no barriers, the past
+of all operations in $H(e)$ is $\emptyset$). The index in $e$ of such a return
+action is called a \emph{barrier} of the execution $e$.
+
+\begin{example}
+
+  TODO WHAT EXAMPLE?
+
+\end{example}
+
 \begin{algorithm}
   \DontPrintSemicolon
   \SetKwInOut{Input}{Input}
@@ -380,6 +398,21 @@ since ordering constraints are only removed from $<$.
   \label{alg:counting}
 \end{algorithm}
 
+The online algorithm for computing the counting representation of $H(e)$
+maintains the integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$, a
+map $\theta:O\rightarrow \<Nats>$ storing the number of barriers before the
+call action of each operation $o$, a boolean $\<finished>$ which becomes
+$\<true>$ when the algorithm reads a return action (this is used to detect
+barriers of $e$), and an integer $\<time>$ storing the number of observed
+barriers. This algorithm terminates only if the length of $H(e)$ is at most
+some given constant $K$. Otherwise, it blocks because of an $\<assume>$
+statement that checks that $\<time>$ is always smaller than $K-1$ (cf.
+Lemma~\ref{lemma:nb_barr}). Initially, the values of the maps $\pi$ and
+$\theta$ are 0, $\<time>=0$, and $\<finished>=\<false>$. The algorithm reads
+successive actions of $e$ and it applies the updates in
+Figure~\ref{fig:online_alg}. The next lemma states the correctness of this
+algorithm.
+
 \begin{lemma}
   \label{lem:counting:alg}
 
@@ -407,7 +440,7 @@ since ordering constraints are only removed from $<$.
 
 \end{proof}
 
-XXX FIGURE OUT HOW TO WORK IN THE FOLLOWING
+XXX WORK THE FOLLOWING INTO THE PREVIOUS PROOF
 
 We define the program $P_K$, that generates the counting representations of all
 histories of length at most $K$. When composed with a particular library $L$,
@@ -421,167 +454,14 @@ history~\footnote{Lemma~\ref{lem:representation} proves only the existence of
 the canonical form (counting representation) of a history, without giving an
 effective construction.} and respectively, of a given execution's history.
 
-We first give a construction for the canonical representation of an interval
-order, which extends straightforwardly to counting representations of
-histories. Thus, in the canonical representation of an interval order, the
-lower, resp., upper, bound of the interval $[i,j]$ associated to some element
-$o$ is defined in function of the number of distinct pasts $\past{o'}$ with
-$o'<o$, resp., $o'<o$ or $o'$ incomparable to $o$.
-
-This property is also an explanation for the fact that the length of an
-interval order equals the number of distinct pasts.
-
-\begin{lemma}
-  \label{lemma:norm_form}
-
-  Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical
-  representation. Then, for every $o\in O$, $I(o)=[i,j]$, where
-  \begin{align*}
-    i = |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|
-    \text{.}
-  \end{align*}
-
-\end{lemma}
-
-\begin{proof}
-
-  TODO GIVE A PROOF
-
-\end{proof}
-
-Lemma~\ref{lemma:norm_form} gives an effective procedure for constructing the counting representation of a history.
-One can determine the interval of an operation by counting the distinct pasts of the other operations and then, it counts
-operations which are instances of the same method and in the same interval.
-
-
-Now, given an execution $e$, we define an online algorithm for computing the counting representation of $H(e)$, that
-avoids constructing the history itself. This algorithm is based on the following observation: the past of an operation $o$ in $H(e)$ 
-consists
-of operations that return before $o$ and consequently, if there is no return action
-between the call actions of two operations $o_1$ and $o_2$, then these two operations have the same past in $H(e)$.
-A consequence of this observation is that the number of distinct pasts in the history of an execution corresponds 
-to one plus the number of occurrences of a return action immediately followed by a call action (with no barriers, the
-past of all operations in $H(e)$ is $\emptyset$). 
-The index in $e$ of such a return action is called a \emph{barrier} of the execution $e$.
-\todo{For example,}
-
-Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is
-called a \emph{barrier} if $e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be
-the number of barriers of $e$. Then,
-
-\begin{lemma}\label{lemma:nb_barr}
-
-For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ is $\nbbarr{e}$.
-
-\end{lemma}
-
-Furthermore, given an operation $o$, the lower bound of the interval associated to $o$ in the canonical representation of $H(e)$
-equals the number of barriers before the call action of $o$ 
-(which corresponds to the number of distinct pasts of operations finishing before $o$).
-Moreover, the upper bound of this interval equals one plus the number of barriers before the return action of $o$
-(the latter corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
-or the length of $H(e)$, if the return action doesn't occur in $e$.
-\todo{For example,}. 
-
-Formally, given $o\in O$ and an action $a$ in $e$, let $\nbbarr{e,a}$ be the number of barriers of $e$ occurring before
-the action $a$. Then,
-
-\begin{lemma}\label{lemma:counting_executions}
-
-Let $e\in (C\cup R)^*$ be a library execution and 
-$I : O -> [n]^2$ the canonical representation of $H(e)$. 
-Then, for every $o\in O$, $I(o)=[i,j]$, where 
-\[
-i = \nbbarr{e,\tup{m,o}},\mbox{ and }
-\]
-\begin{align*}
-  j= \left\{
-  \begin{array}{ll}
-    \nbbarr{e,\tup{o,m}}  & \mbox{ if $\tup{o,m}$ occurs in $e$} \\
-  	\nbbarr{e}            & \mbox{ otherwise.}
-  \end{array}\right.
-\end{align*}
-
-\end{lemma}
-
-The online algorithm for computing the counting representation of $H(e)$ 
-maintains the integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$, 
-a map $\theta:O\rightarrow \<Nats>$ storing the number of barriers before the call action of each operation $o$, 
-a boolean $\<finished>$ which becomes $\<true>$ when the algorithm reads a return action 
-(this is used to detect barriers of $e$), and an integer $\<time>$ storing the number of observed barriers.
-This algorithm terminates only if the length of $H(e)$ is at most some given constant $K$. Otherwise, it
-blocks because of an $\<assume>$ statement that checks that $\<time>$ is always smaller than $K-1$
-(cf. Lemma~\ref{lemma:nb_barr}).
-Initially, the values of the maps $\pi$ and $\theta$ are 0, $\<time>=0$, and $\<finished>=\<false>$.
-The algorithm reads successive actions of $e$ and it applies the updates in Figure~\ref{fig:online_alg}.
-The next lemma states the correctness of this algorithm.
-
-\begin{figure}
-%\lstset{numbers=left, 
-%            numberstyle=\tiny\tt, 
-%            stepnumber=1, 
-%            firstnumber=1,
-%            % numberfirstline=true,
-%            numbersep=4pt}
-            
-for every call action $c=\tup{m,o}$,
-\begin{program}
-   if ($\<finished>$) {
-      $\<time>$++;
-      assume($\<time>$ <= K);
-      $\<finished>$ = $\<false>$;
-   }
-   $\theta(o)$ = $\<time>$;
-   $\pi(m)(\theta(o)$,K)++;
-\end{program}
-
-for every return action $r=\tup{o,m}$,
-\begin{program}
-   $\pi(m)(\theta(o)$,K)--;
-   $\pi(m)(\theta(o)$,$\<time>$)++;
-   $\<finished>$ = $\<true>$;
-\end{program}
-\caption{Online algorithm for computing the counting representation of a given execution's history.}
-\label{fig:online_alg}
-\end{figure}
-
-
-
-\begin{lemma}\label{lemma:alg}
-
-Let $e\in (C\cup R)^*$ be a library execution. The algorithm in Figure~\ref{fig:online_alg} terminates
-iff the length of $H(e)$ is at most $K$ and the function $\pi$ at the end of the algorithm 
-equals the counting representation of $H(e)$.
-
-\end{lemma}
-
-\begin{proof}
-
-Follows from Lemmas~\ref{lemma:nb_barr} and~\ref{lemma:counting_executions}.
-
-\end{proof}
-
-The program $P_K$ is built according to the online algorithm in Figure~\ref{fig:online_alg}. 
-Its states are formed of values for the mappings $\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$.
-The set of executions of $P_K$, projected on call and return actions, is exactly the set of all well-formed
-sequences $e$ over $C\cup R$ such that $H(e)$ is of length at most $K$. 
-Every call action is preceded by a \alert{program action} corresponding to 
-the updates in the top part of Figure~\ref{fig:online_alg} and every return action is followed by a \alert{program action}
-corresponding to the updates in the bottom part of Figure~\ref{fig:online_alg}.
-The following theorem states that $P_K$ generates the counting representations of all histories of length at most $K$.
-
-\begin{theorem}
-
-Let $K\in\<Nats>$ and $Q[K]$ the set of states of $P_K$. Also, let $H_K$ be the set of all histories of length at most $K$. Then,
-\[
-\set{\Pi(h):h\in H_K}=\set{\pi:(\pi,\theta,\<time>,\<finished>)\in Q[K]}.
-\]
-
-\end{theorem}
-
-\begin{proof}
-
-Follows from Lemma~\ref{lemma:alg}.
-
-\end{proof}
-
+The program $P_K$ is built according to the online algorithm in
+Figure~\ref{fig:online_alg}. Its states are formed of values for the mappings
+$\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$. The set of
+executions of $P_K$, projected on call and return actions, is exactly the set
+of all well-formed sequences $e$ over $C\cup R$ such that $H(e)$ is of length
+at most $K$. Every call action is preceded by a \alert{program action}
+corresponding to the updates in the top part of Figure~\ref{fig:online_alg} and
+every return action is followed by a \alert{program action} corresponding to
+the updates in the bottom part of Figure~\ref{fig:online_alg}. The following
+theorem states that $P_K$ generates the counting representations of all
+histories of length at most $K$.
