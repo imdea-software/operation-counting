@@ -244,6 +244,98 @@ $k$.
 \subsection{Monitoring Histories by Counting}
 \label{sec:counting:monitor}
 
+Given a history $h = \tup{O,<,f}$ of interval length $n$, and $k \in \<Nats>$,
+we define \emph{the earlybird abstraction} $A^{\triangleleft}_k(h) =
+\tup{O,<^{\triangleleft},f}$ and \emph{the recency abstraction}
+$A^{\triangleright}_k(h) = \tup{O,<^{\triangleright},f}$ of $h$ by
+\begin{align*}
+  o_1 <^{\triangleleft} o_2 & \text{ iff } o_1 < o_2 \text{ and } \sup I(o_1) < k \\
+  o_1 <^{\triangleright} o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
+\end{align*}
+where $I : O -> [n]^2$ is the interval map of $h$. Intuitively, the
+earlybird abstraction remembers only the ordering between ``old''
+operations which have completed by interval $k$; the
+recency abstraction remembers only the the ordering between ``recent''
+operations which have started after interval $n-k$. It follows by definition
+that $A_k^{\triangleleft}(h), A_k^{\triangleright}(h) \preceq h$,
+since ordering constraints are only removed from $<$.
+
+\begin{algorithm}
+  \DontPrintSemicolon
+  \SetKwInOut{Input}{Input}
+  \SetKwInOut{Output}{Output}
+  \SetKw{Init}{initially}
+  \SetKw{Yield}{yield}
+  \SetKw{True}{true}
+  \SetKw{False}{false}
+  \SetKw{Increment}{incr}
+  \SetKw{Decrement}{decr}
+  \SetKwFunction{Shift}{Shift}
+  \SetKwData{Counters}{counters}
+  \SetKwData{NewPast}{newPast}
+  \SetKwData{Time}{time}
+  \SetKwData{StartTime}{startTime}
+  \Input{interval length $k \in \<Nats>$}
+  \Input{stream $(C\u R)^{@w}$ of call/return actions}
+  \Output{stream of counting representations}
+  \KwData{$\Time: \<Nats>$, $\NewPast: \<Bools>$, $\StartTime[\<Ops>]: \<Nats>$}
+  \Init{$\Time = 0$, $\NewPast = \False$, $\Counters[\_,\_,\_,\_] = 0$}
+  \Switch{input action}{
+    \Case{call action $\call{m}{o}$}{
+      \If{$\NewPast$}{
+        \Increment $\Time$ \;
+        \If{$\Time > k$ and $A_k = A^{\triangleleft}_k$}{
+          \Decrement $\Time$
+        }
+        \If{$\Time > k$ and $A_k = A^{\triangleright}_k$}{
+          \Shift{\Counters}
+        }
+        $\NewPast <- \False$
+      }
+      $\StartTime[o] <- \Time$ \;
+      \Increment $\Counters[m,\False,\StartTime[o],k]$ \;
+    }
+    \Case{return action $\ret{o}$}{
+      \Decrement $\Counters[m,\False,\StartTime[o],k]$ \;
+      \Increment $\Counters[m,\True,\StartTime[o],\Time]$ \;
+      $\NewPast <- \True$
+    }
+  }
+  \Yield $\Counters$
+  \caption{An online algorithm for computing the counting representation
+    $\Pi(A_k(h))$ of a given history $h$.}
+  \label{alg:counting}
+\end{algorithm}
+
+\begin{lemma}
+  \label{lem:counting:alg}
+
+  Algorithm~\ref{alg:counting} outputs the counting representation
+  $\Pi(A_k(h))$ of the weakening $A_k(h)$ of a given history $h$ in constant
+  space%
+  \footnote{The space complexity of Algorithm~\ref{alg:counting} is constant
+  when the size of integers is fixed, as in the case of modern computer
+  architectures; otherwise, the space complexity is logarithmic.}
+  and linear time, for $A_k \in \set{ A_k^\triangleleft, A_k^\triangleright }$.
+
+\end{lemma}
+
+\begin{lemma}
+  \label{lem:counting:reach}
+
+  The set $\set{ A_k(h) : h \in H(L) }$ of $k$ interval-length histories of
+  $L$ is computable when $L$ is a finite-state library.
+
+\end{lemma}
+
+\begin{proof}
+
+  BY REACHABILITY IN PETRI NETS
+
+\end{proof}
+
+XXX FIGURE OUT HOW TO WORK IN THE FOLLOWING
+
 We define the program $P_K$, that generates the counting representations of all
 histories of length at most $K$. When composed with a particular library $L$,
 $P_K\x L$ generates only counting representations of histories of $L$.
