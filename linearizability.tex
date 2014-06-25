@@ -48,7 +48,7 @@ Let $L$ be the least library which contains the execution
 \[
   e = \call{m}{1}\ \call{m'}{2}\ \ret{1},
 \] 
-where the call to $m_2$ is pending, i.e.,~$E(L) = \atLib{\set{e}}$.
+where the call to $m'$ is pending, i.e.,~$E(L) = \atLib{\set{e}}$.
 
 Then, $L$ refines $L$ but $L$ is not linearizable w.r.t. $L$. The latter holds
 because the execution $e$ could be linearizable w.r.t. $L$ only if $L$ were to
