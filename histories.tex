@@ -27,8 +27,8 @@ operations, according to:
 
   \item $f(o) = \left\{
   \begin{array}{ll}
-    \tup{m,\<true>} & \text{ if } \tup{m,o} \in e \text{ and } \tup{o,m} \in e \\
-    \tup{m,\<false>} & \text{ if } \tup{m,o} \in e \text{ and } \tup{o,m} \not\in e
+    \tup{m,\<true>} & \text{ if } \call{m}{o} \in e \text{ and } \ret{o} \in e \\
+    \tup{m,\<false>} & \text{ if } \call{m}{o} \in e \text{ and } \ret{o} \not\in e
   \end{array}
   \right.$
 
@@ -120,14 +120,16 @@ H$, then $h_2 \in H$ as well.
   whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
   state is $q_0 = \set{ o |-> \<false> : o \in O}$. Transitions are given by,
   \begin{align*}
-    & \text{for each } q,o,m \text{ such that } \lnot q(o)
-      \text{, and } q(o') \text{ for all } o' < o \text{:} \\
-    & \qquad q \xrightarrow{\tup{m,o}} q \\
-    & \text{for each } q,o,m \text{ such that } f(o) = \tup{m,\<true>} \text{:} \\
-    & \qquad q[o |-> \<false>] \xrightarrow{\tup{o,m}; a} q[o |-> \<true>]
+    & \text{for each } q \in Q, o \in O, m \in \<Methods> \\
+    & \text{such that } f(o) = \tup{m,\_},
+      \lnot q(o), \text{ and } q(o') \text{ for all } o' < o \text{:} \\
+    & \qquad q \xrightarrow{\call{m}{o}} q \\
+    & \text{for each } q \in Q, o \in O, m \in \<Methods>
+      \text{ such that } f(o) = \tup{m,\<true>} \text{:} \\
+    & \qquad q[o |-> \<false>] \xrightarrow{\ret{o}} \cdot \xrightarrow{a} q[o |-> \<true>]
   \end{align*}
-  In any execution $e \in E(P_h)$, the call action $\tup{o,\_}$ of any
-  operation $o$ must come after the return action $\tup{\_,o'}$ of each $o'<o$.
+  In any execution $e \in E(P_h)$, the call action $\call{m}{o}$ of any
+  operation $o$ must come after the return action $\ret{o'}$ of each $o'<o$.
   Furthermore, all completed operations of $h$ are completed in $e$ if and
   only if $(e|@S) = a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
 

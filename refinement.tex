@@ -2,7 +2,8 @@
 \section{Observational Refinement}\label{sec:obsref}
 
 \newcommand{\match}{\bowtie}
-\metalangkeyword{call,ret}
+\newcommand{\call}[2]{{\ensuremath{#1_{#2}}}}
+\newcommand{\ret}[1]{{\ensuremath{\mathsf{ret}_{#1}}}}
 
 Standard correctness criteria for software library implementations are their
 conformance to \emph{reference implementations}. The literature captures such
@@ -66,14 +67,14 @@ values.
 \end{example}
 
 We fix an arbitrary set $\<Ops>$ of operation identifiers, and for a given set
-$\<Methods>$ of methods, we fix the sets $C = \set{ m_o : m \in \<Methods>, o
-\in \<Ops> }$ of \emph{call actions} and $R = \set{ \<ret>_o : o \in \<Ops> }$
-of \emph{return actions}; each call action $m_o$ pairs together a method $m \in
-\<Methods>$ with an \emph{operation identifier} $o \in \<Ops>$. We denote the
-operation identifier of a call/return action $c$ by $\<op>(c)$. Two call/return
-actions $c$ and $r$ are \emph{matching}, written $c \match r$, when $\<op>(c) =
-\<op>(r)$ and $c \neq r$. A word $e \in @S^*$ over alphabet $@S$, such that $(C
-\u R) \subseteq @S$, is \emph{well formed} when:
+$\<Methods>$ of methods, we fix the sets $C = \set{ \call{m}{o} : m \in
+\<Methods>, o \in \<Ops> }$ of \emph{call actions} and $R = \set{ \ret{o} : o
+\in \<Ops> }$ of \emph{return actions}; each call action $m_o$ pairs together a
+method $m \in \<Methods>$ with an \emph{operation identifier} $o \in \<Ops>$.
+We denote the operation identifier of a call/return action $c$ by $\<op>(c)$.
+Two call/return actions $c$ and $r$ are \emph{matching}, written $c \match r$,
+when $\<op>(c) = \<op>(r)$ and $c \neq r$. A word $e \in @S^*$ over alphabet
+$@S$, such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
 \begin{itemize}
 
   \item Each return is preceded by a matching call: \\
@@ -86,7 +87,8 @@ actions $c$ and $r$ are \emph{matching}, written $c \match r$, when $\<op>(c) =
 Well-formed words will represent executions. We assume every set of well-formed
 words is closed under isomorphic renaming of operation identifiers. For
 notational convenience, we often associate $\<Ops>$ with $\<Nats>$,
-e.g.,~writing $m_1$ and $\<ret>_2$ in place of $m_{o_1}$ and $\<ret>_{o_2}$.
+e.g.,~writing $\call{m}{1}$ and $\ret{2}$ in place of $\call{m}{o_1}$ and
+$\ret{o_2}$.
 
 \begin{example}
   \label{ex:executions}
@@ -94,9 +96,9 @@ e.g.,~writing $m_1$ and $\<ret>_2$ in place of $m_{o_1}$ and $\<ret>_{o_2}$.
   The well-formed words
   \scriptsize
   \begin{align*}
-    \<push>(0)_1\ \<pop>(0)_2\ \<pop>(0)_3\ \<ret>_1\ \<ret>_3\ \<ret>_2 \\
+     \call{\<push>(0)}{1}\ \call{\<pop>(0)}{2}\ \call{\<pop>(0)}{3}\ \ret{1}\ \ret{3}\ \ret{2} \\
     \text{\normalsize and } 
-    \<push>(0)_1\ \<pop>(0)_2\ \<pop>(0)_3\ \<ret>_1\ \<ret>_2
+    \call{\<push>(0)}{1}\ \call{\<pop>(0)}{2}\ \call{\<pop>(0)}{3}\ \ret{1}\ \ret{2}
   \end{align*}
   \normalsize
   represent executions in which one call to the $\<push>(0)$ method overlaps
@@ -142,22 +144,22 @@ given above is denoted by $\atLib{S}$.
   Any library which admits the execution
   \scriptsize
   \begin{align*}
-    \<push>(0)_1\ \<ret>_1\ \<pop>(0)_2\ \<ret>_2
+    \<push>(0)_1\ \ret{1}\ \<pop>(0)_2\ \ret{2}
   \end{align*}
   \normalsize
   with sequential calls to $\<push>(0)$ and $\<pop>(0)$ must also admit
   \scriptsize
   \begin{align*}
-    \<push>(0)_1\ \<pop>(0)_2\ \<ret>_1\ \<ret>_2
+    \<push>(0)_1\ \<pop>(0)_2\ \ret{1}\ \ret{2}
     \text{ \normalsize and }
-    \<push>(0)_1\ \<pop>(0)_2\ \<pop>(0)_3\ \<ret>_1\ \<ret>_2
+    \<push>(0)_1\ \<pop>(0)_2\ \<pop>(0)_3\ \ret{1}\ \ret{2}
     \text{\normalsize,}
   \end{align*}
   \normalsize
   among others, yet need not admit an execution
   \scriptsize
   \begin{align*}
-    \<push>(0)_1\ \<pop>(0)_2\ \<pop>(0)_3\ \<ret>_1\ \<ret>_3\ \<ret>_2
+    \call{\<push>(0)}{1}\ \call{\<pop>(0)}{2}\ \call{\<pop>(0)}{3}\ \ret{1}\ \ret{3}\ \ret{2}
   \end{align*}
   \normalsize
   with two completed $\<pop>(0)$ operations.
@@ -197,7 +199,7 @@ value should be enabled, in order to accept any returned value.
 
   A program which allows any return value from a call to $\<pop>(\_)$ should
   enable all call actions $\<pop>(x)_o$ from any state in which some call
-  action $\<pop>(\_)_{\_}$ is enabled. 
+  action $\call{\<pop>(\_)}{\_}$ is enabled. 
 
 \end{example}
 
