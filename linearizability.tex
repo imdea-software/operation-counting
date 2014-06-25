@@ -31,9 +31,9 @@ Furthermore, a library $L_1$ is linearizable
 w.r.t. a library $L_2$ iff every execution $e_1\in L_1$ is linearizable w.r.t.
 $L_2$. %
 
-Given a library execution $e$, an 
-operation $o$ is called \emph{completed} if both the call and the return actions of $o$, 
-$\tup{m,o}$ and $\tup{o,m}$, belong to $e$. Otherwise, $o$ is called \emph{pending}.
+Given a library execution $e$, an operation $o$ is called \emph{completed} if
+both the call and the return actions of $o$, $\call{m}{o}$ and $\ret{o}$,
+belong to $e$. Otherwise, $o$ is called \emph{pending}.
 
 Note that linearizability between two libraries $L_1$ and $L_2$ compares executions 
 of $L_1$, that may contain pending operations, with executions of $L_2$ where every operation 
@@ -46,22 +46,20 @@ imply linearizability.
 \begin{example}
 Let $L$ be the least library which contains the execution 
 \[
-e=\tup{m_1,o_1}\tup{m_2,o_2}\tup{o_1,m_1},
+  e = \call{m}{1}\ \call{m'}{2}\ \ret{1},
 \] 
-where the call to $m_2$ is pending, i.e., $E(L)=\atLib{\{e\}}$.
-%(i.e., there exists no return action matching the call action $\tup{m_2,o_2}$). 
+where the call to $m_2$ is pending, i.e.,~$E(L) = \atLib{\set{e}}$.
 
-Then, $L$ refines $L$
-but $L$ is not linearizable w.r.t. $L$. The latter holds because the execution 
-$e$ could be linearizable w.r.t. $L$ only if $L$ would contain one of the following
-executions:
-\[
-\begin{array}{l}
-\tup{m_1,o_1}\tup{o_1,m_1},\ \tup{m_1,o_1}\tup{m_2,o_2}\tup{o_1,m_1}\tup{o_2,m_2}, \\[1mm] %\mbox{ or }
-\mbox{or }\tup{m_1,o_1}\tup{o_1,m_1}\tup{m_2,o_2}\tup{o_2,m_2}.
-\end{array}
-\]
-However, since $L$ is the least library that contains $e$, none of these executions belongs to $L$.
+Then, $L$ refines $L$ but $L$ is not linearizable w.r.t. $L$. The latter holds
+because the execution $e$ could be linearizable w.r.t. $L$ only if $L$ were to
+contain one of the following executions:
+\begin{align*}
+  \call{m}{1}\ \ret{1} \text{, } \quad
+  \call{m}{1}\ \call{m'}{2}\ \ret{1}\ \ret{2} \text{, } \quad
+  \call{m}{1}\ \ret{1}\ \call{m'}{2}\ \ret{2} \text{.}
+\end{align*}
+However, since $L$ is the least library that contains $e$, none of these
+executions belongs to $L$.
 
 Note that $H(L)\subseteq H(L)$, which is also a consequence of Theorem~\ref{th:equiv}.
 \end{example}
@@ -170,9 +168,9 @@ of actions, we have that $o_1<o_2$ in $H(e_2)$.
   and (2) appending matching return actions for the operations in $O_+$. 
   Clearly, $e_1'$ and $e_2$ contain the same set of actions. Now, $H(e_1)\preceq H(e_2)$ implies that 
   $e_2$ is a permutation of $e_1'$ that preserves the order between return and call actions. Assume by contradiction
-  that this is not the case, i.e., there exists $o_1$ and $o_2$ such that $\tup{o_1,m}$ occurs before $\tup{m,o_2}$ in $e_1'$ 
-  but $\tup{o_1,m}$ occurs after $\tup{m,o_2}$ in $e_2$. By the construction of $e_1'$, the former implies that 
-  $\tup{o_1,m}$ occurs before $\tup{m,o_2}$ in $e_1$. Therefore, $o_1<o_2$ in $H(e_1)$ but $\neg o_1<o_2$ in $H(e_2)$
+  that this is not the case, i.e., there exists $o_1$ and $o_2$ such that $\ret{o_1}$ occurs before $\call{m}{o_2}$ in $e_1'$ 
+  but $\ret{o_1}$ occurs after $\call{m}{o_2}$ in $e_2$. By the construction of $e_1'$, the former implies that 
+  $\ret{o_1}$ occurs before $\call{m}{o_2}$ in $e_1$. Therefore, $o_1<o_2$ in $H(e_1)$ but $\neg o_1<o_2$ in $H(e_2)$
   which contradicts the fact that $H(e_1)\preceq H(e_2)$.
  
 \end{proof}
