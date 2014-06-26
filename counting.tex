@@ -33,17 +33,20 @@ weaker history $A_k(h) \preceq h$, and which have the following properties:
   there exists $k \in \<Nats>$ such that $h \preceq A_k(h)$.
   
   \item[Tractable inclusion:]
-  $A_k(h) \in H(L)$ is decidable in polynomial time when $k$ and $L$ are fixed.
+  $A_k(h) \in H(L)$ is decidable in polynomial time when $k$ is fixed. %and $L$ are fixed.
 
 \end{description}
 This weakening-based approximation is convenient since whenever $A_k(h)$ is not
 included in $H(L)$, then neither is $h$, since $H(L)$ is closed under
-weakening. While completeness means that increasing $k$ increases the ability
+weakening (i.e., if $h$ would belong to $H(L)$, then any weakening, 
+and in particular $A_k(h)$, would also belong to $H(L)$). 
+While completeness means that increasing $k$ increases the ability
 to detect observational refinement violations, this must incur a decrease in
 efficiency since the inclusion problem $A_k(h) \in H(L)$ is NP-hard when $k$ is
 not fixed. By design, the approximation function $A_k$ allows us to solve the
 approximate history inclusion problem $A_k(h) \in H(L)$ in polynomial time when
-$k$ and $L$ are fixed. For the more general problem of refinement between a
+$k$ is fixed. %and $L$ are fixed. 
+For the more general problem of refinement between a
 given library $L_1$ and fixed library $L_2$, our approximation asks whether
 $A_k(h) \in H(L_1) \setminus H(L_2)$, and becomes decidable for fixed $k \in
 \<Nats>$, so long as the set $\set{ A_k(h) : h \in H(L_1) }$ is computable.
@@ -62,7 +65,7 @@ approximate history inclusion problem is polynomial-time computable. Our
 development relies on identifying histories with a known mathematical concept
 called ``interval orders''~(\S\ref{sec:counting:intervals}). Leveraging the
 notion of \emph{length} of an interval order, we then abstract each history $h$
-to a weaker history $A_k(h)$ whose interval-length is bounded by $k$, and
+to a weaker history $A_k(h)$ whose length is bounded by $k$, and
 represent the set $H(L)$ of histories by a formula $@Y_k$ over bounded
 intervals against which $A_k(h)$ can be evaluated in polynomial
 time~(\S\ref{sec:counting:logic}). Finally, we exhibit a program monitoring
@@ -246,7 +249,7 @@ only their counting representations.
 This canonical ``counting'' representation of histories leads to an effective
 logical characterization of sets of histories using arithmetic operations, inequalities,
 and an operation-counting function $\#$. Formally, \emph{operation counting
-logic} is a first-order logic with the following syntax:
+logic} ($\ocl$ for short) is a first-order logic with the following syntax:
 
 \[
 \begin{array}{c}
@@ -285,7 +288,7 @@ h\models \exists x.\ F&\mbox{iff} &\mbox{there exists $m\in\<Methods>$ such that
 TODO SYNTACTIC SUGAR IF NECESSARY
 
 An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
-when $h \in H(L) <=> h |= @Y$ for every history $h$ of interval length at most
+when $h \in H(L) <=> h |= @Y$ for every history $h$ of length at most
 $k$.
 
 \begin{lemma}
@@ -303,7 +306,7 @@ $k$.
 
   Since $A_k(h)$ is required to be polynomial-time computable, and deciding
   $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
-  has interval length at most $k$, it remains only to show $A_k(h) |= @Y$ is
+  has length at most $k$, it remains only to show $A_k(h) |= @Y$ is
   polynomial-time computable. This follows easily from the following facts: 
   (1) the counting representation of $A_k(h)$ is polynomial-time computable 
   (cf. Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
