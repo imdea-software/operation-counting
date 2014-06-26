@@ -35,6 +35,7 @@
 \newcommand{\order}[1]{\mathcal{O}(#1)}
 \newcommand{\pow}[1]{\wp({#1})}
 \newcommand{\bottom}{\perp}
+\newcommand{\nil}{\mathbin\perp}
 
 %%% MATH LIGATURES %%%
 
@@ -127,7 +128,8 @@
 \mathfn{min,max,log,dom,range}
 
 \metalangkeyword{true,false,assume}
-\metalangkeyword{method,op}
+\metalangkeyword{ret,method,op}
+\metalangkeyword{empty}
 \metalangkeyword{name,value}
 \mathfn{past}
 \metalangkeyword{print,sync,read,write,assume,finished,time,barriers,read,write,w,r,reg}
@@ -139,5 +141,10 @@
   Lab[\mathbb{A}],
   Ints[\mathbb{Z}],
   Methods[\mathbb{M}],
+  Vals[\mathbb{V}],
   Ops[\mathbb{O}],
 }
+
+\newcommand{\match}{\bowtie}
+\newcommand{\call}[2]{{\ensuremath{#1_{#2}}}}
+\newcommand{\ret}[1]{{\ensuremath{\mathsf{ret}_{#1}}}}

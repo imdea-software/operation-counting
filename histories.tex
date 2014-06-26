@@ -14,11 +14,11 @@ it reduces observational refinement to a property that doesn't contain the unive
 over programs. TODO AWKWARD PHRASING
 
 A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
-\<Ops>$ of operation identifiers labeled by $f: O -> (\<Methods> \x \<Bools>)$
-for which $f(o) = \tup{\_,\<false>}$ implies $o$ is maximal in $<$.
-The \emph{history} $H(e)$ of a well-formed execution $e \in @S^*$ labels each
-operation with a method and completed status, and orders the non-overlapping
-operations, according to:
+\<Ops>$ of operation identifiers labeled by $f: O -> \<Methods> \x \<Vals> \x
+(\<Vals> \u \set{\nil})$ for which $f(o) = \tup{\_,\_,\nil}$ implies $o$ is
+maximal in $<$. The \emph{history} $H(e)$ of a well-formed execution $e \in
+@S^*$ labels each operation with a method and completed status, and orders the
+non-overlapping operations, according to:
 \begin{itemize}
 
   \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
@@ -27,8 +27,8 @@ operations, according to:
 
   \item $f(o) = \left\{
   \begin{array}{ll}
-    \tup{m,\<true>} & \text{ if } \call{m}{o} \in e \text{ and } \ret{o} \in e \\
-    \tup{m,\<false>} & \text{ if } \call{m}{o} \in e \text{ and } \ret{o} \not\in e
+    \tup{m,u,v} & \text{ if } m(u)_o \in e \text{ and } \<ret>(v)_o \in e \\
+    \tup{m,u,\nil} & \text{ if } m(u)_o \in e \text{ and } \<ret>(\_)_o \not\in e
   \end{array}
   \right.$
 
@@ -49,7 +49,7 @@ Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
 injection $g: O_2 -> O_1$ such that
 \begin{itemize}
 
-  \item $f_1(o) = \tup{\_,\<true>}$ implies $o \in \<range>(g)$
+  \item $f_1(o) = \tup{\_,\_,v \neq \nil}$ implies $o \in \<range>(g)$
   for each $o \in O_1$,
 
   \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
@@ -57,12 +57,13 @@ injection $g: O_2 -> O_1$ such that
   \item $f_1(g(o)) \preceq f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
-where $\tup{m_1,b_1} \preceq \tup{m_2,b_2}$ iff $m_1 = m_2$ and $b_1 => b_2$.
-We say $h_1$ and $h_2$ are \emph{equivalent} when $h_1 \preceq h_2$ and $h_2
-\preceq h_1$. Throughout this work we do not distinguish between equivalent
-histories, and we assume every set $H$ of histories is closed under inclusion
-of equivalent histories, i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in
-H$, then $h_2 \in H$ as well.
+where $\tup{m_1,u_1,v_1} \preceq \tup{m_2,u_2,v_2}$ iff $m_1 = m_2$, $u_1 =
+u_2$, and $(v_1 \neq \nil => v_1 = v_2)$. We say $h_1$ and $h_2$ are
+\emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. Throughout this
+work we do not distinguish between equivalent histories, and we assume every
+set $H$ of histories is closed under inclusion of equivalent histories,
+i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in H$, then $h_2 \in H$ as
+well.
 
 \begin{lemma}
   \label{lemma:lib_closure}
@@ -120,18 +121,18 @@ H$, then $h_2 \in H$ as well.
   whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
   state is $q_0 = \set{ o |-> \<false> : o \in O}$. Transitions are given by,
   \begin{align*}
-    & \text{for each } q \in Q, o \in O, m \in \<Methods> \\
-    & \text{such that } f(o) = \tup{m,\_},
+    & \text{for each } q \in Q, o \in O, m \in \<Methods>, u \in \<Vals> \\
+    & \text{such that } f(o) = \tup{m,u,\_},
       \lnot q(o), \text{ and } q(o') \text{ for all } o' < o \text{:} \\
-    & \qquad q \xrightarrow{\call{m}{o}} q \\
-    & \text{for each } q \in Q, o \in O, m \in \<Methods>
-      \text{ such that } f(o) = \tup{m,\<true>} \text{:} \\
-    & \qquad q[o |-> \<false>] \xrightarrow{\ret{o}} \cdot \xrightarrow{a} q[o |-> \<true>]
+    & \qquad q \xrightarrow{m(u)_o} q \\
+    & \text{for each } q \in Q, o \in O, m \in \<Methods>, v \in \<Vals>
+      \text{ with } f(o) = \tup{m,\_,v} \text{:} \\
+    & \qquad q[o |-> \<false>] \xrightarrow{\<ret>(v)_o} \cdot \xrightarrow{a} q[o |-> \<true>]
   \end{align*}
-  In any execution $e \in E(P_h)$, the call action $\call{m}{o}$ of any
-  operation $o$ must come after the return action $\ret{o'}$ of each $o'<o$.
-  Furthermore, all completed operations of $h$ are completed in $e$ if and
-  only if $(e|@S) = a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
+  In any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
+  come after the return $\<ret>(v)_{o'}$ of each $o'<o$. Furthermore, all
+  completed operations of $h$ are completed in $e$ if and only if $(e|@S) =
+  a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
 
   ($\Leftarrow$)
   Let $P$ be a program over actions $@S$, and $e \in E(P \x L_1)$; we show that
