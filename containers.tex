@@ -1,8 +1,77 @@
 \section{Containers}
 \label{sec:containers}
 
-TODO EVERYTHING WE KNOW ABOUT STACKS AND QUEUES
+\metalangkeyword{isAdd,isRem,sameVal,emptyVal}
+\metalangkeyword{pending,completed,total,is,before}
+\metalangkeyword{removev,fifov,lifov,emptyv}
 
-TODO SHOULD THE EXPERIMENTAL RESULTS GO HERE? AT LEAST THE ONES ABOUT COVERAGE
-W/ BARRIERS IN THE SCAL EXPERIMENTS? MAYBE THE RUNTIME EXPERIMENTS HAVE A MORE
-GENERAL FLAVOR, AND CAN BE PUT IN A SEPARATE SECTION --- OR THE NEXT SECTION.
+Define the container formulas by
+\begin{align*}
+  @Y_\mathrm{stack} &= \lnot\<removev> /| \lnot\<lifov> /| \lnot\<emptyv> \text{, and } \\
+  @Y_\mathrm{queue} &= \lnot\<removev> /| \lnot\<fifov> /| \lnot\<emptyv>
+\end{align*}
+from Figure~\ref{fig:spec:ds}.
+
+\begin{figure}
+  \begin{align*}
+    \<pending>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \\
+    \<completed>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') \\
+    \<total>(x,i,j) &= \<pending>(x,i,j) + \<completed>(x,i,j) \\
+    \<before>(x,y) &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
+    \<is>(x)    &= \<total>(x) > 0 \\
+    \<removev> &= \exists x,y.\ \<isAdd>(x) /| \<isRem>(y) /| \<sameVal>(x,y) \\
+               &  \quad /| \<total>(x) > \<completed>(y) \\
+    \<fifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_2) \\
+                 & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
+                 & /| \<isRem>(y_1) /| \<isRem>(y_2) \\
+                 & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
+                 & /| (\<is>(y_1) => \<before>(y_2,y_1)) \\
+                 & /| (\lnot\<is>(y_1) => \lnot\exists y_3.\ \<isRem>(y_3) \\
+                 & \quad /| \<pending>(y_3) /| \lnot\<before>(y_2,y_3)) \\
+    \<lifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
+              & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
+              & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
+              & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
+    \<emptyv> &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
+              & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
+              & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
+              & /| \<before>(x,y) /| \<before>(y,z)
+  \end{align*}
+  \caption{}
+  \label{fig:spec:ds}
+\end{figure}
+
+We say that a formula $@Y$ has a \emph{cutoff} $n \in \<Nats>$ when for each
+history $h |= @Y$ there exists some $h' \preceq h$ such that $h' |= @Y$.
+
+\begin{lemma}
+  \label{lem:ds:cutoff}
+
+  The negation of the container formulas $\lnot@Y_\mathrm{stack}$ and
+  $\lnot@Y_\mathrm{queue}$ have cutoffs $3$ and $2$; in particular:
+  \begin{itemize}
+
+    \item $\<removev>$ has cutoff $0$.
+    
+    \item $\<fifov>$ has cutoff $2$.
+    
+    \item $\<lifov>$ has cutoff $3$.
+    
+    \item $\<emptyv>$ has cutoff $2$.
+
+  \end{itemize}
+\end{lemma}
+
+\begin{example}
+
+  SHOW THAT $\<emptyv>$ requires an unbounded number of intervals.
+
+\end{example}
+
+\begin{lemma}
+  \label{lem:ds:completeness}
+
+  ``These formula are \emph{almost} complete when only unique values are added.
+  The remove empty rule is incomplete.''
+
+\end{lemma}
