@@ -6,3 +6,32 @@ TODO EVERYTHING WE KNOW ABOUT STACKS AND QUEUES
 TODO SHOULD THE EXPERIMENTAL RESULTS GO HERE? AT LEAST THE ONES ABOUT COVERAGE
 W/ BARRIERS IN THE SCAL EXPERIMENTS? MAYBE THE RUNTIME EXPERIMENTS HAVE A MORE
 GENERAL FLAVOR, AND CAN BE PUT IN A SEPARATE SECTION --- OR THE NEXT SECTION.
+
+\metalangkeyword{isAdd,isRem,sameVal,emptyVal}
+\metalangkeyword{pending,completed,total,is,before}
+\metalangkeyword{removev,orderv,emptyv}
+
+\begin{figure}
+  \begin{align*}
+    \<pending>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \\
+    \<completed>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') \\
+    \<total>(x,i,j) &= \<pending>(x,i,j) + \<completed>(x,i,j) \\
+    \<before>(x,y) &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
+    \<is>(x)    &= \<total>(x) > 0 \\
+    \<removev> &= \exists x,y.\ \<isAdd>(x) /| \<isRem>(y) /| \<sameVal>(x,y) \\
+               &  \quad /| \<total>(x) > \<completed>(y) \\
+    \<orderv> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_2) \\
+                 & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
+                 & /| \<isRem>(y_1) /| \<isRem>(y_2) \\
+                 & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
+                 & /| (\<is>(y_1) => \<before>(y_2,y_1)) \\
+                 & /| (\lnot\<is>(y_1) => \lnot\exists y_3.\ \<isRem>(y_3) \\
+                 & \quad /| \<pending>(y_3) /| \lnot\<before>(y_2,y_3)) \\
+    \<emptyv> &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
+              & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
+              & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
+              & /| \<before>(x,y) /| \<before>(y,z)
+  \end{align*}
+  \caption{}
+  \label{fig:spec:container}
+\end{figure}
