@@ -1,4 +1,93 @@
+%!TEX root = draft.tex
 \section{Regular Specifications}
 \label{sec:regular}
 
-TODO OUR GENERAL RESULTS FOR REGULAR/CONTEXT-FREE SPECIFICATIONS
+We prove that for every $k$ and every atomic library $\atLib{S}$ over a fixed-size set of methods $\<Methods>$, 
+where $S$ is a context-free set of sequential executions, there exists an effectively computable
+$\ocl$ formula $@Y_S[k]$ representing $\atLib{S}$ up to $k$. 
+
+More precisely, we show that there exists a context-free regular language $S_k$, whose Parikh image is exactly 
+the set of counting representations of histories in $\atLib{S}$ of length at most $k$.
+The language $S_k$ is context-free because it is the intersection between a regular language and the inverse of 
+an homomorphism from $S_k$ to some context-free language $S'$, obtained from $S$ 
+(here, we use the closure of context-free languages under 
+inverse homomorphisms and intersection with regular languages). Then, $@Y_S[k]$ is defined as the quantifier-free Presburger
+formula representing the Parikh image of $S_k$ (which exists by Parikh theorem~\cite{}) 
+
+\begin{theorem}
+
+Let $\atLib{S}$ be an atomic library over a set of methods $\<Methods>$ of fixed size, where 
+$S$ is a context-free language. Then, for every $k$, there exists an effectively computable 
+$\ocl$ formula $@Y_S[k]$ representing $\atLib{S}$ up to $k$.
+
+\end{theorem}
+
+\begin{proof}
+
+Let $S'$ be the context-free language obtained from $S$ by replacing every call action
+$m_o$ with $\tup{m,\<true>}$ and by deleting every return action. Note that every sequence $\sigma$ in $S'$
+represents a history $h=(O,<,f)\in H(S)$ in the sense that the multiset of symbols in $\sigma$ is exactly the
+multiset $\mset{ f(o): o\in O}$ of operation labels in $h$ and every two operation labels in $\sigma$ occur
+in the order defined by $<$, i.e., for every two operations $o_1,o_2\in O$, if $o_1<o_2$, then $f(o_1)$ 
+occurs before $f(o_2)$ in $\sigma$.
+
+Let $h=(O,<,f)\in H(\atLib{S})$ be a history of length at most $k$ and $I:O -> [k]^2$ its canonical representation. 
+Since there exists a sequential history $h'=(O',<',f')\in H(S)$ (where the operations are totally ordered) 
+such that $h\preceq h'$, $h$ can be written as a sequence
+of symbols \tup{f(o),I(o),b} that is consistent with the order between operations defined by $<'$. The boolean $b$
+is $\<true>$ iff the operation $o$ belongs to the sequential history $h'$. Formally,
+let $\<Lab>$ be the following alphabet:
+\[
+\<Lab>=\set{\tup{m,b,i,j,b'}: m\in\<Methods>, b,b'\in\<Bools>, 0\leq i\leq j\leq k}.
+\]
+
+Let $\lab(h):O -> \<Lab>$ be a mapping associating to each operation $o$ a symbol in $\<Lab>$:
+\[
+\lab(h)(o)=\left\{\begin{array}{ll}\tup{f(o),I(o),\<true>},\mbox{ if $o\in O'$}\\
+						\tup{f(o),I(o),\<false>},\mbox{ otherwise.}
+			\end{array}
+		\right.
+\]
+
+Then, let $\alpha(h)$ be a sequence over $\<Lab>$ such that:
+\begin{itemize}
+	\item the multiset of symbols in $\alpha(h)$ is exactly the multiset of symbols in the range of $\lab(h)$, and 
+	\item for every $o_1<' o_2$, $\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
+\end{itemize}
+
+Since $h\preceq h'$, whenever an operation $o_1$ is ordered before another operation $o_2$ in 
+the sequential history $h'$, the interval $I(o_1)$ is either before or it is overlapping with $I(o_2)$.
+Therefore, the order between intervals in the sequence $\alpha(h)$ is not arbitrary. More precisely, 
+if a symbol $\tup{m_1,b_1,i_1,j_1,b'_1}$ occurs before another symbol $\tup{m_2,b_2,i_2,j_2,b'_2}$, 
+then $i_1\leq j_2$. A sequence $\sigma\in\<Lab>^*$ satisfying this property is called 
+\emph{interval-consistent}. 
+
+Now, let $\mu:\<Lab> -> \<Methods>^*$ be an homomorphism defined by:
+\[
+\mu(\tup{m,b,i,j,b'})=\left\{\begin{array}{ll} \tup{m,\<true>},\mbox{ if $b'=\<true>$}\\
+						\epsilon,\mbox{ otherwise}
+			\end{array}
+		\right.
+\]
+where $\epsilon$ denotes the empty sequence.
+
+It follows easily from definitions that $\mu(\alpha(h))\in S'$, for any history $h$. On the other hand, $\mu^{-1}(S')$ may contain
+sequences which do not correspond to valid histories of $\atLib{S}$ because they are not interval-consistent. However,
+if $S_k$ is the set of all sequences $\alpha(h)$ with $h$ a history of $\atLib{S}$ of length at most $k$, i.e.,
+$S_k=\set{\alpha(h):h\in \atLib{S}\mbox{ of length $k$}}$, then one can prove that
+\[
+S_k=\mu^{-1}(S')\cap \mathbb{I},
+\]
+where $\mathbb{I}$ is the language of all interval-consistent sequences. Since the latter is regular and the context-free languages
+are closed under intersection with regular languages and inverse homomorphisms, the language $S_k$ is context-free.
+
+Hence, by Parikh theorem~\cite{}, there exists a quantifier-free Presburger formula $@Y$ representing the Parikh image of $S_k$.
+W.l.o.g. we assume that the free variables of this formula are $\# a$ with $a\in\<Lab>$ (the variable $\# a$ represents the number of 
+occurrences of $a$ in a sequence of $S_k$).
+
+We define $@Y_S[k]$ as the quantifier-free Presburger formula obtained from 
+\[
+@Y\ \land \hspace{-1mm}\bigwedge_{(m,b,i,j)}\#(m,b,i,j)=\# \tup{m,b,i,j,\<true>} + \# \tup{m,b,i,j,\<false>}
+\]
+by projecting out all variables of $@Y$.
+\end{proof}
