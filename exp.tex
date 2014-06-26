@@ -65,23 +65,34 @@ TODO DESCRIBE THIS BETTER AND MAKE IT CLEARER
 
 \subsection{Efficiency}
 
-Figure~\ref{fig:data:runtime} compares the runtime of our operation-counting
-instrumentation for $A_2$, versus a linearization-based instrumentation. The
-x-axis shows the number of invoked operations, increasing from $2$ to $20$,
-while the y-axis shows the total execution time of each approach on a
-logarithmic scale, normalized to the total execution time without any
-instrumentation. Though we have not specially optimized our implementation of
-operation counting, we observe that runtime stays within the same order of
-magnitude as without instrumentation. However, one clearly observes the cost
-incurred by the exponential-time linearization algorithm: as the number of
-operations increases --- and thus exponentially the number of possible
-linearizations --- performance seriously degrades. With only $20$ operations,
-instrumentation overhead is nearly $100,000$\%.
-
+Figure~\ref{fig:data:runtime} compares the runtime overhead of our
+operation-counting instrumentation for $k=2$, versus a linearization-based
+instrumentation, sampling executions with up to $20$ operations on Scal's
+nonblocking Michael-Scott queue $L_\mathrm{msq}$. Since computing the set of
+sequential histories $\ker H(L_\mathrm{msq})$ over $n$ operations becomes
+prohibitively expensive as $n$ increases --- already surpassing a timeout of
+$5$m for $n=7$ --- our measurements bypass the computation of $\ker
+H(L_\mathrm{msq})$ entirely, and simply enumerate the linearizations of $H(e)$
+for each execution $e$ without checking their inclusion $\ker
+H(L_\mathrm{msq})$. Despite our best-effort-efficiency implementation of this
+enumeration, one observes the cost incurred by this exponential-time algorithm:
+as the number of operations increases --- thus exponentially increasing the
+number linearizations --- performance plummets. With only 20 operations,
+instrumentation overhead is nearly 100,000\%. Operation counting avoids this
+dramatic overhead; though we have not optimized our implementation, we observe
+that runtime overhead stays within 30\%.
 
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/lin-vs-counting-time}
-  \caption{Runtime}
+  \caption{Comparison of runtime overhead between linearization-based monitoring
+    and operation counting ($k=2$) for up to $20$ operations. Each data point
+    measures runtime on a logarithmic scale, normalized to unmonitored
+    execution time, over all executions up to $3$ preemptions on Scal's
+    nonblocking Michael-Scott queue with $i$ enqueue operations and $j$ dequeue
+    operations. The x-axis is ordered by increasing $i+j$, for $i$ and $j$
+    ranging over $1..10$. Times do not include pre-calculation of sequential
+    histories for linearization-based monitoring.
+  }
   \label{fig:data:runtime}
 \end{figure}
