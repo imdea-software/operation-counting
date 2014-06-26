@@ -1,42 +1,42 @@
 \section{Experimental Evaluation}
 \label{sec:exp}
 
-TODO DESCRIBE (1) EXPERIMENTAL GOALS, THEN FOR EACH (2) DESCRIBE THE SETUP,
-(3) SHOW THE DATA, (4) INTERPRET THE DATA
-
-In order to demonstrate the efficacy of operation counting as a useful
-approximation for detecting observational refinement violations, we argue
-that our $k$-approximate history inclusion checks:
+In order to demonstrate the efficacy of our history-inclusion based
+approximation to observational refinement, we argue that our $k$-approximation:
 \begin{itemize}
 
-  \item uncover most violations with small values of $k$, and
+  \item uncovers most violations with small values of $k$, and
 
-  \item can be efficiently implemented, and are exponentially-more efficient
-  than linearization-based checks.
-  
+  \item can be efficiently implemented, and vastly outperforms linearizability
+  checking.
+
 \end{itemize}
 
 To argue both points, we have studied the concurrent data structure
-implementations of Scal~\cite{}, which include both LIFO- and FIFO-based
-container objects. Some of these objects, such as the Michael-Scott
-Queue~\cite{}, are meant to preserve observational refinement\footnote{More
-precisely, they have been designed to be linearizable.}, while others, such as
-Kirsch et al.'s $k$-FIFO~\cite{}, are meant to preserve weaker properties. For
-our experiments we have used Scal's C++ implementations without modification,
-except to annotate methods with a fixed set of possible preemption points,
-e.g.,~preceding accesses to shared storage.
+implementations of Scal\footnote{Scal High-Performance Multicore-Scalable
+Computing~\url{http://scal.cs.uni-salzburg.at}}, which include both LIFO- and
+FIFO-based container objects. Some of these objects, such as the Michael-Scott
+Queue~\cite{conf/podc/MichaelS96}, are meant to preserve observational
+refinement\footnote{More precisely, they have been designed to be
+linearizable.}, while others, such as Kirsch et al.'s
+$k$-FIFO~\cite{conf/pact/KirschLP13}, are meant to preserve weaker properties.
+For our experiments we have used Scal's C++ implementations without
+modification, except to annotate methods with a fixed set of possible
+preemption points, e.g.,~preceding accesses to shared storage.
 
 To make the following comparisons, we have developed a tool for enumerating a
 (large) number of alternate executions involving a limited number of object
 method invocations. We execute each operation on a separate thread, and ensure
 that all thread schedules up to a given number $n \in \<Nats>$ of thread
 preemptions (at specified preemption points) are executed, similarly to
-Microsoft's Chess tool~\cite{}. With $n=0$ preemptions, there is only one
-schedule/execution, and the number of schedules/executions grows exponentially
-with increasing $n$. For instance, with our annotation of preemptions in Scal's
-Michael-Scott Queue, increasing $n=1..5$ yields $33$, $612$, $8343$, $95,434$,
-and $930,141$ schedules, which are executed roughly at the rate of one million
-schedules per minute.
+Microsoft's Chess tool~\cite{conf/osdi/MusuvathiQBBNN08}. With $n=0$
+preemptions, there is only one schedule/execution, though the number of
+schedules/executions grows exponentially as $n$ increases. For instance, with
+our annotation of preemptions in Scal's Michael-Scott Queue, increasing
+$n=1..5$ yields $33$, $612$, $8343$, $95434$, and $930141$ schedules, which are
+executed at a rate of roughly one million schedules per minute on a MacBook Pro
+2.6GHz Intel Core i5 machine.
+
 
 \subsection{Coverage of Violations}
 
