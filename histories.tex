@@ -118,16 +118,19 @@ well.
   Lemma~\ref{lemma:lib_closure}, namely $h$.
 
   We construct $P_h = \tup{Q,@S,q_0,@d}$ over alphabet $@S = C \u R \u \set{a}$
-  whose states $Q = 2^O$ map operations to a ``completed'' status. The initial
-  state is $q_0 = \set{ o |-> \<false> : o \in O}$. Transitions are given by,
+  whose states $Q : O -> \<Bools>^2$ track operations called/completed status.
+  The initial state is $q_0 = \set{ o |-> \tup{\bot,\bot} : o \in O}$.
+  Transitions are given by,
   \begin{align*}
-    & \text{for each } q \in Q, o \in O, m \in \<Methods>, u \in \<Vals> \\
-    & \text{such that } f(o) = \tup{m,u,\_},
-      \lnot q(o), \text{ and } q(o') \text{ for all } o' < o \text{:} \\
-    & \qquad q \xrightarrow{m(u)_o} q \\
-    & \text{for each } q \in Q, o \in O, m \in \<Methods>, v \in \<Vals>
-      \text{ with } f(o) = \tup{m,\_,v} \text{:} \\
-    & \qquad q[o |-> \<false>] \xrightarrow{\<ret>(v)_o} \cdot \xrightarrow{a} q[o |-> \<true>]
+    & \text{for each } q \in Q, o \in O, m \in \<Methods>, v \in \<Vals> \\
+    & \quad \text{if } f(o) = \tup{m,v,\_}
+      \text{ and } q(o') \text{ for all } o' < o \text{ then} \\
+    & \qquad q[o |-> \bot,\bot] \xrightarrow{m(v)_o} q[o |-> \top,\bot] \\
+    & \quad \text{ if } f(o) = \tup{m,\_,v} \text{ and } v \neq \nil \text{ then} \\
+    & \qquad q[o |-> \top,\bot] \xrightarrow{\<ret>(v)_o}
+      \cdot \xrightarrow{a} q[o |-> \top,\top] \\
+    & \quad \text{ if } f(o) = \tup{m,\_,\nil} \text{ then} \\
+    & \qquad q[o |-> \top,\bot] \xrightarrow{\<ret>(v)_o} q[o |-> \top,\top]
   \end{align*}
   In any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
   come after the return $\<ret>(v)_{o'}$ of each $o'<o$. Furthermore, all
