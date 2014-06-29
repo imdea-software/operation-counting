@@ -430,30 +430,32 @@ j= \left\{\begin{array}{ll}\nbbarr{e,\<ret>(v)_o},&\mbox{ if $\<ret>(v)_o$ occur
 
 Algorithm~\ref{alg:counting} outputs the counting representation of 
 $A^{\Vdash}_k(H(e))$, for any given $k$ and $e$. The counting
-representation is stored in the array $\<counters>$, the variable $\<time>$
-is used to count the numbers of interval ticks, $\<newPast>$
-is used to detect interval ticks, and 
+representation is stored in the array $\<counters>$ and the variable 
+$\<newPast>$ is used to detect interval ticks.
+The variable $\<time>$
+is used to count the number of interval ticks until this number becomes $k$
+and remains unmodified afterwards. For each operation $o$, 
 $\<startTime>(o)$ stores the number of interval ticks before the call 
-action of $o$.
+action of $o$, if this number is greater than $n-k$, and $0$, otherwise.
 When the length of the history $H(e)$ is at most $k$, 
-the algorithm outputs the counting representation of $H(e)$; 
-thus, the procedure $\<Shift>$ is never invoked and the variables $i$ and
-$j$ used in the case of return actions equal $\<startTime>(o)$
-and $\<time>$, respectively (cf. Lemma~\ref{lemma:counting_executions}).
+the procedure $\<Shift>$ is never invoked and 
+the algorithm outputs the counting representation of $H(e)$
+(cf. Lemma~\ref{lemma:counting_executions}).
 When $H(e)$ is of length $n>k$, the procedure $\<Shift>$
-and the values of $i$ and $j$ are used to ``forget'' ordering constraints 
-between operations whose interval limits in $H(e)$ are smaller than $n-k$.
+is used to ``forget'' ordering constraints 
+between operations whose interval limits in $H(e)$ are smaller than $n-k$
+(cf. Lemma~\ref{lemma:abstraction}).
 Basically, at every new interval tick after the $k$th one, the interval $[i,j]$ of a
 completed operation becomes $[i-1,j-1]$ if $i>0$ and $[i,j-1]$, otherwise
 (cf. the first $\<foreach>$ loop in the procedure $\<Shift>$), 
 and the interval $[i,k]$ of a pending operation becomes $[i-1,k]$
-(cf. the second $\<foreach>$ loop in $\<Shift>$). In this way, the
-interval associated by the algorithm to each operation $o$ reflects
-the relation between interval maps given in Lemma~\ref{lemma:abstraction}.
+(cf. the second $\<foreach>$ loop in $\<Shift>$). Moreover, for each
+operation $o$, $\<startTime>(o)$ is decremented (the decrement operation
+is defined over $\<Nats>$ and therefore, decrementing $0$ has no effect). 
 
 
 
-\begin{algorithm}
+\begin{algorithm}[thb]
   \DontPrintSemicolon
   \SetKwInOut{Input}{Input}
   \SetKwInOut{Output}{Output}
@@ -479,9 +481,11 @@ the relation between interval maps given in Lemma~\ref{lemma:abstraction}.
   \Switch{input action}{
     \Case{call action $m(u)_o$}{
       \If{$\NewPast$}{
-        \Increment $\Time$ \;
-        \If{$\Time > k$}{
+        \If{$\Time = k$}{
           \Shift{\Counters}
+        }
+        \If{$\Time < k$}{
+          \Increment $\Time$ 
         }
         $\NewPast <- \False$
       }
@@ -489,10 +493,10 @@ the relation between interval maps given in Lemma~\ref{lemma:abstraction}.
       \Increment $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
     }
     \Case{return action $ \<ret>(v)_o$}{
-      $i <-|\<time>-\nbbarr{e,m(u)_o}|_k$ \;
-      $j <- \<min>(\Time,k)$ \;
-      \Decrement $\Counters[\synop{m}{u}{\bottom},i,k]$ \;
-      \Increment $\Counters[\synop{m}{u}{v},i,j]$ \;
+%      $i <-|\<time>-\nbbarr{e,m(u)_o}|_k$ \;
+%      $j <- \<min>(\Time,k)$ \;
+      \Decrement $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
+      \Increment $\Counters[\synop{m}{u}{v},\StartTime[o],\Time]$ \;
       $\NewPast <- \True$
     }
   }
@@ -501,22 +505,25 @@ the relation between interval maps given in Lemma~\ref{lemma:abstraction}.
   \Procedure \Shift{\Counters} \;
   \Indp
   \ForEach{$x=\synop{m}{u}{v}$}{
-  	\For{$i$ = $0$ \To $k-1$}{
-		\For{$j$ = $i$ \To $k-1$}{
-			$\Counters[x,i,j]$ += $\Counters[x,i+1,j+1]$
-			$\Counters[x,i+1,j+1] <- 0$ 
+  	\For{$i$ = $1$ \To $k$}{
+		\For{$j$ = $i$ \To $k$}{
+			$\Counters[x,i-1,j-1]$ += $\Counters[x,i,j]$
+			$\Counters[x,i,j	] <- 0$ 
 		}
 	}
-	\For{$j$ = $0$ \To $k-1$}{
-			$\Counters[x,0,j]$ += $\Counters[x,0,j+1]$
-			$\Counters[x,0,j+1] <- 0$ 
+	\For{$j$ = $1$ \To $k$}{
+			$\Counters[x,0,j-1]$ += $\Counters[x,0,j]$
+			$\Counters[x,0,j] <- 0$ 
 	}
   }
   \ForEach{$x=\synop{m}{u}{\bottom}$}{
-	\For{$i$ = $0$ \To $k-1$}{
-			$\Counters[x,i,k]$ += $\Counters[x,i+1,k]$
-			$\Counters[x,i+1,k] <- 0$ 
+	\For{$i$ = $1$ \To $k$}{
+			$\Counters[x,i-1,k]$ += $\Counters[x,i,k]$
+			$\Counters[x,i,k] <- 0$ 
 	}
+  }
+  \ForEach{$o$} {
+  	\Decrement \StartTime[o] \;
   }
     \caption{An online algorithm for computing the counting representation
     $\Pi(A^{\Vdash}_k(H(e)))$ of a given history $h$.}
@@ -541,42 +548,63 @@ algorithm.
 
 \end{lemma}
 
-\begin{lemma}
-  \label{lem:counting:reach}
+Algorithm~\ref{alg:counting} can also be interpreted as a program $P_k$ that composed with a library $L$,
+generates the set $\set{ A_k^{\Vdash}(h) : h \in H(L) }$ of all recency abstractions of histories of $L$.
+%More precisely, every value of the array $\<counters>$ reachable in this program 
+%represents the counting representation $\Pi(A_k^{\Vdash}(h))$ of some $A_k^{\Vdash}(h)$ with $h\in H(L)$
+%and for every $h\in H(L)$, the program reaches a state where the value of $\<counters>$
+%equals $\Pi(A_k^{\Vdash}(h))$. 
+More precisely, let $\<Cnts>(P_k\times L)$ be the set of all
+values of the array $\<counters>$ reachable in $P_k\times L$. Then, 
 
-  The set $\set{ A^{\Vdash}_k(h) : h \in H(L) }$ of $k$ interval-length histories of
-  $L$ is computable when $L$ is a finite-state library.
+\begin{lemma}
+
+  For any library $L$,
+  \[
+  \<Cnts>(P_k\times L) = \set{ \Pi(A^{\Vdash}_k(h)) : h \in H(L) }.
+  \] 
 
 \end{lemma}
 
-\begin{proof}
+\todo{Checking inclusion is reducible to invariant checking}
 
-  BY REACHABILITY IN PETRI NETS
 
-\end{proof}
-
-XXX WORK THE FOLLOWING INTO THE PREVIOUS PROOF
-
-We define the program $P_K$, that generates the counting representations of all
-histories of length at most $K$. When composed with a particular library $L$,
-$P_K\x L$ generates only counting representations of histories of $L$.
-
-The program $P_K$ stores the counting representation of the current execution's
-history in an integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It
-updates the function $\pi$ at every call and return action. These updates
-correspond to a particular construction of the counting representation of a
-history~\footnote{Lemma~\ref{lem:representation} proves only the existence of
-the canonical form (counting representation) of a history, without giving an
-effective construction.} and respectively, of a given execution's history.
-
-The program $P_K$ is built according to the online algorithm in
-Figure~\ref{fig:online_alg}. Its states are formed of values for the mappings
-$\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$. The set of
-executions of $P_K$, projected on call and return actions, is exactly the set
-of all well-formed sequences $e$ over $C\cup R$ such that $H(e)$ is of length
-at most $K$. Every call action is preceded by a \alert{program action}
-corresponding to the updates in the top part of Figure~\ref{fig:online_alg} and
-every return action is followed by a \alert{program action} corresponding to
-the updates in the bottom part of Figure~\ref{fig:online_alg}. The following
-theorem states that $P_K$ generates the counting representations of all
-histories of length at most $K$.
+%\begin{lemma}
+%  \label{lem:counting:reach}
+%
+%  The set $\set{ A^{\Vdash}_k(h) : h \in H(L) }$ of $k$ interval-length histories of
+%  $L$ is computable when $L$ is a finite-state library.
+%
+%\end{lemma}
+%
+%\begin{proof}
+%
+%  BY REACHABILITY IN PETRI NETS
+%
+%\end{proof}
+%
+%XXX WORK THE FOLLOWING INTO THE PREVIOUS PROOF
+%
+%We define the program $P_K$, that generates the counting representations of all
+%histories of length at most $K$. When composed with a particular library $L$,
+%$P_K\x L$ generates only counting representations of histories of $L$.
+%
+%The program $P_K$ stores the counting representation of the current execution's
+%history in an integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It
+%updates the function $\pi$ at every call and return action. These updates
+%correspond to a particular construction of the counting representation of a
+%history~\footnote{Lemma~\ref{lem:representation} proves only the existence of
+%the canonical form (counting representation) of a history, without giving an
+%effective construction.} and respectively, of a given execution's history.
+%
+%The program $P_K$ is built according to the online algorithm in
+%Figure~\ref{fig:online_alg}. Its states are formed of values for the mappings
+%$\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$. The set of
+%executions of $P_K$, projected on call and return actions, is exactly the set
+%of all well-formed sequences $e$ over $C\cup R$ such that $H(e)$ is of length
+%at most $K$. Every call action is preceded by a \alert{program action}
+%corresponding to the updates in the top part of Figure~\ref{fig:online_alg} and
+%every return action is followed by a \alert{program action} corresponding to
+%the updates in the bottom part of Figure~\ref{fig:online_alg}. The following
+%theorem states that $P_K$ generates the counting representations of all
+%histories of length at most $K$.
