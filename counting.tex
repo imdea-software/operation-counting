@@ -342,25 +342,41 @@ recency abstraction remembers only the the ordering between ``recent''
 operations which have started after interval $n-k$. It follows by definition
 that $A_k^{\Vdash}(h) \preceq h$,
 since ordering constraints are only removed from $<$.
-Note that $A^{\Vdash}_k(h)=h$ for any history $h$ of length $n\leq k$.
+Also, $A^{\Vdash}_k(h)=h$ for any history $h$ of length $n\leq k$.
+The next lemma relates the interval maps of $h$ and $A^{\Vdash}_k(h)$.
 
-In the following, we define an online algorithm for computing the recency abstraction of 
+\begin{lemma}\label{lemma:abstraction}
+
+Let $I : O -> [n]^2$ and $I^{\Vdash}_k: O -> [k]^2$ be the interval maps
+of $h$ and $A^{\Vdash}_k(h)$, respectively. Then, for every $o\in O$,
+\[
+I(o)=[i,j] \mbox{ iff } I^{\Vdash}_k(o) = [ |n-i|_k, |n-j|_k ]
+\]
+where for every $m$, $|m|_k=m$, if $m\leq k$, and $|m|_k=0$, otherwise.
+
+\end{lemma}
+
+We define an online algorithm for computing the recency abstraction of 
 an execution's history $H(e)$, that reads the stream of call/return actions in $e$
 and computes the counting representation of the recency abstraction $A^{\Vdash}_k(H(e))$.
 
-The recency abstraction depends on the interval map $I$ of $H(e)$ and thus, the algorithm
-needs to count distinct pasts of operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form}).
-The past of an operation $o$ in $H(e)$ 
-consists
-of operations that return before $o$ and consequently, if there is no return action
-between the call actions of two operations $o_1$ and $o_2$, then these two operations have the same past in $H(e)$.
+%The recency abstraction depends on the interval map $I$ of $H(e)$ and thus, 
+To compute the counting representation, the algorithm counts distinct pasts of operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form})
+based on the following observation.
+%The past of an operation $o$ in $H(e)$ 
+%consists
+%of operations that return before $o$ and consequently, 
+Two operations $o_1$ and $o_2$ have the same past in $H(e)$ 
+(i.e., the set of operations that finish before $o_1$ and respectively, $o_2$ is the same) iff there is no return action that occurs in $e$ 
+between the call actions of $o_1$ and respectively, $o_2$.
 Therefore, the lower bound of the interval $I(o)$ associated to some operation $o$
-equals the number of occurrences of a return immediately followed by a call before the call action of $o$
-(which corresponds to the number of distinct pasts of operations finishing before $o$).
+equals the number of occurrences of a return immediately followed by a call before the call action of $o$.
+%(which corresponds to the number of distinct pasts of operations finishing before $o$).
 The index in $e$ of such a return action is called an \emph{interval tick} of $e$.
-Analogously, the upper bound of this interval equals the number of interval ticks before the return action of $o$
-(which corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
-or the length of $H(e)$, if the return action doesn't occur in $e$.
+Analogously, the upper bound of this interval equals the number of interval ticks before the return action of $o$,
+if such an action exists,
+%(which corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
+or the length of $H(e)$, otherwise.
 
 
 %A consequence of this fact is that the number of distinct pasts in $H(e)$ is 
@@ -431,7 +447,9 @@ Basically, at every new interval tick after the $k$th one, the interval $[i,j]$ 
 completed operation becomes $[i-1,j-1]$ if $i>0$ and $[i,j-1]$, otherwise
 (cf. the first $\<foreach>$ loop in the procedure $\<Shift>$), 
 and the interval $[i,k]$ of a pending operation becomes $[i-1,k]$
-(cf. the second $\<foreach>$ loop in $\<Shift>$).
+(cf. the second $\<foreach>$ loop in $\<Shift>$). In this way, the
+interval associated by the algorithm to each operation $o$ reflects
+the relation between interval maps given in Lemma~\ref{lemma:abstraction}.
 
 
 
@@ -471,7 +489,7 @@ and the interval $[i,k]$ of a pending operation becomes $[i-1,k]$
       \Increment $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
     }
     \Case{return action $ \<ret>(v)_o$}{
-      $i <- \<min>(k,\<time>-\nbbarr{e,m(u)_o})$ \;
+      $i <-|\<time>-\nbbarr{e,m(u)_o}|_k$ \;
       $j <- \<min>(\Time,k)$ \;
       \Decrement $\Counters[\synop{m}{u}{\bottom},i,k]$ \;
       \Increment $\Counters[\synop{m}{u}{v},i,j]$ \;
@@ -519,7 +537,7 @@ algorithm.
 %  synopses in $e$
 %  when the size of integers is fixed, as in the case of modern computer
 %  architectures; otherwise, the space complexity is also logarithmic in the length of $e$.}
-  and linear time.
+  and time $O(|e|)$.
 
 \end{lemma}
 
