@@ -1,3 +1,4 @@
+%!TEX root = draft.tex
 \section{Containers}
 \label{sec:containers}
 
@@ -5,6 +6,16 @@
 \metalangkeyword{pending,completed,total,is,before}
 \metalangkeyword{removev,fifov,lifov,emptyv}
 
+\begin{align*}
+\<total>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,,i',j') \\
+\exists t_a,t_r\ \exists x,y.\ &
+\sum_{i\leq t_r}\<total>(\<rem>\triangleright x,i,j) < \<total>(\<add>(x),0,t_a) \\[1mm]
+&\land\ \<total>(\<rem>\triangleright y,0,t_r) > \sum_{i\leq t_a} \<total>(\<add>(y),i,j) \\[3mm]
+\forall t_a,t_r\ \forall x,y.\ &
+\sum_{i\leq t_r}\<total>(\<rem>\triangleright x,i,j) \geq \<total>(\<add>(x),0,t_a) \\[1mm]
+&\lor\ \<total>(\<rem>\triangleright y,0,t_r) \leq \sum_{i\leq t_a} \<total>(\<add>(y),i,j)
+\end{align*}
+  
 Define the container formulas by
 \begin{align*}
   @Y_\mathrm{stack} &= \lnot\<removev> /| \lnot\<lifov> /| \lnot\<emptyv> \text{, and } \\
