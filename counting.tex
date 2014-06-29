@@ -320,42 +320,120 @@ $k$.
 
 \end{proof}
 
-\subsection{Monitoring Histories by Counting}
+\subsection{Approximating Histories by Counting}
 \label{sec:counting:monitor}
 
 Given a history $h = \tup{O,<,f}$ of interval length $n$, and $k \in \<Nats>$,
-we define \emph{the earlybird abstraction} $A^{\triangleleft}_k(h) =
-\tup{O,<^{\triangleleft},f}$ and \emph{the recency abstraction}
-$A^{\triangleright}_k(h) = \tup{O,<^{\triangleright},f}$ of $h$ by
+we define 
+%\emph{the earlybird abstraction} $A^{\triangleleft}_k(h) =
+%\tup{O,<^{\triangleleft},f}$ and 
+\emph{the recency abstraction}
+$A^{\Vdash}_k(h) = \tup{O,<^{\Vdash},f}$ of $h$ by
 \begin{align*}
-  o_1 <^{\triangleleft} o_2 & \text{ iff } o_1 < o_2 \text{ and } \sup I(o_1) < k \\
-  o_1 <^{\triangleright} o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
+%  o_1 <^{\triangleleft} o_2 & \text{ iff } o_1 < o_2 \text{ and } \sup I(o_1) < k \\
+  o_1 <^{\Vdash} o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
 \end{align*}
-where $I : O -> [n]^2$ is the interval map of $h$. Intuitively, the
-earlybird abstraction remembers only the ordering between ``old''
-operations which have completed by interval $k$; the
+where $I : O -> [n]^2$ is the interval map of $h$. Intuitively, 
+%the
+%earlybird abstraction remembers only the ordering between ``old''
+%operations which have completed by interval $k$; 
+the
 recency abstraction remembers only the the ordering between ``recent''
 operations which have started after interval $n-k$. It follows by definition
-that $A_k^{\triangleleft}(h), A_k^{\triangleright}(h) \preceq h$,
+that $A_k^{\Vdash}(h) \preceq h$,
 since ordering constraints are only removed from $<$.
+Note that $A^{\Vdash}_k(h)=h$ for any history $h$ of length $n\leq k$.
 
-Now, given an execution $e$, we define an online algorithm for computing the
-counting representation of $H(e)$, that avoids constructing the history itself.
-This algorithm is based on the following observation: the past of an operation
-$o$ in $H(e)$ consists of operations that return before $o$ and consequently,
-if there is no return action between the call actions of two operations $o_1$
-and $o_2$, then these two operations have the same past in $H(e)$. A
-consequence of this observation is that the number of distinct pasts in the
-history of an execution corresponds to one plus the number of occurrences of a
-return action immediately followed by a call action (with no barriers, the past
-of all operations in $H(e)$ is $\emptyset$). The index in $e$ of such a return
-action is called a \emph{barrier} of the execution $e$.
+In the following, we define an online algorithm for computing the recency abstraction of 
+an execution's history $H(e)$, that reads the stream of call/return actions in $e$
+and computes the counting representation of the recency abstraction $A^{\Vdash}_k(H(e))$.
 
-\begin{example}
+The recency abstraction depends on the interval map $I$ of $H(e)$ and thus, the algorithm
+needs to count distinct pasts of operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form}).
+The past of an operation $o$ in $H(e)$ 
+consists
+of operations that return before $o$ and consequently, if there is no return action
+between the call actions of two operations $o_1$ and $o_2$, then these two operations have the same past in $H(e)$.
+Therefore, the lower bound of the interval $I(o)$ associated to some operation $o$
+equals the number of occurrences of a return immediately followed by a call before the call action of $o$
+(which corresponds to the number of distinct pasts of operations finishing before $o$).
+The index in $e$ of such a return action is called an \emph{interval tick} of $e$.
+Analogously, the upper bound of this interval equals the number of interval ticks before the return action of $o$
+(which corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
+or the length of $H(e)$, if the return action doesn't occur in $e$.
 
-  TODO WHAT EXAMPLE?
 
-\end{example}
+%A consequence of this fact is that the number of distinct pasts in $H(e)$ is 
+%one more than the number of occurrences of a return action immediately followed by a call action 
+%(when there is no return followed by a call, the past of all the operations in $H(e)$ is $\emptyset$). 
+%The index in $e$ of such a return action is called an \emph{interval tick} of the execution $e$.
+%\todo{For example,}
+%
+%Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called an \emph{interval tick} if 
+%$e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be the number of interval ticks of $e$. 
+%\begin{lemma}\label{lemma:nb_barr}
+%
+%For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ equals $\nbbarr{e}$.
+%
+%\end{lemma}
+%
+%Furthermore, given an operation $o$, the lower bound of the interval associated to $o$ in the 
+%canonical representation of $H(e)$
+%equals the number of interval ticks before the call action of $o$ 
+%(which corresponds to the number of distinct pasts of operations finishing before $o$).
+%Moreover, the upper bound of this interval equals the number of interval ticks before the return action of $o$
+%(the latter corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
+%or the length of $H(e)$, if the return action doesn't occur in $e$.
+%\todo{For example,}. 
+
+Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called an \emph{interval tick} if 
+$e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be the number of interval ticks of $e$. 
+%\begin{lemma}\label{lemma:nb_barr}
+%
+%For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ equals $\nbbarr{e}$.
+%
+%\end{lemma}
+Furthermore, for any action $a$ in $e$, let $\nbbarr{e,a}$ be the number of 
+interval ticks of $e$ occurring before the action $a$. 
+
+\begin{lemma}\label{lemma:counting_executions}
+
+Let $e\in (C\cup R)^*$ be a library execution and 
+$I : O -> (n)^2$ the canonical representation of $H(e)$. 
+Then, for every $o\in O$, $I(o)=(i,j)$, where 
+\[
+i = \nbbarr{e,m(u)_o},\mbox{ and }
+\]
+\[
+j= \left\{\begin{array}{ll}\nbbarr{e,\<ret>(v)_o},&\mbox{ if $\<ret>(v)_o$ occurs in $e$}\\
+				    \nbbarr{e},&\mbox{ otherwise}.
+	    \end{array}\right.
+\]
+
+\end{lemma}
+
+Algorithm~\ref{alg:counting} outputs the counting representation of 
+$A^{\Vdash}_k(H(e))$, for any given $k$ and $e$. The counting
+representation is stored in the array $\<counters>$, the variable $\<time>$
+is used to count the numbers of interval ticks, $\<newPast>$
+is used to detect interval ticks, and 
+$\<startTime>(o)$ stores the number of interval ticks before the call 
+action of $o$.
+When the length of the history $H(e)$ is at most $k$, 
+the algorithm outputs the counting representation of $H(e)$; 
+thus, the procedure $\<Shift>$ is never invoked and the variables $i$ and
+$j$ used in the case of return actions equal $\<startTime>(o)$
+and $\<time>$, respectively (cf. Lemma~\ref{lemma:counting_executions}).
+When $H(e)$ is of length $n>k$, the procedure $\<Shift>$
+and the values of $i$ and $j$ are used to ``forget'' ordering constraints 
+between operations whose interval limits in $H(e)$ are smaller than $n-k$.
+Basically, at every new interval tick after the $k$th one, the interval $[i,j]$ of a
+completed operation becomes $[i-1,j-1]$ if $i>0$ and $[i,j-1]$, otherwise
+(cf. the first $\<foreach>$ loop in the procedure $\<Shift>$), 
+and the interval $[i,k]$ of a pending operation becomes $[i-1,k]$
+(cf. the second $\<foreach>$ loop in $\<Shift>$).
+
+
 
 \begin{algorithm}
   \DontPrintSemicolon
@@ -367,75 +445,88 @@ action is called a \emph{barrier} of the execution $e$.
   \SetKw{False}{false}
   \SetKw{Increment}{incr}
   \SetKw{Decrement}{decr}
+  \SetKw{To}{to}
   \SetKwFunction{Shift}{Shift}
   \SetKwData{Counters}{counters}
   \SetKwData{NewPast}{newPast}
   \SetKwData{Time}{time}
   \SetKwData{StartTime}{startTime}
+  \SetKw{Procedure}{procedure}
+  
   \Input{interval length $k \in \<Nats>$}
   \Input{stream $(C\u R)^{@w}$ of call/return actions}
   \Output{stream of counting representations}
   \KwData{$\Time: \<Nats>$, $\NewPast: \<Bools>$, $\StartTime[\<Ops>]: \<Nats>$}
-  \Init{$\Time = 0$, $\NewPast = \False$, $\Counters[\_,\_,\_,\_] = 0$}
+  \Init{$\Time = 0$, $\NewPast = \False$, $\Counters[\_,\_,\_] = 0$}
   \Switch{input action}{
-    \Case{call action $\call{m}{o}$}{
+    \Case{call action $m(u)_o$}{
       \If{$\NewPast$}{
         \Increment $\Time$ \;
-        \If{$\Time > k$ and $A_k = A^{\triangleleft}_k$}{
-          \Decrement $\Time$
-        }
-        \If{$\Time > k$ and $A_k = A^{\triangleright}_k$}{
+        \If{$\Time > k$}{
           \Shift{\Counters}
         }
         $\NewPast <- \False$
       }
       $\StartTime[o] <- \Time$ \;
-      \Increment $\Counters[m,\False,\StartTime[o],k]$ \;
+      \Increment $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
     }
-    \Case{return action $\ret{o}$}{
-      \Decrement $\Counters[m,\False,\StartTime[o],k]$ \;
-      \Increment $\Counters[m,\True,\StartTime[o],\Time]$ \;
+    \Case{return action $ \<ret>(v)_o$}{
+      $i <- \<min>(k,\<time>-\nbbarr{e,m(u)_o})$ \;
+      $j <- \<min>(\Time,k)$ \;
+      \Decrement $\Counters[\synop{m}{u}{\bottom},i,k]$ \;
+      \Increment $\Counters[\synop{m}{u}{v},i,j]$ \;
       $\NewPast <- \True$
     }
   }
-  \Yield $\Counters$
-  \caption{An online algorithm for computing the counting representation
-    $\Pi(A_k(h))$ of a given history $h$.}
+  \Yield $\Counters$ 
+  \BlankLine
+  \Procedure \Shift{\Counters} \;
+  \Indp
+  \ForEach{$x=\synop{m}{u}{v}$}{
+  	\For{$i$ = $0$ \To $k-1$}{
+		\For{$j$ = $i$ \To $k-1$}{
+			$\Counters[x,i,j]$ += $\Counters[x,i+1,j+1]$
+			$\Counters[x,i+1,j+1] <- 0$ 
+		}
+	}
+	\For{$j$ = $0$ \To $k-1$}{
+			$\Counters[x,0,j]$ += $\Counters[x,0,j+1]$
+			$\Counters[x,0,j+1] <- 0$ 
+	}
+  }
+  \ForEach{$x=\synop{m}{u}{\bottom}$}{
+	\For{$i$ = $0$ \To $k-1$}{
+			$\Counters[x,i,k]$ += $\Counters[x,i+1,k]$
+			$\Counters[x,i+1,k] <- 0$ 
+	}
+  }
+    \caption{An online algorithm for computing the counting representation
+    $\Pi(A^{\Vdash}_k(H(e)))$ of a given history $h$.}
   \label{alg:counting}
 \end{algorithm}
 
-The online algorithm for computing the counting representation of $H(e)$
-maintains the integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$, a
-map $\theta:O\rightarrow \<Nats>$ storing the number of barriers before the
-call action of each operation $o$, a boolean $\<finished>$ which becomes
-$\<true>$ when the algorithm reads a return action (this is used to detect
-barriers of $e$), and an integer $\<time>$ storing the number of observed
-barriers. This algorithm terminates only if the length of $H(e)$ is at most
-some given constant $K$. Otherwise, it blocks because of an $\<assume>$
-statement that checks that $\<time>$ is always smaller than $K-1$ (cf.
-Lemma~\ref{lemma:nb_barr}). Initially, the values of the maps $\pi$ and
-$\theta$ are 0, $\<time>=0$, and $\<finished>=\<false>$. The algorithm reads
-successive actions of $e$ and it applies the updates in
-Figure~\ref{fig:online_alg}. The next lemma states the correctness of this
+
+The next lemma states the correctness of this
 algorithm.
 
 \begin{lemma}
   \label{lem:counting:alg}
 
   Algorithm~\ref{alg:counting} outputs the counting representation
-  $\Pi(A_k(h))$ of the weakening $A_k(h)$ of a given history $h$ in constant
-  space%
-  \footnote{The space complexity of Algorithm~\ref{alg:counting} is constant
-  when the size of integers is fixed, as in the case of modern computer
-  architectures; otherwise, the space complexity is logarithmic.}
-  and linear time, for $A_k \in \set{ A_k^\triangleleft, A_k^\triangleright }$.
+  $\Pi(A^{\Vdash}_k(H(e)))$ of the weakening $A^{\Vdash}_k(H(e))$ of a given execution's 
+  history $H(e)$ in space $O(|\synopses{e}|\cdot \log |e|)$
+%  \footnote{The space complexity of Algorithm~\ref{alg:counting} is linear in the number of method
+%  synopses in $e$
+%  when the size of integers is fixed, as in the case of modern computer
+%  architectures; otherwise, the space complexity is also logarithmic in the length of $e$.}
+  and linear time.
 
 \end{lemma}
 
 \begin{lemma}
   \label{lem:counting:reach}
 
-  The set $\set{ A_k(h) : h \in H(L) }$ of $k$ interval-length histories of
+  The set $\set{ A^{\Vdash}_k(h) : h \in H(L) }$ of $k$ interval-length histories of
   $L$ is computable when $L$ is a finite-state library.
 
 \end{lemma}

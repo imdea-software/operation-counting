@@ -19,13 +19,15 @@
 \newcommand{\sync}[2]{\<sync> ({#1}, {#2})}
 \newcommand{\past}[1]{past({#1})}
 \newcommand{\future}[1]{\mathit{future}({#1})}
-\newcommand{\nbbarr}[1]{\mbox{\#}\<barriers>({#1})}
-\newcommand{\nbbarrA}[2]{\mbox{\#}\<barriers>({#1},{#2})}
+\newcommand{\nbbarr}[1]{\mbox{\#}\<tick>({#1})}
+\newcommand{\nbbarrA}[2]{\mbox{\#}\<tick>({#1},{#2})}
 \newcommand{\counting}[2]{\mbox{\#}{#1}({#2})}
 \newcommand{\atLib}[1]{\overline{{#1}}}
 \newcommand{\rf}{\mathit{rf}}
 \newcommand{\ocl}{{\sf OCL}}
 \newcommand{\lab}{{\sf lab}}
+\newcommand{\synop}[3]{{#1}({#2})\triangleright {#3}}
+\newcommand{\synopses}[1]{\<Synopses>({#1})}
 
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
@@ -132,7 +134,7 @@
 \metalangkeyword{empty}
 \metalangkeyword{name,value}
 \mathfn{past}
-\metalangkeyword{print,sync,read,write,assume,finished,time,barriers,read,write,w,r,reg}
+\metalangkeyword{print,sync,read,write,assume,finished,time,barriers,read,write,w,r,reg,tick,newPast,counters,startTime,Shift,foreach}
 \metalangkeyword{push,pop,enqueue,dequeue}
 
 \semanticdomain{%
@@ -141,6 +143,7 @@
   Lab[\mathbb{A}],
   Ints[\mathbb{Z}],
   Methods[\mathbb{M}],
+  Synopses[\mathbb{S}],
   Vals[\mathbb{V}],
   Ops[\mathbb{O}],
 }
