@@ -69,13 +69,16 @@ One can use any sequential history $h_1'$ stronger than $h_1$
 to build a sequential history $h'$ stronger than $h$. 
 Let $o_1$ be a $\<read>(a)$ operation of $h_1$ and $o_1'$  
 the last write operation before $o_1$ in $h_1'$ (since $h_1'\in H(L_{\<reg>})$, $o_1'$ is a $\<write>(a)$ operation). 
-We show that $h_1'$ can be extended to include all the read operations equivalent to $o_1$.
+We show that $h_1'$ can be extended to a valid sequential history of $L_{\<reg>}$ that 
+includes all the read operations equivalent to $o_1$. 
 Thus, let $o_2$ be a $\<read>(b)$ operation  of $h_1$ equivalent to $o_1$. By definition, 
-$I(o_1)=I(o_2)$ and there exists a $\<write>(b)$ operation $o_2'$ of $h_1$ such that $I(o_2')=I(o_1')$.
-The operation $o_2$ can be added to $h_1'$ such that $o_2'<_1' o_2 <_1' o_1'<_1' o_1 $ ($<_1'$ is the
-order relation in $h_1'$). The new history $h_1'$ is a sequential history of $L_{\<reg>}$ stronger than 
-the projection of $h$ over $O_1\cup\{o_2\}$. By applying the same reasoning, one can obtain a 
-sequential history stronger than the full $h$.
+$I(o_1)=I(o_2)$ and if $a=b$ then $o_2$ can be added to $h_1'$ such that $o_1'<' o_1 <' o_2$ ($<'$ is the
+order relation in $h_1'$).
+Otherwise, since $o_1\sim o_2$ there exists a $\<write>(b)$ operation $o_2'$ of $h$ such that $I(o_2')=I(o_1')$.
+The operation $o_2$ can be added to $h_1'$ such that $o_2'<' o_2 <' o_1'<' o_1 $. 
+The new history $h_1'$ is a sequential history of $L_{\<reg>}$ stronger than 
+the projection of $h$ over $O_1\cup\{o_2\}$. Applying the same reasoning for all the other read operations, 
+one can obtain a sequential history stronger than the whole $h$.
 \end{proof}
 
 %We prove that $h$ is a history of $L_{\<reg>}$ iff for every completed $\<read>(a)$ operation $o$ there exists
@@ -172,94 +175,164 @@ defined by $\sup \iota < \inf \iota'$. The fact that $\Psi_1$ expresses the firs
 Lemma~\ref{lemma:register} is straightforward. 
 
 %The $\ocl$ characterization of the second condition in Lemma~\ref{lemma:register}
-The formula $\Psi_2$ expresses a constraint over the intervals defining the equivalence classes
-of $\sim$, which is equivalent to the second condition in Lemma~\ref{lemma:register}.
-Thus, let $\mathcal{P}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ be the set of pairs interval -- sets of intervals.
+The formula $\Psi_2$ expresses a constraint over the pairs interval -- set of intervals
+$(I(o),I_{\<w>}(o))$ with $o$ an operation in the modeled history, equivalent to the 
+second condition in Lemma~\ref{lemma:register}.
+Thus, let $\mathcal{P}_k=\mathcal{I}_{k}\times (2^{\mathcal{I}_{k}}\setminus\emptyset)$. Then,
+\[
+\Psi_2 = \bigvee_{\mathcal{P}\subseteq \mathcal{P}_k} \hspace{-1mm}\forall\ \vec{x}.\ \Big(\bigwedge_{p\in \mathcal{P}} Is(\vec{x}[p],p)
+\land \bigwedge_{p\not\in \mathcal{P}} Empty(p)\land Valid(\mathcal{P},\vec{x})\Big)
+\]
+where $\vec{x}$ is a vector of synopsis-type variables, one for each $p\in \mathcal{P}$,
+$Is(\vec{x}[p],p)$ states that $\vec{x}[p]$ is the synopsis of a read operation $o$ 
+such that $p=(I(o),I_{\<w>}(o))$, $Empty(p)$ states that there exists no read operation
+$o$ with $p=(I(o),I_{\<w>}(o))$, and $Valid(\mathcal{P},\vec{x}[p])$ states that any 
+projection of the modeled history over a maximal set of operations that contains 
+as read operations only the ones characterized by $Is(\vec{x}[p],p)$ with $p\in \mathcal{P}$
+is a valid history of $L_{\<reg>}$.
 
+More precisely,
 \[
 \begin{array}{l}
-\Psi_2 = \bigvee_{\mathcal{P}\subseteq \mathcal{P}_k} \Big(\bigwedge_{p\in \mathcal{P}} NonEmpty(p) \\[1mm]
-\hspace{2.2cm}\land\ \exists\ \rf:\mathcal{P} -> [k]^2\ \big( \\[1mm]
-\hspace{2.3cm}\forall\ p\in \mathcal{P}.\ \rf(p)\in \mathcal{I}_{\<w>}(e)\ \land \\[1mm]
-\hspace{2.3cm}\forall\ p\neq p'\in \mathcal{P}.\ \big(\neg (\rf(p) < \rf(p') < \mathcal{I}_{\<r>}(p))\ \land  \\[1mm]
-\hspace{4.35cm} \neg (\rf(p) < \mathcal{I}_{\<r>}(p') < \mathcal{I}_{\<r>}(p)) \big) \\
-\hspace{2.4cm}\big)\Big)
+Is(\vec{x}[p],p) = \<isRead>(\vec{x}[p])\land \#(\vec{x}[p],p|_1) > 0 \\[.5mm]
+\hspace{.7cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(\vec{x}[p],y)\land \#(y,\iota) > 0\big)  \\[.5mm]
+\hspace{.7cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Rightarrow \neg p|_1 < \iota \\[1mm]
+Empty(p) = \forall y.\ \neg Is(y,p) \\[1mm]
+\end{array}
+\]
+\[
+\begin{array}{l}
+Valid(\mathcal{P},\vec{x})= \exists\ \rf:\mathcal{P} -> \mathcal{I}_{k}\ \big(\ \forall\ p\in \mathcal{P}.\ \rf(p)\in p|_2\ \land \\[1mm]
+\hspace{.3cm}\forall\ p,p'\in \mathcal{P}.\ \<DiffVal>(\vec{x}[p],\vec{x}[p'])\Rightarrow \big(\neg (\rf(p) < \rf(p') < p|_1)  \\[1mm]
+\hspace{5cm} \land\ \neg (\rf(p) < p'|_1 < p|_1) \big) \\
+\hspace{4cm}\big)
 \end{array}
 \]
 
-\todo{Still working...}
+The formulas $Is(\vec{x}[p],p)$ and $Empty(p)$ follow precisely the definition of the equivalence relation $\sim$.
+The formula $Valid(\mathcal{P},\vec{x})$ expresses the fact that there exists a read-from relation $\rf$
+associating to each read operation with synopsis $\vec{x}[p]$ a write operation in some interval from $p|_2$.
+The last two rows ensure that $\rf$ is a valid read-from relation: the interval of the write can not be separated from
+the interval of the read using the interval of a read or write over a different value.
+The predicate $\<DiffVal>(x,y)$ holds for any two synopses $x=\<read>\triangleright a$ and $y=\<read>\triangleright b$
+with $a\neq b$. Note that the existential quantifier over functions $\rf$ can be transformed into a bounded disjunction.
 
-The first formula states that for every completed $\<read>(a)$ operation $o$ there exists
-a $\<write>(a)$ operation $o'$ which finishes before or overlaps with $o$.
-In the second formula, the second row states that $\rf(e)$ is the interval of a write operation,  
-which writes a value read by one of the read operations in $e$. The last two rows state that 
-it is not possible to separate $\rf(e)$ from the interval of the reads in $e$ using $\rf(e')$ or $I_{\<r>}(e')$, for some
-other equivalence class $e'$. Otherwise, the write operation represented by $\rf(e)$
-cannot be the last write operation before the representative of $e$.
+%follow the definition of a valid history of $L_{reg}$ that 
+%it is not possible to separate $\rf(p)$ from the interval of the read in $e$ using $\rf(e')$ or $I_{\<r>}(e')$, for some
+%other equivalence class $e'$. Otherwise, the write operation represented by $\rf(e)$
+%cannot be the last write operation before the representative of $e$.
 
+%The first two rows state that there exists an $\vec{x}[p]$ operation whose interval is exactly the first component in $p$
+%and one $\<write>(a)$ operation in each interval from the second component of $p$. The last row states 
+%that the intervals in the second component of $p$ (corresponding to write operations) are not ordered after the 
+%first component of $p$.
 
- and 
-$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
-
-
-Roughly, $\Psi_{\<reg>}[k]$ is obtained by rewriting the first formula in Lemma~\ref{lemma:register} and 
-by adding a disjunction in front of the second formula 
-(called $\Phi$ in the following), over all equivalence relations $\sim$. 
-More precisely, since $\Phi$ characterizes only the intervals
-associated to some non-empty equivalence class $e$, i.e., $\mathcal{I}_{\<r>}(e)$ and $\mathcal{I}_{\<w>}(e)$,  
-the disjunction ranges over sets of pairs interval -- sets of intervals.
-Furthermore, since the goal is to characterize histories of length at most $k$, the limits of the intervals 
-are bounded by $k$.
-
-%Note that the canonical representation of a history of length at most $K$ uses intervals whose limits are bounded by $K$. 
-Thus, let $\mathcal{I}_{k}$ be the set of intervals $[i,j]$ with $0\leq i\leq j\leq k$ and 
-$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
-
-Let $\Psi_{\<reg>}[k]$ be the following $\ocl$ formula:
-\[
-\begin{array}{l}
-\forall x.\ \big(\<read>(x)\land \exists \iota\in \mathcal{I}_{k}.\  \#(x,\<true>,\iota)>0)\big)\Rightarrow \\[1mm]
-\hspace{.6cm}\big(\exists y.\ \mathsf{Rd\-Wr}(x,y) %\\[1mm]
-%\hspace{2.8cm}
-\land\ \exists \iota'\in \mathcal{I}_{k}.\ (\#(y,\_,\iota') > 0 \land \neg \iota < \iota')\big)\\[1mm]
-\land \\[-3mm]
-\end{array}
-\]
+%$Valid(p)$ states that there exists a read operation $o$ such that $p=(I(o),I_{\<w>}(o))$
+%and $RegHistory(\mathcal{P})$ states that any projection of the modeled history over
+%a maximal set of operations that contains one representative of each equivalence class
+%is a valid history of $L_{\<reg>}$. Thus,
 %\[
 %\begin{array}{l}
-%\forall a.\ (\exists \iota\in \mathcal{I}_{K}.\ \counting{\<read>(a)}{\iota}>0)\Rightarrow \\[.5mm]
-%\hspace{2cm}\big(\exists \iota'\in \mathcal{I}_{K}.\ (\counting{\<write>(a)}{\iota'} > 0 \land \neg \iota < \iota')\big)\\[1mm]
+%Valid(p) = \exists x.\ \big(\ \<isRead>(x)\land \#(x,p|_1) > 0 \\[.5mm]
+%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(x,y)\land \#(y,\iota) > 0\big)  \\[.5mm]
+%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Rightarrow \neg p|_1 < \iota \big)
+%\end{array}
+%\]
+%where $p|_1$, resp., $p|_2$, is the projection of $p$ on the first, resp., second, component.
+%
+%The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $p$
+%and one $\<write>(a)$ operation in each interval from the second component of $p$. The last row states 
+%that the intervals in the second component of $p$ (corresponding to write operations) are not ordered after the 
+%first component of $p$.
+%%(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
+%
+%Then, $RegHistory(\mathcal{P})$ is defined as
+%\[
+%\begin{array}{l}
+%\forall\ \vec{x}\ 
+%\exists\ \rf:\mathcal{P} -> \mathcal{I}_{k}\ \big(\ \forall\ p\in \mathcal{P}.\ \rf(p)\in p|_2\ \land \\[1mm]
+%\hspace{.3cm}\forall\ p,p'\in \mathcal{P}.\ \<DiffVal>(\vec{x}[p],\vec{x}[p'])\Rightarrow \big(\neg (\rf(p) < \rf(p') < p|_1)  \\[1mm]
+%\hspace{4.35cm} \land\ \neg (\rf(p) < p'|_1 < p|_1) \big) \\
+%\hspace{2.4cm}\big)
+%\end{array}
+%\]
+%where $\vec{x}$ is a vector of synopsis-type variables, one for each $p\in \mathcal{P}$
+%and $\<DiffVal>(x,y)$ holds if $x=\<read>\triangleright a$, $y=\<read>\triangleright b$, and $a\neq b$.
+%
+%\todo{Still working...}
+%
+%The first formula states that for every completed $\<read>(a)$ operation $o$ there exists
+%a $\<write>(a)$ operation $o'$ which finishes before or overlaps with $o$.
+%In the second formula, the second row states that $\rf(e)$ is the interval of a write operation,  
+%which writes a value read by one of the read operations in $e$. The last two rows state that 
+%it is not possible to separate $\rf(e)$ from the interval of the reads in $e$ using $\rf(e')$ or $I_{\<r>}(e')$, for some
+%other equivalence class $e'$. Otherwise, the write operation represented by $\rf(e)$
+%cannot be the last write operation before the representative of $e$. 
+%
+%
+%
+% and 
+%$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
+%
+%
+%Roughly, $\Psi_{\<reg>}[k]$ is obtained by rewriting the first formula in Lemma~\ref{lemma:register} and 
+%by adding a disjunction in front of the second formula 
+%(called $\Phi$ in the following), over all equivalence relations $\sim$. 
+%More precisely, since $\Phi$ characterizes only the intervals
+%associated to some non-empty equivalence class $e$, i.e., $\mathcal{I}_{\<r>}(e)$ and $\mathcal{I}_{\<w>}(e)$,  
+%the disjunction ranges over sets of pairs interval -- sets of intervals.
+%Furthermore, since the goal is to characterize histories of length at most $k$, the limits of the intervals 
+%are bounded by $k$.
+%
+%%Note that the canonical representation of a history of length at most $K$ uses intervals whose limits are bounded by $K$. 
+%Thus, let $\mathcal{I}_{k}$ be the set of intervals $[i,j]$ with $0\leq i\leq j\leq k$ and 
+%$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
+%
+%Let $\Psi_{\<reg>}[k]$ be the following $\ocl$ formula:
+%\[
+%\begin{array}{l}
+%\forall x.\ \big(\<read>(x)\land \exists \iota\in \mathcal{I}_{k}.\  \#(x,\<true>,\iota)>0)\big)\Rightarrow \\[1mm]
+%\hspace{.6cm}\big(\exists y.\ \mathsf{Rd\-Wr}(x,y) %\\[1mm]
+%%\hspace{2.8cm}
+%\land\ \exists \iota'\in \mathcal{I}_{k}.\ (\#(y,\_,\iota') > 0 \land \neg \iota < \iota')\big)\\[1mm]
 %\land \\[-3mm]
 %\end{array}
 %\]
-\[
-\bigvee_{\mathcal{E}\subseteq \mathcal{E}_k} \Phi[@O\gets \mathcal{E}]\land \bigwedge_{e\in \mathcal{E}} NonEmpty(e)
-%\forall e\in \mathcal{E}_k.\ e\in E \Leftrightarrow NonEmpty(e),
-\]
-where $\Phi[@O\mapsto \mathcal{E}]$ denotes the formula $\Phi$ where $@O$ is substituted by $\mathcal{E}$ and 
-$NonEmpty(e)$ states that $e$ represents a non-empty equivalence class of $\sim$, i.e., there exists a read operation $o$ with $I(o)=e|_1$
-and $I_{\<w>}(o)=e|_2$ ($e|_1$, resp., $e|_2$, is the projection of $e$ on the first, resp., second, component).
-The formula $\Psi_{\<reg>}[k]$ contains two predicates over methods, $\<read>(x)$, that holds for every method $x=\<read>(a)$, for some $a$,
-and $\mathsf{Rd\-Wr}(x,y)$, that holds for every two methods $x=\<read>(a)$ and $y=\<write>(a)$, for some $a$. Also, for readability,
-it contains quantifiers over intervals in $\mathcal{I}_{k}$. Since $k$ is fixed, the existential, resp., universal quantifier over intervals 
-can be transformed in a disjunction, resp, conjunction, over all pairs of integer constants $0\leq i\leq j\leq k$.
-
-
-Formally, $NonEmpty(e)$ is defined by
-\[
-\begin{array}{l}
-\exists x.\ \big(\ \<read>(x)\land \#(x,\<true>,e|_1) > 0 \\[.5mm]
-\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(x,y)\land \#(y,\_,\iota) > 0\big)  \\[.5mm]
-\hspace{.9cm}\land\ \exists\ \iota \in e|_2\land \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Rightarrow \neg e|_1 < \iota \big)
-\end{array}
-\]
-
-The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $e$
-and one $\<write>(a)$ operation in each interval from the second component of $e$. The last row states that the second
-component of $e$ is non-empty (i.e., there exists a write operation) the intervals
-in the second component of $e$ (corresponding to write operations) are not ordered after the first component of $e$
-(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
-
+%%\[
+%%\begin{array}{l}
+%%\forall a.\ (\exists \iota\in \mathcal{I}_{K}.\ \counting{\<read>(a)}{\iota}>0)\Rightarrow \\[.5mm]
+%%\hspace{2cm}\big(\exists \iota'\in \mathcal{I}_{K}.\ (\counting{\<write>(a)}{\iota'} > 0 \land \neg \iota < \iota')\big)\\[1mm]
+%%\land \\[-3mm]
+%%\end{array}
+%%\]
+%\[
+%\bigvee_{\mathcal{E}\subseteq \mathcal{E}_k} \Phi[@O\gets \mathcal{E}]\land \bigwedge_{e\in \mathcal{E}} NonEmpty(e)
+%%\forall e\in \mathcal{E}_k.\ e\in E \Leftrightarrow NonEmpty(e),
+%\]
+%where $\Phi[@O\mapsto \mathcal{E}]$ denotes the formula $\Phi$ where $@O$ is substituted by $\mathcal{E}$ and 
+%$NonEmpty(e)$ states that $e$ represents a non-empty equivalence class of $\sim$, i.e., there exists a read operation $o$ with $I(o)=e|_1$
+%and $I_{\<w>}(o)=e|_2$ ($e|_1$, resp., $e|_2$, is the projection of $e$ on the first, resp., second, component).
+%The formula $\Psi_{\<reg>}[k]$ contains two predicates over methods, $\<read>(x)$, that holds for every method $x=\<read>(a)$, for some $a$,
+%and $\mathsf{Rd\-Wr}(x,y)$, that holds for every two methods $x=\<read>(a)$ and $y=\<write>(a)$, for some $a$. Also, for readability,
+%it contains quantifiers over intervals in $\mathcal{I}_{k}$. Since $k$ is fixed, the existential, resp., universal quantifier over intervals 
+%can be transformed in a disjunction, resp, conjunction, over all pairs of integer constants $0\leq i\leq j\leq k$.
+%
+%
+%Formally, $NonEmpty(e)$ is defined by
+%\[
+%\begin{array}{l}
+%\exists x.\ \big(\ \<read>(x)\land \#(x,\<true>,e|_1) > 0 \\[.5mm]
+%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(x,y)\land \#(y,\_,\iota) > 0\big)  \\[.5mm]
+%\hspace{.9cm}\land\ \exists\ \iota \in e|_2\land \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Rightarrow \neg e|_1 < \iota \big)
+%\end{array}
+%\]
+%
+%The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $e$
+%and one $\<write>(a)$ operation in each interval from the second component of $e$. The last row states that the second
+%component of $e$ is non-empty (i.e., there exists a write operation) the intervals
+%in the second component of $e$ (corresponding to write operations) are not ordered after the first component of $e$
+%(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
+%
 The fact that $\Psi_{\<reg>}[k]$ represents $L_{\<reg>}$ up to $k$ is 
 a direct consequence of Lemma~\ref{lemma:register}. 
 %The satisfaction problem for this formula is in polynomial time
