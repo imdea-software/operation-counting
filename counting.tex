@@ -1,5 +1,6 @@
 %!TEX root = draft.tex
 \section{Operation Counting for Bounded Histories}
+\label{sec:counting}
 
 By the equivalences of Section~\ref{sec:lin}, checking whether a given history
 $H(e)$ is included in a fixed set $H(L)$ of library histories is equivalent to
@@ -75,42 +76,10 @@ purpose runtime montior~(\S\ref{sec:counting:monitor}).
 
 XXX CAREFUL BECAUSE THE FOLLOWING IS IN FLUX
 
+\subsection{An Operation-Counting Logic}
+\label{sec:counting:logic}
 
-\subsection{Histories are Interval Orders}
-\label{sec:counting:intervals}
-
-While the general definition of histories allows arbitrary partial orders of
-operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
-restricted class called \emph{interval orders}. Intuitively, this is because
-our execution model assumes that operations share a common notion of global
-time: the \emph{pasts} of any two operations (defined by the set of operations
-that have completed before a given operation starts) cannot be incomparable.
-
-\begin{definition}
-
-  An \emph{interval order} is a partial order $\tup{O,<}$ such that
-  $o_1 < o_3$ and $o_2 < o_4$ implies $o_1 < o_4$ or $o_2 < o_3$.
-
-\end{definition}
-
-\begin{lemma}
-  \label{lem:intervals}
-
-  The history $H(e) = \tup{O,f,<}$ of a well-formed execution $e$ forms an
-  interval order $\tup{O,<}$.
-
-\end{lemma}
-
-\begin{proof}
-
-  Suppose $o_1 < o_3$ and $o_2 < o_4$ in $H(e)$, and fix $i_1, i_2, i_3, i_4$
-  such that $e_{i_1}$ and $e_{i_2}$ are the return actions of $o_1$ and $o_2$,
-  and $e_{i_3}$ and $e_{i_4}$ are the call actions of $o_3$ and $o_4$; note
-  that $i_1 < i_3$ and $i_2 < i_4$. Since $<$ linearly orders $\set{i_1, i_2,
-  i_3, i_4}$, either $i_1 < i_4$, in which case $o_1 < o_4$, or $i_4 < i_1$, in
-  which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
-
-\end{proof}
+TODO INSERT SETUP TEXT
 
 The \emph{past} of an element $o \in O$ of a poset $\tup{O,<}$ is the set
 \begin{align*}
@@ -155,9 +124,6 @@ demonstrate in the following subsections. Subsection~\ref{sec:counting:approx}
 describes concrete definitions that are useful in practice for detecting
 observational refinement  violations.
 
-
-\subsection{An Operation-Counting Logic}
-\label{sec:counting:logic}
 
 Interval orders have a canonical representation which basically, associates to
 each element an interval on the integer line. While in general there may exist

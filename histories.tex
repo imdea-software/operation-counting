@@ -1,24 +1,22 @@
 %!TEX root = draft.tex
 \section{History Inclusion}
+\label{sec:histories}
 
-%THE POINT: REDUCING REFINEMENT TO SOMETHING WITHOUT A UNIVERSALLY QUANTIFIED
-%PROGRAM: INCLUSION OF LIBRARY HISTORIES.
-
-While observational refinement is defined over program executions, in the
-following we introduce an alternative mathematical structure called
-\emph{histories} which concisely summarize the executions admitted by a
-library. Histories also provide a convenient foundation in which to formulate
-our technical development. More precisely, we show that observational refinement
-is equivalent to a plain inclusion between library histories. This result is important because
-it reduces observational refinement to a property that doesn't contain the universal quantifier
-over programs. TODO AWKWARD PHRASING
+Though we seek to develop automated techniques to check observational
+refinement between libraries, the definition of Section~\ref{sec:refinement}
+does not suggest any practical means; it only suggests enumerating every
+possible execution of every possible program. In this section we introduce an
+equivalent notion based on concise abstractions of program executions called
+\emph{histories}. Besides being independent of programs, this equivalent notion
+helps expose the structure of the refinement problem, and suggests practical
+means of automation which we develop in Section~\ref{sec:counting}.
 
 A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
 \<Ops>$ of operation identifiers labeled by $f: O -> \<Methods> \x \<Vals> \x
 (\<Vals> \u \set{\nil})$ for which $f(o) = \tup{\_,\_,\nil}$ implies $o$ is
 maximal in $<$. The \emph{history} $H(e)$ of a well-formed execution $e \in
-@S^*$ labels each operation with a method and completed status, and orders the
-non-overlapping operations, according to:
+@S^*$ labels each operation with a method-call summary, and orders
+non-overlapping operations:
 \begin{itemize}
 
   \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
@@ -44,6 +42,44 @@ $H(L) = \set{ H(e) : e \in E(L) }$ denotes the histories admitted by $L$.
 
 \end{example}
 
+While the general concept of histories allows arbitrary partial orders of
+operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
+restricted class called \emph{interval orders}. Intuitively, this is because
+our execution model assumes that operations share a common notion of global
+time: the \emph{pasts} of any two operations (formalized in
+Section~\ref{sec:counting} as the set of operations that have completed before
+a given operation starts) cannot be incomparable.
+
+\begin{definition}
+
+  An \emph{interval order} is a partial order $\tup{O,<}$ such that
+  $o_1 < o_3$ and $o_2 < o_4$ implies $o_1 < o_4$ or $o_2 < o_3$.
+
+\end{definition}
+
+\begin{lemma}
+  \label{lem:intervals}
+
+  The history $H(e) = \tup{O,f,<}$ of a well-formed execution $e$ forms an
+  interval order $\tup{O,<}$.
+
+\end{lemma}
+
+\begin{proof}
+
+  Suppose $o_1 < o_3$ and $o_2 < o_4$ in $H(e)$, and fix $i_1, i_2, i_3, i_4$
+  such that $e_{i_1}$ and $e_{i_2}$ are the return actions of $o_1$ and $o_2$,
+  and $e_{i_3}$ and $e_{i_4}$ are the call actions of $o_3$ and $o_4$; note
+  that $i_1 < i_3$ and $i_2 < i_4$. Since $<$ linearly orders $\set{i_1, i_2,
+  i_3, i_4}$, either $i_1 < i_4$, in which case $o_1 < o_4$, or $i_4 < i_1$, in
+  which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
+
+\end{proof}
+
+\noindent
+In this work we consider only histories of well-formed executions, i.e.,~those
+forming interval orders, without explicit qualification.
+
 Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
 \emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
 injection $g: O_2 -> O_1$ such that
@@ -66,7 +102,7 @@ i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in H$, then $h_2 \in H$ as
 well.
 
 \begin{lemma}
-  \label{lemma:lib_closure}
+  \label{lem:lib:closed}
 
   Library histories $H(L)$ are closed under weakening,
   i.e.,~$h_1 \in H(L)$ and $h_2 \preceq h_1$ implies $h_2 \in H(L)$.
@@ -80,7 +116,7 @@ well.
 \end{proof}
 
 \begin{lemma}
-  \label{lemma:lib_exec}
+  \label{lem:lib:execs}
 
   $E(L)$ contains all executions with histories in $H(L)$,
   i.e.,~$e \in (C \u R)^*$ and $H(e) \in H(L)$ implies $e \in E(L)$.
@@ -93,8 +129,13 @@ well.
 
 \end{proof}
 
+\noindent
+Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply that
+refinement between two libraries is equivalent to containment between their
+histories.
+
 \begin{theorem}
-  \label{th:equiv}
+  \label{thm:equivalence}
 
   $L_1 \leq L_2$ iff $H(L_1) \subseteq H(L_2)$.
 
@@ -115,7 +156,7 @@ well.
   <= L_2$. Since $|(e_2|@S)| = n$ and $e_2 \in E(P_h)$, we also know that $h
   \preceq H(e_2)$, and since $(e_2 | C \u R) \in E(L_2)$, we have $H(e_2) \in
   H(L_2)$, along with any history weaker than $H(e_2)$ by
-  Lemma~\ref{lemma:lib_closure}, namely $h$.
+  Lemma~\ref{lem:lib:closed}, namely $h$.
 
   We construct $P_h = \tup{Q,@S,q_0,@d}$ over alphabet $@S = C \u R \u \set{a}$
   whose states $Q : O -> \<Bools>^2$ track operations called/completed status.
@@ -141,7 +182,7 @@ well.
   Let $P$ be a program over actions $@S$, and $e \in E(P \x L_1)$; we show that
   $e \in E(P \x L_2)$. Since $(e | C \cup R) \in E(L_1)$, we know $H(e) \in
   H(L_1)$ by definition of $H(L_1)$, and then $H(e) \in H(L_2)$ by hypothesis.
-  By Lemma~\ref{lemma:lib_exec} we deduce $(e | C \cup R) \in E(L_2)$, and
+  By Lemma~\ref{lem:lib:execs} we deduce $(e | C \cup R) \in E(L_2)$, and
   thus by definition of LTS composition, $e \in E(P \x L_2)$.
 
 \end{proof}
