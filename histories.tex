@@ -104,8 +104,7 @@ well.
 \begin{lemma}
   \label{lem:lib:closed}
 
-  Library histories $H(L)$ are closed under weakening,
-  i.e.,~$h_1 \in H(L)$ and $h_2 \preceq h_1$ implies $h_2 \in H(L)$.
+  If $h_1 \in H(L)$ and $h_2 \preceq h_1$ then $h_2 \in H(L)$.
 
 \end{lemma}
 
@@ -118,8 +117,7 @@ well.
 \begin{lemma}
   \label{lem:lib:execs}
 
-  $E(L)$ contains all executions with histories in $H(L)$,
-  i.e.,~$e \in (C \u R)^*$ and $H(e) \in H(L)$ implies $e \in E(L)$.
+  $H(e) \in H(L)$ iff $e|(C\u R)^* \in E(L)$.
 
 \end{lemma}
 
