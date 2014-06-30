@@ -213,7 +213,7 @@ The formulas $Is(\vec{x}[p],p)$ and $Empty(p)$ follow precisely the definition o
 The formula $Valid(\mathcal{P},\vec{x})$ expresses the fact that there exists a read-from relation $\rf$
 associating to each read operation with synopsis $\vec{x}[p]$ a write operation in some interval from $p|_2$.
 The last two rows ensure that $\rf$ is a valid read-from relation: the interval of the write can not be separated from
-the interval of the read using the interval of a read or write over a different value.
+the interval of the read using the interval of another read or write over a different value.
 The predicate $\<DiffVal>(x,y)$ holds for any two synopses $x=\<read>\triangleright a$ and $y=\<read>\triangleright b$
 with $a\neq b$. Note that the existential quantifier over functions $\rf$ can be transformed into a bounded disjunction.
 
