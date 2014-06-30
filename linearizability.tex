@@ -214,10 +214,10 @@ there exists an execution $e_2\in L_2$ with only completed operations
 such that $e_1\sqsubseteq e_2$. By Lemma~\ref{lemma:exec_hist}, this implies $H(e_1)\preceq H(e_2)$.
 %there exists an execution $e_2\in S\subseteq  \atLib{S}$, where every operation is completed, 
 %such that $H(e_1)\preceq H(e_2)$. 
-By the closure property in Lemma~\ref{lemma:lib_closure}, if $H(e_2)\in H(L_2)$
+By the closure property in Lemma~\ref{lem:lib:closed}, if $H(e_2)\in H(L_2)$
 then $h=H(e_1)\in H(L_2)$, which concludes the proof.
 
-($\Leftarrow$) Let $e_1$ be an execution of $L_1$. By hypothesis, $H(e_1)\in H(L_2)$, which by Lemma~\ref{lemma:lib_exec},
+($\Leftarrow$) Let $e_1$ be an execution of $L_1$. By hypothesis, $H(e_1)\in H(L_2)$, which by Lemma~\ref{lem:lib:execs},
 implies $e_1\in E(L_2)$.
 Since $L_2$ is an atomic library, %for any execution $e_1$ of $\atLib{S}$
 there exists a sequential execution $e_2$ of $L_2$ such that $e_1\sqsubseteq e_2$. Finally, since $e_2$ is a sequential execution,
