@@ -101,7 +101,7 @@ $\<ret>(v)_{o_2}$.
 
 \end{example}
  
-\todo{Closure properties are motivated by the fact that we consider only concurrent libraries. In sequential libraries, they do not hold}
+%\todo{Closure properties are motivated by the fact that we consider only concurrent libraries. In sequential libraries, they do not hold}
 
 Libraries dictate the execution of methods between their call and return
 points. Accordingly, a library cannot prevent a method from being called,
@@ -126,10 +126,6 @@ alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
 Note that even a library that implements \emph{atomic methods} --- i.e.,~in
 which the internal actions of separate method calls do not interleave --- admits
 executions in which method calls and returns overlap.
-
-The least set of executions which contains some given set $S$ and satisfies all the closure properties
-given above is denoted by $\atLib{S}$.
-
 
 \begin{example}
   \label{ex:libraries}
@@ -157,7 +153,59 @@ given above is denoted by $\atLib{S}$.
   \normalsize
   with two completed $\<pop>$ operations returning $0$.
   
-  \todo{Add an example on removing return actions}
+\end{example}
+
+The executions in the premise and resp., the conclusion of each of the closure rules given
+above %(together with the prefix closure which holds because all the states of an LTS are accepting) 
+are related by a partial order $\sqsubseteq$ defined as follows: $e_1\sqsubseteq e_2$ iff
+there exists an execution $e_1'$ obtained from $e_1$ by
+appending matching return actions (for unmatched call actions) or deleting call actions
+such that 
+\begin{itemize}
+	\item $e_1'$ and $e_2$ contain exactly the same set of actions, and 
+	\item $e_2$ is a permutation of $e_1'$ that preserves the order between return and call
+actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$
+in $e_1'$ then the same holds in $e_2$). 
+\end{itemize}
+We defer the reader to Section~\ref{} for the relation between $\sqsubseteq$ and the classic linearizability 
+relation between executions~\cite{journals/toplas/HerlihyW90}.
+
+
+
+\begin{example}
+TODO ILLUSTRATE THE RELATION $\sqsubseteq$. POSITIVE AND NEGATIVE EXAMPLES.
+\end{example}
+
+
+It is straightforward that $e_1\sqsubseteq e_2$ whenever 
+$e_1$ and $e_2$ are in the conclusion and respectively the premise of a closure rule. 
+Therefore,
+
+\begin{lemma}\label{lemma:exec_closure}
+
+The set of executions $E(L)$ of a library $L$ is downward closed w.r.t. $\sqsubseteq$, i.e., 
+if $e\in E(L)$ then $e'\in E(L)$ for every $e'\sqsubseteq e$.
+
+\end{lemma}
+
+\begin{proof}
+
+TODO
+
+\end{proof}
+
+Lemma~\ref{lemma:exec_closure} implies that $E(L)$ has a canonical representation,
+which is the set of maximal elements w.r.t. $\sqsubseteq$, called the \emph{kernel} of $L$ 
+and denoted by $\kernel(L)$. 
+
+A library $L$ is called \emph{atomic} iff its kernel contains only sequential executions, i.e., executions where 
+every call action is immediately followed by its matching return action. 
+Atomic libraries are typically used as specifications for concurrent objects.
+
+\begin{example}
+
+TODO SETS, STACKS, QUEUES, REGISTER
+
 \end{example}
 
 \paragraph{Programs}

@@ -4,71 +4,69 @@
 
 %TODO FIND OUT WHETHER TO KEEP THE FOLLOWING TEXT AND IF SO WHERE TO PUT IT
 
-We have shown in the previous section that observational refinement between two libraries is 
-equivalent to the inclusion between their sets of histories. This result is
+The equivalence between observational refinement and history inclusion is 
 similar to the relation between observational refinement and 
-linearizability~\cite{journals/tcs/FilipovicORY10}: these two notions are equivalent if the libraries
-contain only terminating executions (where every method invocation finishes) and in general,
+linearizability~\cite{journals/tcs/FilipovicORY10}: these two notions are equivalent if the library
+methods terminate in every context while for arbitrary libraries,
 linearizability implies observational refinement but the reverse is not true.
-In the following, we explain the differences between these two equivalence results and also, we compare
-the notions of ``history inclusion'' and linearizability.
+%In the following, we give more details concerning this statement.
 
-\paragraph{Comparison to the relation between observational refinement and linearizability.}
+\paragraph{Observational refinement and linearizability.}
 We first recall the notion of
-linearizability~\cite{journals/toplas/HerlihyW90}. Thus, a library execution $e_1$ is \emph{linearizable} w.r.t. a
-library $L_2$ iff there exists an execution $e_1'$ obtained from $e_1$ by
-appending matching return actions (for unmatched call actions) or deleting call actions
-and an execution $e_2$ of $L_2$ such that 
-\begin{itemize}
-	\item $e_1'$ doesn't contain pending operations 
-(i.e., unmatched call actions), 
-	\item $e_1'$ and $e_2$ contain exactly the same set of actions, and 
-	\item $e_2$ is a permutation of $e_1'$ that preserves the order between return and call
-actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$
-in $e_1'$ then the same holds in $e_2$). 
-\end{itemize}
-
-\begin{example}
-
-TODO LINEARIZABLE AND NOT LINEARIZABLE EXECUTIONS
-
-\end{example}
-
-Furthermore, a library $L_1$ is linearizable
+linearizability~\cite{journals/toplas/HerlihyW90}. 
+An operation $o$ of an execution $e$ is called \emph{completed} iff 
+both the call and the return actions of $o$, $m(u)_o$ and $\<ret>(v)_o$,
+belong to $e$. Otherwise, $o$ is called \emph{pending}.
+Thus, a library execution $e_1$ is \emph{linearizable} w.r.t. a
+library $L_2$ iff there exists an execution $e_2\in L_2$ with only completed operations 
+such that $e_1\sqsubseteq e_2$.
+% execution $e_1'$ obtained from $e_1$ by
+%appending matching return actions (for unmatched call actions) or deleting call actions
+%and an execution $e_2$ of $L_2$ such that 
+%\begin{itemize}
+%	\item $e_1'$ doesn't contain pending operations 
+%(i.e., unmatched call actions), 
+%	\item $e_1'$ and $e_2$ contain exactly the same set of actions, and 
+%	\item $e_2$ is a permutation of $e_1'$ that preserves the order between return and call
+%actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$
+%in $e_1'$ then the same holds in $e_2$). 
+%\end{itemize}
+%
+%\begin{example}
+%
+%TODO LINEARIZABLE AND NOT LINEARIZABLE EXECUTIONS
+%
+%\end{example}
+Also, a library $L_1$ is linearizable
 w.r.t. a library $L_2$ iff every execution $e_1\in L_1$ is linearizable w.r.t.
 $L_2$. %
 
-Given a library execution $e$, an operation $o$ is called \emph{completed} if
-both the call and the return actions of $o$, $\call{m}{o}$ and $\ret{o}$,
-belong to $e$. Otherwise, $o$ is called \emph{pending}.
 
-Note that linearizability between two libraries $L_1$ and $L_2$ compares executions 
+Since linearizability compares executions 
 of $L_1$, that may contain pending operations, with executions of $L_2$ where every operation 
-is completed. Therefore, if there exist methods that never terminate in $L_2$ (i.e., in all executions all the 
-calls to these methods are pending), then 
+is completed, observational refinement may not
+imply linearizability when $L_2$ contains non-terminating methods (i.e., the 
+calls to these methods are pending in all executions).
 %If we consider libraries with non-terminating methods than 
-observational refinement may not
-imply linearizability. 
 
 \begin{example}
-Let $L$ be the least library which contains the execution 
-\[
-  e = \call{m}{1}\ \call{m'}{2}\ \ret{1},
-\] 
-where the call to $m'$ is pending, i.e.,~$E(L) = \atLib{\set{e}}$.
-
-Then, $L$ refines $L$ but $L$ is not linearizable w.r.t. $L$. The latter holds
+Let $L$ be a library such that $\kernel(L)$ contains a single execution
+$e = m(u)_1\ m'(u)_2\ \<ret>(v)_1$.
+Note that the call to $m'$ in $e$ is pending. %, i.e.,~$E(L) = \atLib{\set{e}}$.
+Then, $L$ is an observational refinement of $L$ but $L$ is not linearizable w.r.t. $L$. The latter holds
 because the execution $e$ could be linearizable w.r.t. $L$ only if $L$ were to
-contain one of the following executions:
-\begin{align*}
-  \call{m}{1}\ \ret{1} \text{, } \quad
-  \call{m}{1}\ \call{m'}{2}\ \ret{1}\ \ret{2} \text{, } \quad
-  \call{m}{1}\ \ret{1}\ \call{m'}{2}\ \ret{2} \text{.}
-\end{align*}
-However, since $L$ is the least library that contains $e$, none of these
-executions belongs to $L$.
-
-Note that $H(L)\subseteq H(L)$, which is also a consequence of Theorem~\ref{th:equiv}.
+contain one of the following three executions:
+\[
+\begin{array}{c}
+  m(u)_1\ \<ret>(v)_1 \quad \quad\quad
+  m(u)_1\ m'(u)_2\ \<ret>(v)_1\ \<ret>(\_)_2  \quad \\[1mm]
+  m(u)_1\ \<ret>(v)_1\ m'(u)_2\ \<ret>(\_)_2 \text{.}
+\end{array}
+\]
+However, since $\kernel(L)=\set{e}$, none of these
+executions is in $E(L)$.
+%
+%Note that $H(L)\subseteq H(L)$, which is also a consequence of Theorem~\ref{th:equiv}.
 \end{example}
 
 %If we consider that libraries are defined as arbitrary sets of well-formed
@@ -98,37 +96,38 @@ Note that $H(L)\subseteq H(L)$, which is also a consequence of Theorem~\ref{th:e
 %computation for programs while the result in \citet{journals/tcs/FilipovicORY10} is
 %proved only for programs with shared variables.
 
-\paragraph{Linearizability w.r.t. sequential specifications.}
-Concurrent implementations of data structures are usually considered to be
-correct if they are linearizable w.r.t. the sequential version of the same data
-structure, e.g., a concurrent stack should be linearizable w.r.t. the
-sequential stack. In our framework, we consider only concurrent libraries,
-therefore, this correctness condition translates to the fact that the
-concurrent implementation is an observational refinement of the atomic
-implementation, where, intuitively, method bodies execute in one single atomic
-step but, method calls and returns can still overlap. By Theorem~\ref{th:equiv}, this is equivalent
-to the fact that every history of the concurrent implementation is also a history of the
-atomic implementation.
-
-Atomic libraries are formally defined as follows.  
-An execution is called 
-\emph{sequential} if all call actions are immediately followed by their matching 
-return action. % except possibly the last one.
-
-\begin{definition}
-
-A library $L$ is called \emph{atomic} iff there exists a set of sequential executions $S$ such that 
-$E(L)=\atLib{S}$. The set $S$ is called the \emph{kernel} of $L$.
-
-\end{definition}
-By an abuse of notation, an atomic library with kernel $S$ is denoted also by $\atLib{S}$.
-
-\begin{example}
-
-\todo{Atomic register, stack, queue}
-
-\end{example}
-
+\paragraph{Linearizability w.r.t. atomic libraries.}
+Concurrent objects are usually considered to be
+correct if they are linearizable w.r.t. the atomic version of the same object, 
+e.g., a concurrent stack should be linearizable w.r.t. the
+atomic stack. 
+%In our framework, we consider only concurrent libraries,
+%therefore, this correctness condition translates to the fact that the
+%concurrent implementation is an observational refinement of the atomic
+%implementation, where, intuitively, method bodies execute in one single atomic
+%step but, method calls and returns can still overlap. By Theorem~\ref{th:equiv}, this is equivalent
+%to the fact that every history of the concurrent implementation is also a history of the
+%atomic implementation.
+%
+%Atomic libraries are formally defined as follows.  
+%An execution is called 
+%\emph{sequential} if all call actions are immediately followed by their matching 
+%return action. % except possibly the last one.
+%
+%\begin{definition}
+%
+%A library $L$ is called \emph{atomic} iff there exists a set of sequential executions $S$ such that 
+%$E(L)=\atLib{S}$. The set $S$ is called the \emph{kernel} of $L$.
+%
+%\end{definition}
+%By an abuse of notation, an atomic library with kernel $S$ is denoted also by $\atLib{S}$.
+%
+%\begin{example}
+%
+%\todo{Atomic register, stack, queue}
+%
+%\end{example}
+%
 %Given a \emph{sequential} library $L_{seq}$, i.e., whose executions are all
 %sequential, the set of executions allowed by the \emph{atomic} concurrent
 %library $L_{at}$ where method bodies are exactly the same as in $L_{seq}$
@@ -137,24 +136,31 @@ By an abuse of notation, an atomic library with kernel $S$ is denoted also by $\
 %the least set of executions that contains all the executions of $L_{seq}$ and
 %that satisfies the closure properties in Section~\ref{sec:obsref}. Then, the
 %following result is a direct consequence of the definitions.
+%
+We show that linearizability w.r.t. atomic libraries is equivalent to ``history inclusion'' w.r.t. atomic libraries,
+and thus, observational refinement. Essentially, this is a consequence of the fact that the methods
+of an atomic library terminate in every context.
 
-We show that linearizability w.r.t. sequential libraries is equivalent to ``history inclusion'' w.r.t. atomic libraries.
-The following lemma relates linearizability and the ``weaker than'' comparison between histories.
+TODO MOVE THE FOLLOWING LEMMA TO SECTION 3, TO PROVE DOWNWARD CLOSURE FOR HISTORIES
+
+The following lemma relates the $\sqsubseteq$ relation between executions 
+and the ``weaker than'' comparison between histories.
 
 \begin{lemma}
-  \label{prop:lin}
+  \label{lemma:exec_hist}
 
-  An execution $e_1$ is linearizable w.r.t. a set of executions $E$ iff there exists an
-  execution $e_2\in E$, where every operation is completed, such that
-  $H(e_1)\preceq H(e_2)$.
+%  An execution $e_1$ is linearizable w.r.t. a set of executions $E$ iff there exists an
+%  execution $e_2\in E$, where every operation is completed, such that
+%  $H(e_1)\preceq H(e_2)$.
+     For any two executions $e_1$ and $e_2$, $e_1\sqsubseteq e_2$ iff $H(e_1)\preceq H(e_2)$.
 
 \end{lemma}
 
 \begin{proof}
 
-($\Rightarrow$) Let $e_1$ be an execution linearizable w.r.t. a set of executions $E$. By definition,
-there exists an execution $e_1'$ with no pending operations, obtained from $e_1$ by appending 
-return actions or deleting call actions and an execution $e_2\in E$ s.t. (1) $e_1'$ and $e_2$ contain exactly
+($\Rightarrow$) By definition,
+there exists an execution $e_1'$, obtained from $e_1$ by appending 
+return actions or deleting call actions s.t. (1) $e_1'$ and $e_2$ contain exactly
 the same set of actions and (2) $e_2$ is a permutation of $e_1'$ that preserves the order between 
 return and call actions. 
 Since the completed operations of $e_1$ are also present in $e_1'$ and a subset of the pending operations of $e_1$
@@ -162,11 +168,9 @@ are completed in $e_1'$ (also, the order between call and return actions common 
 we have that $H(e_1)\preceq H(e_1')$. Moreover, since $e_2$ preserves the order between return and call actions
 we have that $H(e_1')\preceq H(e_2)$. More precisely, if two operations $o_1$ and $o_2$ are ordered as $o_1<o_2$ in $H(e_1')$,
 then the return action of $o_1$ occurs before the call action of $o_2$. Because $e_2$ preserves the order between such pairs
-of actions, we have that $o_1<o_2$ in $H(e_2)$.
+of actions, we have that $o_1<o_2$ in $H(e_2)$. Therefore, by transitivity, $H(e_1)\preceq H(e_2)$.
 
-($\Leftarrow$) Let $e_1$ be an execution for which there exists an
-  execution $e_2\in E$, where every operation is completed, such that
-  $H(e_1)\preceq H(e_2)$. W.l.o.g. we assume that the injection required by the $\preceq$ relation
+($\Leftarrow$) W.l.o.g. we assume that the injection required by the $\preceq$ relation
   between $H(e_1)$ and $H(e_2)$ is the identity.
   Thus, the set of pending operations of $e_1$ can be partitioned in 
   two sets $O_{-}$ and $O_{+}$ such that the operations in $O_{-}$ don't occur in $e_2$ and the operations in 
@@ -175,10 +179,10 @@ of actions, we have that $o_1<o_2$ in $H(e_2)$.
   and (2) appending matching return actions for the operations in $O_+$. 
   Clearly, $e_1'$ and $e_2$ contain the same set of actions. Now, $H(e_1)\preceq H(e_2)$ implies that 
   $e_2$ is a permutation of $e_1'$ that preserves the order between return and call actions. Assume by contradiction
-  that this is not the case, i.e., there exists $o_1$ and $o_2$ such that $\ret{o_1}$ occurs before $\call{m}{o_2}$ in $e_1'$ 
-  but $\ret{o_1}$ occurs after $\call{m}{o_2}$ in $e_2$. By the construction of $e_1'$, the former implies that 
-  $\ret{o_1}$ occurs before $\call{m}{o_2}$ in $e_1$. Therefore, $o_1<o_2$ in $H(e_1)$ but $\neg o_1<o_2$ in $H(e_2)$
-  which contradicts the fact that $H(e_1)\preceq H(e_2)$.
+  that this is not the case, i.e., there exists $o_1$ and $o_2$ such that $\ret(v){o_1}$ occurs before $m(u)_{o_2}$ in $e_1'$ 
+  but $\ret(v){o_1}$ occurs after $m(u)_{o_2}$ in $e_2$. By the construction of $e_1'$, the former implies that 
+  $\ret(v){o_1}$ occurs before $m(u)_{o_2}$ in $e_1$. Therefore, $o_1<o_2$ in $H(e_1)$ but $\neg o_1<o_2$ in $H(e_2)$,
+  which contradicts $H(e_1)\preceq H(e_2)$.
  
 \end{proof}
 
@@ -193,33 +197,37 @@ of actions, we have that $o_1<o_2$ in $H(e_2)$.
 %then by Lemma~\ref{lemma:lib_closure}, there exists a history of $L_2$ which is
 %actually equivalent to the history of $e_1$.
 
-The following proposition is a consequence of Lemma~\ref{prop:lin} and of the fact that the observational refinement between
-a library $L_1$ and an \emph{atomic} library $L_2$ is equivalent to the linearizability of $L_1$ w.r.t. $L_2$. The latter holds
-because atomic libraries don't contain methods that never terminate.
+%The following proposition is a consequence of Lemma~\ref{lemma:exec_hist} and of the fact that the observational refinement between
+%a library $L_1$ and an \emph{atomic} library $L_2$ is equivalent to the linearizability of $L_1$ w.r.t. $L_2$. The latter holds
+%because atomic libraries don't contain methods that never terminate.
 
 \begin{proposition}
 
-A library $L_1$ is linearizable w.r.t. a set of sequential histories $S$ iff $H(L_1)\subseteq H(\atLib{S})$.
+A library $L_1$ is linearizable w.r.t. an atomic library $L_2$ iff $H(L_1)\subseteq H(L_2)$.
 
 \end{proposition}
 
 \begin{proof}
 
-($\Rightarrow$) Let $h\in H(L_1)$. By hypothesis, an execution $e$ with $H(e)=h$ is linearizable w.r.t. $S$.
-Therefore, by Lemma~\ref{prop:lin}, there exists an execution $e_2\in S\subseteq  \atLib{S}$, where every operation is completed, 
-such that $H(e_1)\preceq H(e_2)$. Now, by the closure property in Lemma~\ref{lemma:lib_closure}, if $H(e_2)\in H(\atLib{S})$
-then $h=H(e_1)\in H(\atLib{S})$, which concludes the proof.
+($\Rightarrow$) Let $h\in H(L_1)$. By hypothesis, any execution $e_1$ with $H(e_1)=h$ is linearizable w.r.t. $L_2$, i.e.,
+there exists an execution $e_2\in L_2$ with only completed operations 
+such that $e_1\sqsubseteq e_2$. By Lemma~\ref{lemma:exec_hist}, this implies $H(e_1)\preceq H(e_2)$.
+%there exists an execution $e_2\in S\subseteq  \atLib{S}$, where every operation is completed, 
+%such that $H(e_1)\preceq H(e_2)$. 
+By the closure property in Lemma~\ref{lemma:lib_closure}, if $H(e_2)\in H(L_2)$
+then $h=H(e_1)\in H(L_2)$, which concludes the proof.
 
-($\Leftarrow$) Let $e$ be an execution of $L_1$. By hypothesis, $H(e)\in H(\atLib{S})$. 
-By the definition of atomic libraries, %for any execution $e_1$ of $\atLib{S}$
-there exists an execution $e'$ of $S$, which by definition has no pending operations, such that $H(e)\preceq H(e')$.
+($\Leftarrow$) Let $e_1$ be an execution of $L_1$. By hypothesis, $H(e_1)\in H(L_2)$, which by Lemma~\ref{lemma:lib_exec},
+implies $e_1\in E(L_2)$.
+Since $L_2$ is an atomic library, %for any execution $e_1$ of $\atLib{S}$
+there exists a sequential execution $e_2$ of $L_2$ such that $e_1\sqsubseteq e_2$. Finally, since $e_2$ is a sequential execution,
+it contains only completed operations and thus, $e_1$ is linearizable w.r.t. $L_2$.
 %
 %Because $S$ is 
 %a set of executions where every operation is completed, the executions of $\atLib{S}$ can be completed with 
 %return actions such that it contains no pending operation. Therefore, there exists a history $h'\in H(\atLib{S})$ where all operations are completed such that
 %$H(e)\preceq h'$.
-Therefore, by Lemma~\ref{prop:lin}, $e$ is linearizable w.r.t. $S$.
-
+%Therefore, by Lemma~\ref{lemma:exec_hist}, $e$ is linearizable w.r.t. $S$.
 \end{proof}
 
 
