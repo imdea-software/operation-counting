@@ -77,6 +77,13 @@ alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
   $\<op>(e_i) = \<op>(e_j)$ and $i < j$ implies $e_i \match e_j$.
 
 \end{itemize}
+We say that $e \in @S^*$ is \emph{sequential} when
+\begin{itemize}
+
+  \item Operations do not overlap: \\
+  $\<op>(e_i) = \<op>(e_j)$ implies $e_k \not\in (C\u R)$ for $i < k < j$.
+
+\end{itemize}
 Well-formed words will represent executions. We assume every set of well-formed
 words is closed under isomorphic renaming of operation identifiers. For
 notational convenience, we often associate $\<Ops>$ with $\<Nats>$,
@@ -123,9 +130,11 @@ alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
   
 \end{itemize}
-Note that even a library that implements \emph{atomic methods} --- i.e.,~in
-which the internal actions of separate method calls do not interleave --- admits
-executions in which method calls and returns overlap.
+We write $e_1 ~> e_2$ when $e_2$ can be derived form $e_1$ by applying one of
+the above rules. The \emph{closure} of a set $E$ of executions under $~>$ is
+denoted $\overline{E}$. Note that even a library that implements \emph{atomic
+methods}, e.g.,~by guarding method bodies with a global-lock acquisition,
+admits executions in which method calls and returns overlap.
 
 \begin{example}
   \label{ex:libraries}
@@ -155,52 +164,87 @@ executions in which method calls and returns overlap.
   
 \end{example}
 
-The executions in the premise and resp., the conclusion of each of the closure rules given
-above %(together with the prefix closure which holds because all the states of an LTS are accepting) 
-are related by a partial order $\sqsubseteq$ defined as follows: $e_1\sqsubseteq e_2$ iff
-there exists an execution $e_1'$ obtained from $e_1$ by
-appending matching return actions (for unmatched call actions) or deleting call actions
-such that 
-\begin{itemize}
-	\item $e_1'$ and $e_2$ contain exactly the same set of actions, and 
-	\item $e_2$ is a permutation of $e_1'$ that preserves the order between return and call
-actions (i.e., if a return action $r\in R$ occurs before a call action $c\in C$
-in $e_1'$ then the same holds in $e_2$). 
-\end{itemize}
-We defer the reader to Section~\ref{} for the relation between $\sqsubseteq$ and the classic linearizability 
-relation between executions~\cite{journals/toplas/HerlihyW90}.
+\begin{lemma}
+  \label{lem:kernel}
 
-
-
-\begin{example}
-TODO ILLUSTRATE THE RELATION $\sqsubseteq$. POSITIVE AND NEGATIVE EXAMPLES.
-\end{example}
-
-
-It is straightforward that $e_1\sqsubseteq e_2$ whenever 
-$e_1$ and $e_2$ are in the conclusion and respectively the premise of a closure rule. 
-Therefore,
-
-\begin{lemma}\label{lemma:exec_closure}
-
-The set of executions $E(L)$ of a library $L$ is downward closed w.r.t. $\sqsubseteq$, i.e., 
-if $e\in E(L)$ then $e'\in E(L)$ for every $e'\sqsubseteq e$.
+  For any set $E(L)$ of library executions, there exists a unique minimal
+  (w.r.t.~set inclusion) set $E_0$ such that $\overline{E}_0 = E(L)$.
 
 \end{lemma}
 
 \begin{proof}
 
-TODO
+  By contradiction, suppose that $E_1 \neq E_2$ are minimal subsets of $E(L)$
+  such that $\overline{E}_1 = \overline{E}_2 = E(L)$. Let $E_1' = E_1 \setminus
+  E_2$ and $E_2' = E_2 \setminus E_1$ be the elements unique to $E_1$ and
+  $E_2$. Each element of $e_2' \in E_2'$ must be $\leadsto$-derivable from some
+  $e_1' \in E_1'$, and visa versa, since $e_2' \in \overline{E}_1 = E(L)$ and
+  $e_2'$ is not derivable from $(E_1 \setminus E_1') = (E_2 \setminus E_2')$
+  --- otherwise $E_2$ would not be minimal. It follows that $|E_1'| = |E_2'|$.
+  But if $|E_1'| = |E_2'|$, then there must be a non-trivial cycle $e_1 ~> e_2
+  ~> .. ~> e_{2i} ~> e_1$ of elements alternating between $E_1'$ and $E_2'$;
+  however it is easily seen that non-trivial $\leadsto$-cycles do not exist.
 
 \end{proof}
 
-Lemma~\ref{lemma:exec_closure} implies that $E(L)$ has a canonical representation,
-which is the set of maximal elements w.r.t. $\sqsubseteq$, called the \emph{kernel} of $L$ 
-and denoted by $\kernel(L)$. 
+\noindent
+This minimal $E_0$ of Lemma~\ref{lem:kernel} is called the \emph{kernel} of
+$E(L)$, and is denoted by $\ker E(L)$. A library is called \emph{atomic} if its
+kernel contains only sequential executions. Atomic libraries are typically used
+as specifications for concurrent objects.
 
-A library $L$ is called \emph{atomic} iff its kernel contains only sequential executions, i.e., executions where 
-every call action is immediately followed by its matching return action. 
-Atomic libraries are typically used as specifications for concurrent objects.
+% The executions in the premise and resp., the conclusion of each of the closure
+% rules given above
+% % (together with the prefix closure which holds because all the states of an LTS
+% % are accepting)
+% are related by a partial order $\sqsubseteq$ defined as follows:
+% $e_1\sqsubseteq e_2$ iff there exists an execution $e_1'$ obtained from $e_1$
+% by appending matching return actions (for unmatched call actions) or deleting
+% call actions such that
+%
+% \begin{itemize}
+%
+%   \item $e_1'$ and $e_2$ contain exactly the same set of actions, and
+%
+%   \item $e_2$ is a permutation of $e_1'$ that preserves the order between
+% return and call actions (i.e., if a return action $r\in R$ occurs before a call
+% action $c\in C$ in $e_1'$ then the same holds in $e_2$).
+%
+% \end{itemize}
+% We defer the reader to Section~\ref{} for the relation between $\sqsubseteq$
+% and the classic linearizability relation between
+% executions~\cite{journals/toplas/HerlihyW90}.
+%
+% \begin{example}
+% TODO ILLUSTRATE THE RELATION $\sqsubseteq$. POSITIVE AND NEGATIVE EXAMPLES.
+% \end{example}
+%
+% It is straightforward that $e_1\sqsubseteq e_2$ whenever $e_1$ and $e_2$ are in
+% the conclusion and respectively the premise of a closure rule. Therefore,
+%
+% \begin{lemma}
+%   \label{lemma:exec_closure}
+%
+%   The set of executions $E(L)$ of a library $L$ is downward closed w.r.t.
+%   $\sqsubseteq$, i.e., if $e\in E(L)$ then $e'\in E(L)$ for every
+%   $e'\sqsubseteq e$.
+%
+% \end{lemma}
+%
+% \begin{proof}
+%
+% TODO
+%
+% \end{proof}
+%
+% Lemma~\ref{lemma:exec_closure} implies that $E(L)$ has a canonical
+% representation, which is the set of maximal elements w.r.t. $\sqsubseteq$,
+% called the \emph{kernel} of $L$ and denoted by $\kernel(L)$.
+%
+% A library $L$ is called \emph{atomic} iff its kernel contains only sequential
+% executions, i.e., executions where every call action is immediately followed by
+% its matching return action. Atomic libraries are typically used as
+% specifications for concurrent objects.
 
 \begin{example}
 
