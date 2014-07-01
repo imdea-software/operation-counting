@@ -174,16 +174,16 @@ admits executions in which method calls and returns overlap.
 
 \begin{proof}
 
-  By contradiction, suppose that $E_1 \neq E_2$ are minimal subsets of $E(L)$
-  such that $\overline{E}_1 = \overline{E}_2 = E(L)$. Let $E_1' = E_1 \setminus
-  E_2$ and $E_2' = E_2 \setminus E_1$ be the elements unique to $E_1$ and
-  $E_2$. Each element of $e_2' \in E_2'$ must be $\leadsto$-derivable from some
-  $e_1' \in E_1'$, and visa versa, since $e_2' \in \overline{E}_1 = E(L)$ and
-  $e_2'$ is not derivable from $(E_1 \setminus E_1') = (E_2 \setminus E_2')$
-  --- otherwise $E_2$ would not be minimal. It follows that $|E_1'| = |E_2'|$.
-  But if $|E_1'| = |E_2'|$, then there must be a non-trivial cycle $e_1 ~> e_2
-  ~> .. ~> e_{2i} ~> e_1$ of elements alternating between $E_1'$ and $E_2'$;
-  however it is easily seen that non-trivial $\leadsto$-cycles do not exist.
+  By contradiction, suppose that $E_1 \neq E_2$ are minimal such that
+  $\overline{E}_1 = \overline{E}_2 = E(L)$. Let $E_1' = E_1 \setminus E_2$ and
+  $E_2' = E_2 \setminus E_1$ be the elements unique to $E_1$ and $E_2$. Each
+  element of $e_2' \in E_2'$ must be $\leadsto$-derivable from some $e_1' \in
+  E_1'$, and visa versa, since $e_2' \in \overline{E}_1 = E(L)$ and $e_2'$ is
+  not derivable from $(E_1 \setminus E_1') = (E_2 \setminus E_2')$ ---
+  otherwise $E_2$ would not be minimal. It follows that $|E_1'| = |E_2'|$, and
+  that there must be a non-trivial cycle $e_1 ~> e_2 ~> .. ~> e_{2i} ~> e_1$ of
+  elements alternating between $E_1'$ and $E_2'$; however it is easily seen
+  that non-trivial $\leadsto$-cycles do not exist.
 
 \end{proof}
 
