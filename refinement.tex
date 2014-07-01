@@ -250,6 +250,8 @@ as specifications for concurrent objects.
 
 TODO SETS, STACKS, QUEUES, REGISTER
 
+The kernel contains only completed executions ... for a sequential execution $e$ with a pending operation at the end, the execution without this pending operation is also in the library because of prefix closure and it is a generator for $e$ (by applying the first closure rule)
+
 \end{example}
 
 \paragraph{Programs}
