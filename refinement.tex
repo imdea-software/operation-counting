@@ -77,11 +77,11 @@ alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
   $\<op>(e_i) = \<op>(e_j)$ and $i < j$ implies $e_i \match e_j$.
 
 \end{itemize}
-We say that $e \in @S^*$ is \emph{sequential} when
+We say that the well-formed word $e \in @S^*$ is \emph{sequential} when
 \begin{itemize}
 
   \item Operations do not overlap: \\
-  $\<op>(e_i) = \<op>(e_j)$ implies $e_k \not\in (C\u R)$ for $i < k < j$.
+  $e_i, e_k \in C$ implies $\<op>(e_i) = \<op>(e_j)$ for $i < j < k$.
 
 \end{itemize}
 Well-formed words will represent executions. We assume every set of well-formed
