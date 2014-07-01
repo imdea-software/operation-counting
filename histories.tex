@@ -21,7 +21,7 @@ non-overlapping operations:
 
   \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
 
-  \item $\<op>(e_i) < \<op>(e_j)$ iff $i < j$, $e_i \in R$, and $e_j \in C$.
+  \item $\<op>(e_i) < \<op>(e_j)$ if{f} $i < j$, $e_i \in R$, and $e_j \in C$.
 
   \item $f(o) = \left\{
   \begin{array}{ll}
@@ -93,7 +93,7 @@ injection $g: O_2 -> O_1$ such that
   \item $f_1(g(o)) \preceq f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
-where $\tup{m_1,u_1,v_1} \preceq \tup{m_2,u_2,v_2}$ iff $m_1 = m_2$, $u_1 =
+where $\tup{m_1,u_1,v_1} \preceq \tup{m_2,u_2,v_2}$ if{f} $m_1 = m_2$, $u_1 =
 u_2$, and $(v_1 \neq \nil => v_1 = v_2)$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. Throughout this
 work we do not distinguish between equivalent histories, and we assume every
@@ -117,7 +117,7 @@ well.
 \begin{lemma}
   \label{lem:lib:execs}
 
-  $H(e) \in H(L)$ iff $e|(C\u R)^* \in E(L)$.
+  $H(e) \in H(L)$ if{f} $e|(C\u R)^* \in E(L)$.
 
 \end{lemma}
 
@@ -135,7 +135,7 @@ histories.
 \begin{theorem}
   \label{thm:equivalence}
 
-  $L_1 \leq L_2$ iff $H(L_1) \subseteq H(L_2)$.
+  $L_1 \leq L_2$ if{f} $H(L_1) \subseteq H(L_2)$.
 
 \end{theorem}
 
