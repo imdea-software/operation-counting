@@ -81,7 +81,7 @@ We say that the well-formed word $e \in @S^*$ is \emph{sequential} when
 \begin{itemize}
 
   \item Operations do not overlap: \\
-  $e_i, e_k \in C$ implies $\<op>(e_i) = \<op>(e_j)$ for $i < j < k$.
+  $e_i, e_k \in C$ and $i < k$ implies $e_i \match e_j$ for some $i < j < k$.
 
 \end{itemize}
 Well-formed words will represent executions. We assume every set of well-formed
