@@ -39,47 +39,42 @@ weaker history $A_k(h) \preceq h$, and which have the following properties:
 \end{description}
 This weakening-based approximation is convenient since whenever $A_k(h)$ is not
 included in $H(L)$, then neither is $h$, since $H(L)$ is closed under
-weakening (i.e., if $h$ would belong to $H(L)$, then any weakening, 
-and in particular $A_k(h)$, would also belong to $H(L)$). 
-While completeness means that increasing $k$ increases the ability
-to detect observational refinement violations, this must incur a decrease in
-efficiency since the inclusion problem $A_k(h) \in H(L)$ is NP-hard when $k$ is
-not fixed. By design, the approximation function $A_k$ allows us to solve the
-approximate history inclusion problem $A_k(h) \in H(L)$ in polynomial time when
-$k$ is fixed. %and $L$ are fixed. 
-For the more general problem of refinement between a
-given library $L_1$ and fixed library $L_2$, our approximation asks whether
-$A_k(h) \in H(L_1) \setminus H(L_2)$, and becomes decidable for fixed $k \in
-\<Nats>$, so long as the set $\set{ A_k(h) : h \in H(L_1) }$ is computable.
-Completeness of $A_k$ ensures overall completeness, i.e.,~that for any $h \in
-H(L_1) \setminus H(L_2)$ there is some $k \in \<Nats>$ such that $A_k(h) \in
-H(L_1) \setminus H(L_2)$.
+weakening; if $h$ were to belong to $H(L)$, then any weakening, and in
+particular $A_k(h)$, would also belong to $H(L)$. While completeness means that
+increasing $k$ increases the ability to detect observational refinement
+violations, this must incur a decrease in efficiency since the inclusion
+problem $A_k(h) \in H(L)$ is NP-hard when $k$ is not fixed. By design, the
+approximation function $A_k$ allows us to solve the approximate history
+inclusion problem $A_k(h) \in H(L)$ in polynomial time for fixed $k$. For the
+more general problem of refinement between libraries $L_1$ and $L_2$, our
+approximation asks whether $A_k(h) \in H(L_1) \setminus H(L_2)$, and becomes
+decidable for fixed $k$, so long as the set $\set{ A_k(h) : h \in H(L_1) }$ is
+computable. Completeness of $A_k$ ensures overall completeness, i.e.,~that for
+any $h \in H(L_1) \setminus H(L_2)$ there is some $k \in \<Nats>$ such that
+$A_k(h) \in H(L_1) \setminus H(L_2)$.
 
 Our key challenge is to develop approximation functions $A_k$ for which history
 inclusion can be computed in polynomial time for fixed $k$, and for which
 observational refinement violations surface with small $k$. We demonstrate the
-latter in Sections~\ref{sec:registers},~\ref{sec:containers},
-and~\ref{sec:experiments}.
+latter in Sections~\ref{sec:registers}--\ref{sec:exp}.
 
 In this section we develop a schema of approximation functions for which the
 approximate history inclusion problem is polynomial-time computable. Our
-development relies on identifying histories with a known mathematical concept
-called ``interval orders''~(\S\ref{sec:counting:intervals}). Leveraging the
-notion of \emph{length} of an interval order, we then abstract each history $h$
-to a weaker history $A_k(h)$ whose length is bounded by $k$, and
-represent the set $H(L)$ of histories by a formula $@Y_k$ over bounded
-intervals against which $A_k(h)$ can be evaluated in polynomial
-time~(\S\ref{sec:counting:logic}). Finally, we exhibit a program monitoring
-scheme which can be used to decide our approximate observational refinement
-problem $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$, or as a general
-purpose runtime montior~(\S\ref{sec:counting:monitor}).
-
-XXX CAREFUL BECAUSE THE FOLLOWING IS IN FLUX
+development exploits structural aspects of the history inclusion problem; in
+particular, we exploit the fact that histories are not arbitrary partial
+orders, but rather are \emph{interval orders}, with a natural measure of
+complexity, i.e.,~the interval order \emph{length}~\cite{phd/Greenough76}.
+Leveraging this notion of length, we abstract each history $h$ to a weaker
+history $A_k(h)$ whose length is bounded by $k$, and represent the set $H(L)$
+of histories by a formula $@Y_k$ over bounded interval length, against which
+$A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:logic}).
+Finally, we exhibit a program monitoring scheme which can be used to decide our
+approximate observational refinement problem $\exists h.\ A_k(h) \in H(L_1)
+\setminus H(L_2)$, or as a general purpose runtime
+montior~(\S\ref{sec:counting:monitor}).
 
 \subsection{An Operation-Counting Logic}
 \label{sec:counting:logic}
-
-TODO INSERT SETUP TEXT
 
 The \emph{past} of an element $o \in O$ of a poset $\tup{O,<}$ is the set
 \begin{align*}
@@ -120,25 +115,32 @@ Our history-weakening approximation functions $A_k$ map histories to weaker
 histories whose corresponding interval orders have length at most $k$. While
 there are various ways to define such a function $A_k$, any such function
 enables the polynomial-time inclusion check $A_k(h) \in H(L)$ which we
-demonstrate in the following subsections. Subsection~\ref{sec:counting:approx}
-describes concrete definitions that are useful in practice for detecting
-observational refinement  violations.
+demonstrate in the following; Section~\ref{sec:counting:monitor} describes an
+instantiation of $A_k$ which we have found useful in practice.
 
-
-Interval orders have a canonical representation which basically, associates to
-each element an interval on the integer line. While in general there may exist
-several ways to associate intervals to elements of an interval order, in the
-canonical representation the limits of intervals are natural numbers bounded
-by the length of the interval order.
+Interval orders have canonical representations which associate to operations
+integer-bounded intervals on the real number line; their canonical
+representations minimize the number of distinct integer-bound values to one
+plus the interval-order length.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
   \label{lem:representation}
   
   An interval order $\tup{O,<}$ of length $n \in \<Nats>$ has a canonical
   representation $I : O -> [n]^2$ mapping each $o \in O$ to the interval $I(o)
-  = [i,j] \subseteq [0,n]$, where $o_1 < o_2$ iff $\sup I(o_1) < \inf I(o_2)$.
-
+  = [i,j] \subseteq [0,n]$, with
+  \begin{align*}
+    i = |\set{\past{o'} : o'<o}| \text{ and }
+    j = |\set{\past{o'} : \neg o<o'}| \text{.}
+  \end{align*}
+  such that $o_1 < o_2$ if{f} $\sup I(o_1) < \inf I(o_2)$.
 \end{lemma}
+
+\noindent
+The canonical representation thus associates the interval $[i,j]$ to an
+operation $o$ which succeeds the $i$th past, and precedes the $(j\!+\!1)$st
+past. Note that the interval of an operation can be determined in polynomial
+time by counting the distinct pasts among operations.
 
 \begin{example}
 
@@ -146,59 +148,18 @@ by the length of the interval order.
 
 \end{example}
 
-We give a construction for the canonical representation of an interval
-order, where the
-lower, resp., upper, bound of the interval $[i,j]$ associated to some element
-$o$ equals the number of distinct pasts $\past{o'}$ with
-$o'<o$, resp., $o'<o$ or $o'$ incomparable to $o$.
-
-%This property is also an explanation for the fact that the length of an
-%interval order equals the number of distinct pasts.
-
-\begin{lemma}
-  \label{lemma:norm_form}
-
-  Let $\tup{O,<}$ be an interval order and $I : O -> [n]^2$ its canonical
-  representation. Then, for every $o\in O$, $I(o)=[i,j]$, where
-  \begin{align*}
-    i = |\set{\past{o'}:o'<o}|\mbox{ and }j= |\set{\past{o'}:\neg o<o'}|
-    \text{.}
-  \end{align*}
-
-\end{lemma}
-
-\begin{proof}
-
-  TODO GIVE A PROOF
-
-\end{proof}
-
-Let $h = \tup{O,f,<}$ be a history for which $\tup{O,f}$ forms an interval
-order, and let $I : O -> [n]^2$ be its minimal representation. We extend $I$ to
-a representation $\pi$ including operations' synopses, by $\pi(o) =
-\tup{f(o),I(o)}$, and then define the \emph{counting representation} $\Pi(h)$
-of $h$ by the multiset $\mset{ \pi(o) : o \in O }$ of synopsis-interval
-pairs $\tup{m(u)\triangleright v^*,[i,j]}$. Finally we lift $\Pi$ to libraries, defining the set
-of counting representations of library histories as $\Pi(L) = \set{ \Pi(h) : h
-\in H(L) }$.
-
-\begin{example}
-
-  TODO EXAMPLE OF COUNTING REPRESENTATIONS
-
-\end{example}
-
-Lemma~\ref{lemma:norm_form} gives a polynomial time procedure for constructing the counting representation of a history.
-One can determine the interval of an operation by counting the distinct pasts of the other operations and then, count
-operations which have the same synopsis and in the same interval.
-
-The next lemma states that checking the membership of a history into a set of histories can be done using
-only their counting representations.
+We define the \emph{counting representation} $\Pi(h)$ of a history $h =
+\tup{O,f,<}$ with canonical representation $I : O -> [n]^2$ as the multiset
+\begin{align*}
+  \Pi(h) = \mset{ \tup{f(o),I(o)} : o \in O }
+\end{align*}
+of operation-label-and-interval pairs; defining $\Pi(L) = \set{ \Pi(h) : h \in
+H(L) }$ yields a criterion equivalent to history inclusion based on counting
+representations.
 
 \begin{lemma}
 
-  Let $e$ be an execution and $L_2$ a library. Then, 
-  $H(e) \in H(L_2)$ if and only if $\Pi(H(e)) \in \Pi(L_2)$.
+  $H(e) \in H(L)$ if{f} $\Pi(H(e)) \in \Pi(L)$.
 
 \end{lemma}
 
@@ -208,51 +169,46 @@ only their counting representations.
 
 \end{proof}
 
+\begin{example}
 
+  TODO EXAMPLE OF COUNTING REPRESENTATIONS
 
+\end{example}
 
+This counting representation leads to an effective logical characterization of
+history sets using arithmetic operations, inequalities, and a counting function
+$\#$. Formally, \emph{operation counting logic} ($\ocl$ for short) is a
+first-order logic with the following syntax:
 
-This canonical ``counting'' representation of histories leads to an effective
-logical characterization of sets of histories using 
-arithmetic operations, inequalities,
-and an operation-counting function $\#$. Formally, \emph{operation counting
-logic} ($\ocl$ for short) is a first-order logic with the following syntax:
-
-\[
-\begin{array}{c}
-\begin{array}{llll}
-i,j\in \<Nats> & \mbox{integer constants} & s\in \<Synopses> & \mbox{synopsis constants}
-\end{array} \\[1mm]
-
-x, x_0, x_1,\ldots: \<Synopses> \quad \mbox{synopsis-type variables} \\[3mm]
-
-\begin{array}{ll}
-M ::= & \hspace{-2mm} s\mid x\\[2mm]
-T  ::= & \hspace{-2mm} i\mid \#(x, i, j)\mid T + T \\[2mm]
-F ::= & \hspace{-2mm} T \leq T \mid P(M_0,M_1,\ldots)\mid \neg F\mid F\land F\mid \exists x.\ F
-\end{array}
-\end{array}
-\]
-
-The function $\#$ is interpreted over histories $h$ as
 \begin{align*}
-  \db{\#(x,i,j)}_h = |\set{ o \in O : \pi(o) = \tup{x,[i,j]} }|,
+  \begin{array}{llll}
+  i,j\in \<Nats> & \mbox{integer constants} & s\in \<Synopses> & \mbox{synopsis constants}
+  \end{array} \\
+  x, x_0, x_1,\ldots: \<Synopses> \quad \mbox{synopsis-type variables} \\
+  \begin{array}{ll}
+  M ::= & \hspace{-2mm} s\mid x\\[2mm]
+  T  ::= & \hspace{-2mm} i\mid \#(x, i, j)\mid T + T \\[2mm]
+  F ::= & \hspace{-2mm} T \leq T \mid P(M_0,M_1,\ldots)\mid \neg F\mid F\land F\mid \exists x.\ F
+  \end{array}
 \end{align*}
-where $\pi$ is the counting representation of $h$. The operation counting logic allows 
-predicates $P$ over synopsis (of any arity) as long as their evaluation can be done in polynomial-time.
-Also, the quantified synopsis-type variables are interpreted only over synopsis occurring in 
-the history $h$ over which the formula is evaluated. Formally, the satisfaction relation $\models$
-for quantified formulas is defined by:
-\[
-\begin{array}{lll}
-h\models \exists x.\ F&\mbox{iff} &\mbox{there exists $s\in\<Synopses>(h)$ such that
-% $f(o)=s$,}\\
-%&&\mbox{for some $o$, and 
-$h\models F[x\gets s]$}.
-\end{array}
-\]
+The function $\#$ is interpreted over a history $h = \tup{O,f,<}$ as
+\begin{align*}
+  \db{\#(x,i,j)}_h = |\set{ o \in O : f(o) = x \text{ and } I(o) = [i,j] }|
+\end{align*}
+where $I$ is the canonical representation of $h$.
 
-The \emph{quantifier rank} of an $\ocl$ formula $@Y$ is the maximum number of nested quantifiers in $@Y$.
+The operation counting logic allows predicates $P$ over synopsis (of any arity)
+as long as their evaluation can be done in polynomial-time. Also, the
+quantified synopsis-type variables are interpreted only over synopsis occurring
+in the history $h$ over which the formula is evaluated. Formally, the
+satisfaction relation $\models$ for quantified formulas is defined by:
+\begin{align*}
+  h |= \exists x.\ F \quad \text{iff} \quad
+  \exists s \in \<Synopses>(h) \text{ such that } h |= F[x <- s].
+\end{align*}
+
+The \emph{quantifier rank} of an $\ocl$ formula $@Y$ is the maximum number of
+nested quantifiers in $@Y$.
 
 TODO SYNTACTIC SUGAR IF NECESSARY
 
@@ -276,16 +232,16 @@ $k$.
   Since $A_k(h)$ is required to be polynomial-time computable, and deciding
   $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
   has length at most $k$, it remains only to show $A_k(h) |= @Y$ is
-  polynomial-time decidable. This follows easily from the following facts: 
-  (1) the counting representation of $A_k(h)$ is polynomial-time computable 
-  (cf. Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
-  can be evaluated in constant/polynomial time, and (3) quantified variables of $@Y$
-  are only instantiated over synopses occurring in $h$. The latter implies that the
-  existential quantifiers can be replaced by a disjunction over all synopses occurring in $h$, i.e.,
-  \[
-  h\models \exists x.\ F\quad \mbox{ iff }\quad h\models \bigvee_{s\in \<Synopses>(h)} F[x\gets m].
-  \]
-%  where $\<Synopses>(h)=\set{s:\exists o.\ f(o)=s}$.
+  polynomial-time decidable. This follows easily from the following facts: (1)
+  the counting representation of $A_k(h)$ is polynomial-time computable (cf.
+  Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
+  can be evaluated in constant/polynomial time, and (3) quantified variables of
+  $@Y$ are only instantiated over synopses occurring in $h$. The latter implies
+  that the existential quantifiers can be replaced by a disjunction over all
+  synopses occurring in $h$, i.e.,
+  \begin{align*}
+    h\models \exists x.\ F\quad \mbox{ iff }\quad h\models \bigvee_{s\in \<Synopses>(h)} F[x\gets m].
+  \end{align*}
 
 \end{proof}
 
