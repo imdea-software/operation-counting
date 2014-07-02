@@ -31,6 +31,7 @@ non-overlapping operations:
   \right.$
 
 \end{itemize}
+For write $m(u) => v$ to denote the label $f(o) = \tup{m,u,v}$, and
 $H(L) = \set{ H(e) : e \in E(L) }$ denotes the histories admitted by $L$.
 
 \begin{example}
@@ -94,7 +95,7 @@ injection $g: O_2 -> O_1$ such that
 
 \end{itemize}
 where $\tup{m_1,u_1,v_1} \preceq \tup{m_2,u_2,v_2}$ if{f} $m_1 = m_2$, $u_1 =
-u_2$, and $(v_1 \neq \nil => v_1 = v_2)$. We say $h_1$ and $h_2$ are
+u_2$, and $(v_1 \neq \nil \implies v_1 = v_2)$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. Throughout this
 work we do not distinguish between equivalent histories, and we assume every
 set $H$ of histories is closed under inclusion of equivalent histories,
@@ -141,11 +142,11 @@ histories.
 
 \begin{proof}
   
-  ($=>$) Let $h = \tup{O,<,f} \in H(L_1)$; we show $h \in H(L_2)$ by
+  ($\Rightarrow$) Let $h = \tup{O,<,f} \in H(L_1)$; we show $h \in H(L_2)$ by
   constructing a program $P_h$ over actions $@S$ which only admits executions
   with histories stronger than $h$:
   \begin{align*}
-    \forall e \in E(P_h).\ |(e|@S)| = n => h \preceq H(e) \text{,}
+    \forall e \in E(P_h).\ |(e|@S)| = n \implies h \preceq H(e) \text{,}
   \end{align*}
   where $n = |\set{ o \in O : f(o) = \tup{\_,\<true>}}|$ is the number of
   completed operations in $h$. Given such a program $P_h$, taking any execution
@@ -174,7 +175,7 @@ histories.
   In any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
   come after the return $\<ret>(v)_{o'}$ of each $o'<o$. Furthermore, all
   completed operations of $h$ are completed in $e$ if and only if $(e|@S) =
-  a^n$. It follows that $|(e|@S)| = n => h \preceq H(e)$.
+  a^n$. It follows that $|(e|@S)| = n \implies h \preceq H(e)$.
 
   ($\Leftarrow$)
   Let $P$ be a program over actions $@S$, and $e \in E(P \x L_1)$; we show that
