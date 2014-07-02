@@ -1,5 +1,5 @@
 %!TEX root = draft.tex
-\section{Operation Counting for Bounded Histories}
+\section{Approximating History Inclusion}
 \label{sec:counting}
 
 By the equivalences of Section~\ref{sec:lin}, checking whether a given history
@@ -73,7 +73,7 @@ approximate observational refinement problem $\exists h.\ A_k(h) \in H(L_1)
 \setminus H(L_2)$, or as a general purpose runtime
 montior~(\S\ref{sec:counting:monitor}).
 
-\subsection{An Operation-Counting Logic}
+\subsection{Bounded-Interval-Length History Inclusion}
 \label{sec:counting:logic}
 
 The \emph{past} of an element $o \in O$ of a poset $\tup{O,<}$ is the set
@@ -181,34 +181,34 @@ $\#$. Formally, \emph{operation counting logic} ($\ocl$ for short) is a
 first-order logic with the following syntax:
 
 \begin{align*}
-  \begin{array}{llll}
-  i,j\in \<Nats> & \mbox{integer constants} & s\in \<Synopses> & \mbox{synopsis constants}
-  \end{array} \\
-  x, x_0, x_1,\ldots: \<Synopses> \quad \mbox{synopsis-type variables} \\
-  \begin{array}{ll}
-  M ::= & \hspace{-2mm} s\mid x\\[2mm]
-  T  ::= & \hspace{-2mm} i\mid \#(x, i, j)\mid T + T \\[2mm]
-  F ::= & \hspace{-2mm} T \leq T \mid P(M_0,M_1,\ldots)\mid \neg F\mid F\land F\mid \exists x.\ F
-  \end{array}
+  i,j & \in \<Nats>
+    \qquad \text{integer constants} \\
+  @l & \in \<Labels>
+    \qquad \text{operation-label constants} \\
+  x & : \<Labels>
+    \qquad \text{operation-label variables} \\
+  X & ::= @l \mid x \\
+  T & ::= i \mid \#(X, i, j) \mid T + T \\
+  F & ::= T \leq T \mid P(X,.,X) \mid \neg F \mid F \land F \mid \exists x.\ F
 \end{align*}
 The function $\#$ is interpreted over a history $h = \tup{O,f,<}$ as
 \begin{align*}
-  \db{\#(x,i,j)}_h = |\set{ o \in O : f(o) = x \text{ and } I(o) = [i,j] }|
+  \db{\#(@l,i,j)}_h = |\set{ o \in O : f(o) = @l \text{ and } I(o) = [i,j] }|
 \end{align*}
 where $I$ is the canonical representation of $h$.
 
-The operation counting logic allows predicates $P$ over synopsis (of any arity)
-as long as their evaluation can be done in polynomial-time. Also, the
-quantified synopsis-type variables are interpreted only over synopsis occurring
-in the history $h$ over which the formula is evaluated. Formally, the
-satisfaction relation $\models$ for quantified formulas is defined by:
+We allow predicates $P$ of arbitrary arity over operation labels, so long as
+they are evaluated in polynomial time. Furthermore, operation-label variables
+are quantified only over the operation labels which occur in the history over
+which a formula is evaluated. The satisfaction relation $|=$ for quantified
+formulas is defined by:
 \begin{align*}
-  h |= \exists x.\ F \quad \text{iff} \quad
-  \exists s \in \<Synopses>(h) \text{ such that } h |= F[x <- s].
+  h |= \exists x.\ F
+  \quad \text{if{f}} \quad
+  \exists o \in O.\ h |= F[x <- f(o)].
 \end{align*}
-
-The \emph{quantifier rank} of an $\ocl$ formula $@Y$ is the maximum number of
-nested quantifiers in $@Y$.
+where $h = \tup{O,f,<}$. The \emph{quantifier rank} of an $\ocl$ formula $@Y$
+is the maximum number of nested quantifiers in $@Y$.
 
 TODO SYNTACTIC SUGAR IF NECESSARY
 
@@ -218,13 +218,10 @@ $k$.
 
 \begin{lemma}
 
-%  Let $k\in\<Nats>$ and $L$ a library such that there exists a counting formula $@Y$ representing $L$ up to $k$.
-%  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in time 
-%  polynomial in the size of $h$ and $@Y$. 
   The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
   polynomial time, for fixed $k$, given an operation counting formula
   $@Y$ for $L$ up to $k$, of fixed quantifier rank.
- 
+
 \end{lemma}
 
 \begin{proof}
@@ -236,16 +233,17 @@ $k$.
   the counting representation of $A_k(h)$ is polynomial-time computable (cf.
   Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
   can be evaluated in constant/polynomial time, and (3) quantified variables of
-  $@Y$ are only instantiated over synopses occurring in $h$. The latter implies
-  that the existential quantifiers can be replaced by a disjunction over all
-  synopses occurring in $h$, i.e.,
+  $@Y$ are only instantiated over labels occurring in $h$. The latter implies
+  that quantifiers can be replaced by a disjunction over the labels occurring
+  in $h = \tup{O,f,<}$:
   \begin{align*}
-    h\models \exists x.\ F\quad \mbox{ iff }\quad h\models \bigvee_{s\in \<Synopses>(h)} F[x\gets m].
+    h |= \exists x.\ F
+    \quad \text{if{f}} \quad
+    h |= \bigvee_{o \in O} F[x <- f(o)].
   \end{align*}
-
 \end{proof}
 
-\subsection{Approximating Histories by Counting}
+\subsection{Monitoring Bounded-Interval-Length Histories}
 \label{sec:counting:monitor}
 
 Given a history $h = \tup{O,<,f}$ of interval length $n$, and $k \in \<Nats>$,
@@ -253,10 +251,10 @@ we define
 %\emph{the earlybird abstraction} $A^{\triangleleft}_k(h) =
 %\tup{O,<^{\triangleleft},f}$ and 
 \emph{the recency abstraction}
-$A^{\Vdash}_k(h) = \tup{O,<^{\Vdash},f}$ of $h$ by
+$A_k(h) = \tup{O,<,f}$ of $h$ by
 \begin{align*}
 %  o_1 <^{\triangleleft} o_2 & \text{ iff } o_1 < o_2 \text{ and } \sup I(o_1) < k \\
-  o_1 <^{\Vdash} o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
+  o_1 < o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
 \end{align*}
 where $I : O -> [n]^2$ is the interval map of $h$. Intuitively, 
 %the
@@ -265,17 +263,17 @@ where $I : O -> [n]^2$ is the interval map of $h$. Intuitively,
 the
 recency abstraction remembers only the the ordering between ``recent''
 operations which have started after interval $n-k$. It follows by definition
-that $A_k^{\Vdash}(h) \preceq h$,
+that $A_k(h) \preceq h$,
 since ordering constraints are only removed from $<$.
-Also, $A^{\Vdash}_k(h)=h$ for any history $h$ of length $n\leq k$.
-The next lemma relates the interval maps of $h$ and $A^{\Vdash}_k(h)$.
+Also, $A_k(h)=h$ for any history $h$ of length $n\leq k$.
+The next lemma relates the interval maps of $h$ and $A_k(h)$.
 
 \begin{lemma}\label{lemma:abstraction}
 
-Let $I : O -> [n]^2$ and $I^{\Vdash}_k: O -> [k]^2$ be the interval maps
-of $h$ and $A^{\Vdash}_k(h)$, respectively. Then, for every $o\in O$,
+Let $I : O -> [n]^2$ and $I_k: O -> [k]^2$ be the interval maps
+of $h$ and $A_k(h)$, respectively. Then, for every $o\in O$,
 \[
-I(o)=[i,j] \mbox{ iff } I^{\Vdash}_k(o) = [ |n-i|_k, |n-j|_k ]
+I(o)=[i,j] \mbox{ iff } I_k(o) = [ |n-i|_k, |n-j|_k ]
 \]
 where for every $m$, $|m|_k=m$, if $m\leq k$, and $|m|_k=0$, otherwise.
 
@@ -283,7 +281,7 @@ where for every $m$, $|m|_k=m$, if $m\leq k$, and $|m|_k=0$, otherwise.
 
 We define an online algorithm for computing the recency abstraction of 
 an execution's history $H(e)$, that reads the stream of call/return actions in $e$
-and computes the counting representation of the recency abstraction $A^{\Vdash}_k(H(e))$.
+and computes the counting representation of the recency abstraction $A_k(H(e))$.
 
 %The recency abstraction depends on the interval map $I$ of $H(e)$ and thus, 
 To compute the counting representation, the algorithm counts distinct pasts of operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form})
@@ -354,7 +352,7 @@ j= \left\{\begin{array}{ll}\nbbarr{e,\<ret>(v)_o},&\mbox{ if $\<ret>(v)_o$ occur
 \end{lemma}
 
 Algorithm~\ref{alg:counting} outputs the counting representation of 
-$A^{\Vdash}_k(H(e))$, for any given $k$ and $e$. The counting
+$A_k(H(e))$, for any given $k$ and $e$. The counting
 representation is stored in the array $\<counters>$ and the variable 
 $\<newPast>$ is used to detect interval ticks.
 The variable $\<time>$
@@ -415,13 +413,13 @@ decrementing $0$ has no effect).
         $\NewPast <- \False$
       }
       $\StartTime[o] <- \Time$ \;
-      \Increment $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
+      \Increment $\Counters[m(u) => \bottom,\StartTime[o],k]$ \;
     }
     \Case{return action $ \<ret>(v)_o$}{
 %      $i <-|\<time>-\nbbarr{e,m(u)_o}|_k$ \;
 %      $j <- \<min>(\Time,k)$ \;
-      \Decrement $\Counters[\synop{m}{u}{\bottom},\StartTime[o],k]$ \;
-      \Increment $\Counters[\synop{m}{u}{v},\StartTime[o],\Time]$ \;
+      \Decrement $\Counters[m(u) => \bottom,\StartTime[o],k]$ \;
+      \Increment $\Counters[m(u) => v,\StartTime[o],\Time]$ \;
       $\NewPast <- \True$
     }
   }
@@ -429,29 +427,29 @@ decrementing $0$ has no effect).
   \BlankLine
   \Procedure \Shift{\Counters} \;
   \Indp
-  \ForEach{$s=\synop{m}{u}{v}$}{
+  \ForEach{$@l = m(u) => v$}{
   	\For{$i$ = $1$ \To $k$}{
 		\For{$j$ = $i$ \To $k$}{
-			$\Counters[s,i-1,j-1]$ += $\Counters[s,i,j]$
-			$\Counters[s,i,j	] <- 0$ 
+			$\Counters[@l,i-1,j-1]$ += $\Counters[@l,i,j]$
+			$\Counters[@l,i,j	] <- 0$ 
 		}
 	}
 	\For{$j$ = $1$ \To $k$}{
-			$\Counters[s,0,j-1]$ += $\Counters[s,0,j]$
-			$\Counters[s,0,j] <- 0$ 
+			$\Counters[@l,0,j-1]$ += $\Counters[@l,0,j]$
+			$\Counters[@l,0,j] <- 0$ 
 	}
   }
-  \ForEach{$s=\synop{m}{u}{\bottom}$}{
+  \ForEach{$@l = m(u) => \bottom$}{
 	\For{$i$ = $1$ \To $k$}{
-			$\Counters[s,i-1,k]$ += $\Counters[s,i,k]$
-			$\Counters[s,i,k] <- 0$ 
+			$\Counters[@l,i-1,k]$ += $\Counters[@l,i,k]$
+			$\Counters[@l,i,k] <- 0$ 
 	}
   }
   \ForEach{$o$} {
   	\Decrement \StartTime[o] \;
   }
     \caption{An online algorithm for computing the counting representation
-    $\Pi(A^{\Vdash}_k(H(e)))$ of a given history $h$.}
+    $\Pi(A_k(H(e)))$ of a given history $h$.}
   \label{alg:counting}
 \end{algorithm}
 
@@ -463,8 +461,8 @@ algorithm.
   \label{lem:counting:alg}
 
   Algorithm~\ref{alg:counting} outputs the counting representation
-  $\Pi(A^{\Vdash}_k(H(e)))$ of the weakening $A^{\Vdash}_k(H(e))$ of a given execution's 
-  history $H(e)$ in space $O(|\synopses{e}|\cdot \log |e|)$
+  $\Pi(A_k(H(e)))$ of the weakening $A_k(H(e))$ of a given execution's 
+  history $H(e)$ in space $O(|\<Methods>| \cdot |\<Vals>|^2 \cdot \log |e|)$
 %  \footnote{The space complexity of Algorithm~\ref{alg:counting} is linear in the number of method
 %  synopses in $e$
 %  when the size of integers is fixed, as in the case of modern computer
@@ -474,11 +472,11 @@ algorithm.
 \end{lemma}
 
 Algorithm~\ref{alg:counting} can also be interpreted as a program $P_k$ that composed with a library $L$,
-generates the set $\set{ A_k^{\Vdash}(h) : h \in H(L) }$ of all recency abstractions of histories of $L$.
+generates the set $\set{ A_k(h) : h \in H(L) }$ of all recency abstractions of histories of $L$.
 %More precisely, every value of the array $\<counters>$ reachable in this program 
-%represents the counting representation $\Pi(A_k^{\Vdash}(h))$ of some $A_k^{\Vdash}(h)$ with $h\in H(L)$
+%represents the counting representation $\Pi(A_k(h))$ of some $A_k(h)$ with $h\in H(L)$
 %and for every $h\in H(L)$, the program reaches a state where the value of $\<counters>$
-%equals $\Pi(A_k^{\Vdash}(h))$. 
+%equals $\Pi(A_k(h))$. 
 More precisely, let $\<Cnts>(P_k\times L)$ be the set of all
 values of the array $\<counters>$ reachable in $P_k\times L$. Then, 
 
@@ -486,7 +484,7 @@ values of the array $\<counters>$ reachable in $P_k\times L$. Then,
 
   For any library $L$,
   \[
-  \<Cnts>(P_k\times L) = \set{ \Pi(A^{\Vdash}_k(h)) : h \in H(L) }.
+  \<Cnts>(P_k\times L) = \set{ \Pi(A_k(h)) : h \in H(L) }.
   \] 
 
 \end{lemma}
@@ -494,7 +492,7 @@ values of the array $\<counters>$ reachable in $P_k\times L$. Then,
 \begin{theorem}
 
   Given $@Y$ an operation counting formula for $L_2$ up to $k$, 
-  the approximate inclusion $\exists h.\ A_k^{\Vdash}(h) \in H(L_1) \setminus H(L_2)$ is equivalent to
+  the approximate inclusion $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$ is equivalent to
   the fact that 
 %  there exists a value of $\<counters>$ reachable in $P_k\times L$ such that
   \[
@@ -510,7 +508,7 @@ values of the array $\<counters>$ reachable in $P_k\times L$. Then,
 %\begin{lemma}
 %  \label{lem:counting:reach}
 %
-%  The set $\set{ A^{\Vdash}_k(h) : h \in H(L) }$ of $k$ interval-length histories of
+%  The set $\set{ A_k(h) : h \in H(L) }$ of $k$ interval-length histories of
 %  $L$ is computable when $L$ is a finite-state library.
 %
 %\end{lemma}

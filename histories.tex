@@ -11,12 +11,14 @@ equivalent notion based on concise abstractions of program executions called
 helps expose the structure of the refinement problem, and suggests practical
 means of automation which we develop in Section~\ref{sec:counting}.
 
-A \emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
-\<Ops>$ of operation identifiers labeled by $f: O -> \<Methods> \x \<Vals> \x
-(\<Vals> \u \set{\nil})$ for which $f(o) = \tup{\_,\_,\nil}$ implies $o$ is
-maximal in $<$. The \emph{history} $H(e)$ of a well-formed execution $e \in
-@S^*$ labels each operation with a method-call summary, and orders
-non-overlapping operations:
+For given sets $\<Methods>$ and $\<Vals>$ of methods and values, we fix a set
+$\<Labels> = \<Methods> \x \<Vals> \x (\<Vals> \u \set{\bot})$ of
+\emph{operation labels}, and denote the label $\tup{m,u,v}$ by $m(u) => v$. A
+\emph{history} $h = \tup{O,<,f}$ is a partial order $<$ on a set $O \subseteq
+\<Ops>$ of operation identifiers labeled by $f: O -> \<Labels>$ for which $f(o)
+= m(u) => \bot$ implies $o$ is maximal in $<$. The \emph{history} $H(e)$ of
+a well-formed execution $e \in @S^*$ labels each operation with a method-call
+summary, and orders non-overlapping operations:
 \begin{itemize}
 
   \item $O = \set{ \<op>(e_i) : 0 \le i < |e| \text{ and } e_i \in C }$,
@@ -25,14 +27,13 @@ non-overlapping operations:
 
   \item $f(o) = \left\{
   \begin{array}{ll}
-    \tup{m,u,v} & \text{ if } m(u)_o \in e \text{ and } \<ret>(v)_o \in e \\
-    \tup{m,u,\nil} & \text{ if } m(u)_o \in e \text{ and } \<ret>(\_)_o \not\in e
+    m(u) => v     & \text{if } m(u)_o \in e \text{ and } \<ret>(v)_o \in e \\
+    m(u) => \bot  & \text{if } m(u)_o \in e \text{ and } \<ret>(\_)_o \not\in e
   \end{array}
   \right.$
 
 \end{itemize}
-For write $m(u) => v$ to denote the label $f(o) = \tup{m,u,v}$, and
-$H(L) = \set{ H(e) : e \in E(L) }$ denotes the histories admitted by $L$.
+The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
 
 \begin{example}
   \label{ex:histories}
@@ -86,16 +87,15 @@ Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
 injection $g: O_2 -> O_1$ such that
 \begin{itemize}
 
-  \item $f_1(o) = \tup{\_,\_,v \neq \nil}$ implies $o \in \<range>(g)$
-  for each $o \in O_1$,
+  \item $o \in \<range>(g)$ when $f_1(o) = m(u) => v$ and $v \neq \bot$,
 
   \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
 
   \item $f_1(g(o)) \preceq f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
-where $\tup{m_1,u_1,v_1} \preceq \tup{m_2,u_2,v_2}$ if{f} $m_1 = m_2$, $u_1 =
-u_2$, and $(v_1 \neq \nil \implies v_1 = v_2)$. We say $h_1$ and $h_2$ are
+where $(m_1(u_1) => v_1) \preceq (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
+u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. Throughout this
 work we do not distinguish between equivalent histories, and we assume every
 set $H$ of histories is closed under inclusion of equivalent histories,
@@ -163,13 +163,13 @@ histories.
   Transitions are given by,
   \begin{align*}
     & \text{for each } q \in Q, o \in O, m \in \<Methods>, v \in \<Vals> \\
-    & \quad \text{if } f(o) = \tup{m,v,\_}
+    & \quad \text{if } f(o) = m(v) => \_
       \text{ and } q(o') \text{ for all } o' < o \text{ then} \\
     & \qquad q[o |-> \bot,\bot] \xrightarrow{m(v)_o} q[o |-> \top,\bot] \\
-    & \quad \text{ if } f(o) = \tup{m,\_,v} \text{ and } v \neq \nil \text{ then} \\
+    & \quad \text{ if } f(o) = m(\_) => v \text{ then} \\
     & \qquad q[o |-> \top,\bot] \xrightarrow{\<ret>(v)_o}
       \cdot \xrightarrow{a} q[o |-> \top,\top] \\
-    & \quad \text{ if } f(o) = \tup{m,\_,\nil} \text{ then} \\
+    & \quad \text{ if } f(o) = m(\_) => \bot \text{ then} \\
     & \qquad q[o |-> \top,\bot] \xrightarrow{\<ret>(v)_o} q[o |-> \top,\top]
   \end{align*}
   In any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
