@@ -149,11 +149,12 @@ time by counting the distinct pasts among operations.
 \end{example}
 
 We define the \emph{counting representation} $\Pi(h)$ of a history $h =
-\tup{O,f,<}$ with canonical representation $I : O -> [n]^2$ as the multiset
+\tup{O,f,<}$, whose underlying interval order $\tup{O,<}$ has the canonical
+representation $I : O -> [n]^2$, as the multiset
 \begin{align*}
   \Pi(h) = \mset{ \tup{f(o),I(o)} : o \in O }
 \end{align*}
-of operation-label-and-interval pairs; defining $\Pi(L) = \set{ \Pi(h) : h \in
+of label-and-interval pairs; defining $\Pi(L) = \set{ \Pi(h) : h \in
 H(L) }$ yields a criterion equivalent to history inclusion based on counting
 representations.
 
@@ -177,25 +178,29 @@ representations.
 
 This counting representation leads to an effective logical characterization of
 history sets using arithmetic operations, inequalities, and a counting function
-$\#$. Formally, \emph{operation counting logic} ($\ocl$ for short) is a
-first-order logic with the following syntax:
-
-\begin{align*}
-  i,j & \in \<Nats>
-    \qquad \text{integer constants} \\
-  @l & \in \<Labels>
-    \qquad \text{operation-label constants} \\
-  x & : \<Labels>
-    \qquad \text{operation-label variables} \\
-  X & ::= @l \mid x \\
-  T & ::= i \mid \#(X, i, j) \mid T + T \\
-  F & ::= T \leq T \mid P(X,.,X) \mid \neg F \mid F \land F \mid \exists x.\ F
-\end{align*}
-The function $\#$ is interpreted over a history $h = \tup{O,f,<}$ as
+$\#$. Formally, \emph{operation counting logic} is the first-order logic whose
+syntax is listed in Figure~\ref{fig:logic}. The $\#$ function is interpreted
+over a history $h = \tup{O,f,<}$ as
 \begin{align*}
   \db{\#(@l,i,j)}_h = |\set{ o \in O : f(o) = @l \text{ and } I(o) = [i,j] }|
 \end{align*}
 where $I$ is the canonical representation of $h$.
+
+\begin{figure}
+  \begin{align*}
+    i,j & \in \<Nats>
+      \qquad \text{integer constants} \\
+    @l & \in \<Labels>
+      \qquad \text{operation-label constants} \\
+    x & : \<Labels>
+      \qquad \text{operation-label variables} \\
+    X & ::= @l \mid x \\
+    T & ::= i \mid \#(X, i, j) \mid T + T \\
+    F & ::= T \leq T \mid P(X,.,X) \mid \neg F \mid F \land F \mid \exists x.\ F
+  \end{align*}
+  \caption{The syntax of Operation Counting Logic.}
+  \label{fig:logic}
+\end{figure}
 
 We allow predicates $P$ of arbitrary arity over operation labels, so long as
 they are evaluated in polynomial time. Furthermore, operation-label variables
@@ -207,14 +212,10 @@ formulas is defined by:
   \quad \text{if{f}} \quad
   \exists o \in O.\ h |= F[x <- f(o)].
 \end{align*}
-where $h = \tup{O,f,<}$. The \emph{quantifier rank} of an $\ocl$ formula $@Y$
-is the maximum number of nested quantifiers in $@Y$.
-
-TODO SYNTACTIC SUGAR IF NECESSARY
-
-An operation counting formula $@Y$ \emph{represents a library $L$ up to $k$}
-when $h \in H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most
-$k$.
+where $h = \tup{O,f,<}$. The \emph{quantifier rank} of an operation counting
+formula $@Y$ is the maximum number of nested quantifiers in $@Y$. An operation
+counting formula $@Y$ \emph{represents a library $L$ up to $k$} when $h \in
+H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
 
 \begin{lemma}
 
@@ -229,13 +230,18 @@ $k$.
   Since $A_k(h)$ is required to be polynomial-time computable, and deciding
   $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
   has length at most $k$, it remains only to show $A_k(h) |= @Y$ is
-  polynomial-time decidable. This follows easily from the following facts: (1)
-  the counting representation of $A_k(h)$ is polynomial-time computable (cf.
-  Lemma~\ref{lemma:norm_form}), (2) all the functions and predicates in $@Y$
-  can be evaluated in constant/polynomial time, and (3) quantified variables of
-  $@Y$ are only instantiated over labels occurring in $h$. The latter implies
-  that quantifiers can be replaced by a disjunction over the labels occurring
-  in $h = \tup{O,f,<}$:
+  polynomial-time decidable. This follows from the facts that:
+  \begin{itemize}
+
+    \item $A_k(h)$ is polynomial-time computable (see Lemma~\ref{lem:representation}),
+
+    \item functions and predicates are polynomial-time computable, and
+
+    \item quantifiers are only instantiated over labels occurring in $h$.
+
+  \end{itemize}
+  The latter implies that quantifiers can be replaced by a disjunction over the
+  labels occurring in $h = \tup{O,f,<}$:
   \begin{align*}
     h |= \exists x.\ F
     \quad \text{if{f}} \quad
