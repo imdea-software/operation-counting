@@ -65,9 +65,10 @@ actions} and $R = \set{ \<ret>(v)_o : v \in \<Vals>, o \in \<Ops> }$ of
 \emph{return actions}; each call action $m(v)_o$ combines a method $m \in
 \<Methods>$ and value $v \in \<Vals>$ with an \emph{operation identifier} $o
 \in \<Ops>$. We denote the operation identifier of a call/return action $c$ by
-$\<op>(c)$. Two call/return actions $c$ and $r$ are \emph{matching}, written $c
-\match r$, when $\<op>(c) = \<op>(r)$ and $c \neq r$. A word $e \in @S^*$ over
-alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well formed} when:
+$\<op>(c)$. Call and return actions $c \in C$ and $r \in R$ are
+\emph{matching}, written $c \match r$, when $\<op>(c) = \<op>(r)$. A word $e
+\in @S^*$ over alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well
+formed} when:
 \begin{itemize}
 
   \item Each return is preceded by a matching call: \\
