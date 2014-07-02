@@ -184,7 +184,7 @@ over a history $h = \tup{O,f,<}$ as
 \begin{align*}
   \db{\#(@l,i,j)}_h = |\set{ o \in O : f(o) = @l \text{ and } I(o) = [i,j] }|
 \end{align*}
-where $I$ is the canonical representation of $h$.
+where $I$ is the canonical representation of $\tup{O,<}$.
 
 \begin{figure}
   \begin{align*}
@@ -252,137 +252,98 @@ H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
 \subsection{Monitoring Bounded-Interval-Length Histories}
 \label{sec:counting:monitor}
 
-Given a history $h = \tup{O,<,f}$ of interval length $n$, and $k \in \<Nats>$,
-we define 
-%\emph{the earlybird abstraction} $A^{\triangleleft}_k(h) =
-%\tup{O,<^{\triangleleft},f}$ and 
-\emph{the recency abstraction}
-$A_k(h) = \tup{O,<,f}$ of $h$ by
+Though there are numerous ways to define a function $A_k$ which approximates
+histories to weaker $k$-interval-length histories, the natural solution we
+consider here is an $A_k$ which maintains the last $k$ interval bounds
+precisely, abstracting all previous interval bounds with equality. Formally,
+given a history $h = \tup{O,<,f}$ of interval length $n$, and $k \in \<Nats>$,
+we define $A_k(h) = \tup{O,<',f}$ by
 \begin{align*}
-%  o_1 <^{\triangleleft} o_2 & \text{ iff } o_1 < o_2 \text{ and } \sup I(o_1) < k \\
-  o_1 < o_2 & \text{ iff } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
+  o_1 <' o_2 & \text{ if{f} } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
 \end{align*}
-where $I : O -> [n]^2$ is the interval map of $h$. Intuitively, 
-%the
-%earlybird abstraction remembers only the ordering between ``old''
-%operations which have completed by interval $k$; 
-the
-recency abstraction remembers only the the ordering between ``recent''
-operations which have started after interval $n-k$. It follows by definition
-that $A_k(h) \preceq h$,
-since ordering constraints are only removed from $<$.
-Also, $A_k(h)=h$ for any history $h$ of length $n\leq k$.
-The next lemma relates the interval maps of $h$ and $A_k(h)$.
+where $I$ is the interval map of $h$. Intuitively, $A_k$ remembers only the the
+ordering between ``recent'' operations which have started after interval $n-k$.
+It follows by definition that $A_k(h) \preceq h$, since ordering constraints
+are only removed from $<$. Note that $A_k(h) = h$ for any history $h$ of length
+$n\leq k$.
 
-\begin{lemma}\label{lemma:abstraction}
+\begin{lemma}
+  \label{lemma:abstraction}
 
-Let $I : O -> [n]^2$ and $I_k: O -> [k]^2$ be the interval maps
-of $h$ and $A_k(h)$, respectively. Then, for every $o\in O$,
-\[
-I(o)=[i,j] \mbox{ iff } I_k(o) = [ |n-i|_k, |n-j|_k ]
-\]
-where for every $m$, $|m|_k=m$, if $m\leq k$, and $|m|_k=0$, otherwise.
+  Let $I$ and $I_k$ be the interval maps of $h$ and $A_k(h)$.
+  For each $o \in O$ with $I(o) = [i,j]$:
+  \begin{align*}
+    I_k(o) = [ \max(i-n+k,0), \max(i-n+k,0) ] \text{.}
+  \end{align*}
 
 \end{lemma}
 
-We define an online algorithm for computing the recency abstraction of 
-an execution's history $H(e)$, that reads the stream of call/return actions in $e$
+We define an online algorithm for computing the recency abstraction of an
+execution's history $H(e)$, that reads the stream of call/return actions in $e$
 and computes the counting representation of the recency abstraction $A_k(H(e))$.
 
-%The recency abstraction depends on the interval map $I$ of $H(e)$ and thus, 
-To compute the counting representation, the algorithm counts distinct pasts of operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form})
-based on the following observation.
-%The past of an operation $o$ in $H(e)$ 
-%consists
-%of operations that return before $o$ and consequently, 
-Two operations $o_1$ and $o_2$ have the same past in $H(e)$ 
-(i.e., the set of operations that finish before $o_1$ and respectively, $o_2$ is the same) iff there is no return action that occurs in $e$ 
-between the call actions of $o_1$ and respectively, $o_2$.
-Therefore, the lower bound of the interval $I(o)$ associated to some operation $o$
-equals the number of occurrences of a return immediately followed by a call before the call action of $o$.
-%(which corresponds to the number of distinct pasts of operations finishing before $o$).
-The index in $e$ of such a return action is called an \emph{interval tick} of $e$.
-Analogously, the upper bound of this interval equals the number of interval ticks before the return action of $o$,
-if such an action exists,
-%(which corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
-or the length of $H(e)$, otherwise.
+To compute the counting representation, the algorithm counts distinct pasts of
+operations occurring in $e$ (cf. Lemma~\ref{lemma:norm_form}) based on the
+following observation. Two operations $o_1$ and $o_2$ have the same past in
+$H(e)$ (i.e., the set of operations that finish before $o_1$ and respectively,
+$o_2$ is the same) iff there is no return action that occurs in $e$ between the
+call actions of $o_1$ and respectively, $o_2$. Therefore, the lower bound of
+the interval $I(o)$ associated to some operation $o$ equals the number of
+occurrences of a return immediately followed by a call before the call action
+of $o$. The index in $e$ of such a return action is called an \emph{interval
+tick} of $e$. Analogously, the upper bound of this interval equals the number
+of interval ticks before the return action of $o$, if such an action exists, or
+the length of $H(e)$, otherwise.
 
+Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is
+called an \emph{interval tick} if $e_i\in R$ and $e_{i+1}\in C$. Let
+$\nbbarr{e}$ be the number of interval ticks of $e$. Furthermore, for any
+action $a$ in $e$, let $\nbbarr{e,a}$ be the number of interval ticks of $e$
+occurring before the action $a$.
 
-%A consequence of this fact is that the number of distinct pasts in $H(e)$ is 
-%one more than the number of occurrences of a return action immediately followed by a call action 
-%(when there is no return followed by a call, the past of all the operations in $H(e)$ is $\emptyset$). 
-%The index in $e$ of such a return action is called an \emph{interval tick} of the execution $e$.
-%\todo{For example,}
-%
-%Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called an \emph{interval tick} if 
-%$e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be the number of interval ticks of $e$. 
-%\begin{lemma}\label{lemma:nb_barr}
-%
-%For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ equals $\nbbarr{e}$.
-%
-%\end{lemma}
-%
-%Furthermore, given an operation $o$, the lower bound of the interval associated to $o$ in the 
-%canonical representation of $H(e)$
-%equals the number of interval ticks before the call action of $o$ 
-%(which corresponds to the number of distinct pasts of operations finishing before $o$).
-%Moreover, the upper bound of this interval equals the number of interval ticks before the return action of $o$
-%(the latter corresponds to the number of distinct pasts of operations finishing before or overlapping with $o$)
-%or the length of $H(e)$, if the return action doesn't occur in $e$.
-%\todo{For example,}. 
+\begin{lemma}
+  \label{lemma:counting_executions}
 
-Formally, given a library execution $e\in (C\cup R)^*$, an index $i$ of $e$ is called an \emph{interval tick} if 
-$e_i\in R$ and $e_{i+1}\in C$. Let $\nbbarr{e}$ be the number of interval ticks of $e$. 
-%\begin{lemma}\label{lemma:nb_barr}
-%
-%For any library execution $e\in (C\cup R)^*$, the length of $H(e)$ equals $\nbbarr{e}$.
-%
-%\end{lemma}
-Furthermore, for any action $a$ in $e$, let $\nbbarr{e,a}$ be the number of 
-interval ticks of $e$ occurring before the action $a$. 
-
-\begin{lemma}\label{lemma:counting_executions}
-
-Let $e\in (C\cup R)^*$ be a library execution and 
-$I : O -> (n)^2$ the canonical representation of $H(e)$. 
-Then, for every $o\in O$, $I(o)=(i,j)$, where 
-\[
-i = \nbbarr{e,m(u)_o},\mbox{ and }
-\]
-\[
-j= \left\{\begin{array}{ll}\nbbarr{e,\<ret>(v)_o},&\mbox{ if $\<ret>(v)_o$ occurs in $e$}\\
-				    \nbbarr{e},&\mbox{ otherwise}.
-	    \end{array}\right.
-\]
-
+  Let $e \in (C\cup R)^*$ be a library execution and $I$ the canonical
+  representation of $H(e)$. Then, for $o \in O$, $I(o)= [i,j]$, where
+  \begin{align*}
+    & i = \nbbarr{e,m(u)_o} \text{, and } \\
+    & j = \left\{\begin{array}{ll}
+      \nbbarr{e,\<ret>(v)_o}, & \text{if } \<ret>(v)_o \text{ occurs in } e \\
+	    \nbbarr{e}              & \text{ otherwise.}
+    \end{array}\right.
+  \end{align*}
 \end{lemma}
 
-Algorithm~\ref{alg:counting} outputs the counting representation of 
-$A_k(H(e))$, for any given $k$ and $e$. The counting
-representation is stored in the array $\<counters>$ and the variable 
-$\<newPast>$ is used to detect interval ticks.
-The variable $\<time>$
-is used to count the number of interval ticks until this number becomes $k$
-and remains unmodified afterwards. For each operation $o$, 
-$\<startTime>(o)$ stores the number of interval ticks before the call 
-action of $o$, if this number is greater than $n-k$, and $0$, otherwise.
-When the length of the history $H(e)$ is at most $k$, 
-the procedure $\<Shift>$ is never invoked and 
-the algorithm outputs the counting representation of $H(e)$
-(cf. Lemma~\ref{lemma:counting_executions}).
-When $H(e)$ is of length $n>k$, the procedure $\<Shift>$
-is used to ``forget'' ordering constraints 
-between operations whose interval limits in $H(e)$ are smaller than $n-k$
-(cf. Lemma~\ref{lemma:abstraction}).
-Basically, at every new interval tick after the $k$th one, the interval $[i,j]$ of a
-completed operation becomes $[i-1,j-1]$ if $i>0$ and $[i,j-1]$, otherwise
-(cf. the first $\<foreach>$ loop in the procedure $\<Shift>$), 
-and the interval $[i,k]$ of a pending operation becomes $[i-1,k]$
-(cf. the second $\<foreach>$ loop in $\<Shift>$). Moreover, $\<startTime>(o)$ is decremented
-for each operation $o$ (since $\<startTime>(o)\in\<Nats>$
-decrementing $0$ has no effect). 
+Algorithm~\ref{alg:counting} outputs the counting representation of
+$A_k(H(e))$, for any given $k$ and $e$. The counting representation is stored
+in the array $\<counters>$ and the variable $\<newPast>$ is used to detect
+interval ticks. The variable $\<time>$ is used to count the number of interval
+ticks until this number becomes $k$ and remains unmodified afterwards. For each
+operation $o$, $\<startTime>(o)$ stores the number of interval ticks before the
+call action of $o$, if this number is greater than $n-k$, and $0$, otherwise.
+When the length of the history $H(e)$ is at most $k$, the procedure $\<Shift>$
+is never invoked and the algorithm outputs the counting representation of
+$H(e)$ (cf. Lemma~\ref{lemma:counting_executions}). When $H(e)$ is of length
+$n>k$, the procedure $\<Shift>$ is used to ``forget'' ordering constraints
+between operations whose interval limits in $H(e)$ are smaller than $n-k$ (cf.
+Lemma~\ref{lemma:abstraction}). Basically, at every new interval tick after the
+$k$th one, the interval $[i,j]$ of a completed operation becomes $[i-1,j-1]$ if
+$i>0$ and $[i,j-1]$, otherwise (cf. the first $\<foreach>$ loop in the
+procedure $\<Shift>$), and the interval $[i,k]$ of a pending operation becomes
+$[i-1,k]$ (cf. the second $\<foreach>$ loop in $\<Shift>$). Moreover,
+$\<startTime>(o)$ is decremented for each operation $o$ (since
+$\<startTime>(o)\in\<Nats>$ decrementing $0$ has no effect).
 
-
+The \texttt{Shift} procedure decrements $\mathsf{startTime}[o]$ for each
+pending operation $o$, and truncates the current counting representation from
+$A_k(H(e))$ to $A_{k-1}(H(e))$ by adding $\mathsf{counters}[@l,i,j]$ to
+$\mathsf{counters}[@l,\max(i-1,0),\max(j-1,0)]$. When $I$ and $I'$ are the
+interval mappings of $A_k(H(e))$ and $A_{k-1}(H(e))$, we have
+\begin{align*}
+  I'(o) = [\max(i-1,0),\max(j-1,0)]
+\end{align*}
+for each $o$ such that $I(o) = [i,j]$.
 
 \begin{algorithm}[thb]
   \DontPrintSemicolon
@@ -410,143 +371,95 @@ decrementing $0$ has no effect).
   \Switch{input action}{
     \Case{call action $m(u)_o$}{
       \If{$\NewPast$}{
-        \If{$\Time = k$}{
-          \Shift{\Counters}
-        }
-        \If{$\Time < k$}{
-          \Increment $\Time$ 
-        }
+        \lIf{$\Time < k$}{ \Increment $\Time$ }
+        \lElse{ \Shift{\Counters, \StartTime} }
         $\NewPast <- \False$
       }
       $\StartTime[o] <- \Time$ \;
-      \Increment $\Counters[m(u) => \bottom,\StartTime[o],k]$ \;
+      \Increment $\Counters[m(u) => \bot,\StartTime[o],k]$ \;
     }
     \Case{return action $ \<ret>(v)_o$}{
-%      $i <-|\<time>-\nbbarr{e,m(u)_o}|_k$ \;
-%      $j <- \<min>(\Time,k)$ \;
-      \Decrement $\Counters[m(u) => \bottom,\StartTime[o],k]$ \;
+      \Decrement $\Counters[m(u) => \bot,\StartTime[o],k]$ \;
       \Increment $\Counters[m(u) => v,\StartTime[o],\Time]$ \;
       $\NewPast <- \True$
     }
   }
-  \Yield $\Counters$ 
-  \BlankLine
-  \Procedure \Shift{\Counters} \;
-  \Indp
-  \ForEach{$@l = m(u) => v$}{
-  	\For{$i$ = $1$ \To $k$}{
-		\For{$j$ = $i$ \To $k$}{
-			$\Counters[@l,i-1,j-1]$ += $\Counters[@l,i,j]$
-			$\Counters[@l,i,j	] <- 0$ 
-		}
-	}
-	\For{$j$ = $1$ \To $k$}{
-			$\Counters[@l,0,j-1]$ += $\Counters[@l,0,j]$
-			$\Counters[@l,0,j] <- 0$ 
-	}
-  }
-  \ForEach{$@l = m(u) => \bottom$}{
-	\For{$i$ = $1$ \To $k$}{
-			$\Counters[@l,i-1,k]$ += $\Counters[@l,i,k]$
-			$\Counters[@l,i,k] <- 0$ 
-	}
-  }
-  \ForEach{$o$} {
-  	\Decrement \StartTime[o] \;
-  }
-    \caption{An online algorithm for computing the counting representation
-    $\Pi(A_k(H(e)))$ of a given history $h$.}
+  \Yield $\Counters$ \;
+  \caption{An online operation algorithm for computing the approximation
+    $\Pi(A_k(H(e)))$ of a given history $H(e)$.}
   \label{alg:counting}
 \end{algorithm}
-
-
-The next lemma states the correctness of this
-algorithm.
 
 \begin{lemma}
   \label{lem:counting:alg}
 
-  Algorithm~\ref{alg:counting} outputs the counting representation
-  $\Pi(A_k(H(e)))$ of the weakening $A_k(H(e))$ of a given execution's 
-  history $H(e)$ in space $O(|\<Methods>| \cdot |\<Vals>|^2 \cdot \log |e|)$
-%  \footnote{The space complexity of Algorithm~\ref{alg:counting} is linear in the number of method
-%  synopses in $e$
-%  when the size of integers is fixed, as in the case of modern computer
-%  architectures; otherwise, the space complexity is also logarithmic in the length of $e$.}
-  and time $O(|e|)$.
+  Algorithm~\ref{alg:counting} outputs the approximation $\Pi(A_k(H(e)))$ of a
+  given execution history in $O(|\<Methods>| \cdot |\<Vals>|^2)$
+  space\footnote{The space complexity of Algorithm~\ref{alg:counting} is
+  constant in the number of operations when the size of integers is fixed, as
+  in the case of modern computer architectures; otherwise, the space complexity
+  is logarithmic in the number of operations, i.e.,~in execution length.} and
+  $O(|e|)$ time.
 
 \end{lemma}
 
-Algorithm~\ref{alg:counting} can also be interpreted as a program $P_k$ that composed with a library $L$,
-generates the set $\set{ A_k(h) : h \in H(L) }$ of all recency abstractions of histories of $L$.
-%More precisely, every value of the array $\<counters>$ reachable in this program 
-%represents the counting representation $\Pi(A_k(h))$ of some $A_k(h)$ with $h\in H(L)$
-%and for every $h\in H(L)$, the program reaches a state where the value of $\<counters>$
-%equals $\Pi(A_k(h))$. 
-More precisely, let $\<Cnts>(P_k\times L)$ be the set of all
-values of the array $\<counters>$ reachable in $P_k\times L$. Then, 
-
-\begin{lemma}
-
-  For any library $L$,
-  \[
-  \<Cnts>(P_k\times L) = \set{ \Pi(A_k(h)) : h \in H(L) }.
-  \] 
-
-\end{lemma}
+As an online monitor program $P_k$ for history approximation,
+Algorithm~\ref{alg:counting} effectively reduces the approximate refinement
+checking problem between $L_1$ and $L_2$ to a reachability problem on the
+composition $L_1 \x P_k$: as $P_k$ tracks the approximation $A_k(H(e))$ of the
+current execution $e$ by counting, we must only check whether $P_k$'s
+$\mathsf{counters}$ satisfy the operation counting formula $@Y$ for $L_2$ up to
+$k$.
 
 \begin{theorem}
 
-  Given $@Y$ an operation counting formula for $L_2$ up to $k$, 
-  the approximate inclusion $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$ is equivalent to
-  the fact that 
-%  there exists a value of $\<counters>$ reachable in $P_k\times L$ such that
-  \[
-  @Y[\#(x,i,j)\gets \<counters>(x,i,j): \mbox{for all $x,i,j$}]
-  \]
-  is not an invariant for $P_k\times L_1$.
+  Given $@Y$ an operation counting formula for $L_2$ up to $k$, the approximate
+  inclusion $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$ is equivalent to
+  the safety verification problem
+  \begin{align*}
+    (P_k \x L_1) |= \Box \lnot @Y
+  \end{align*}
+  where $@Y$ is interpreted over the $\mathsf{counters}$ array of $P_k$.
 
 \end{theorem}
 
-
-
-
-%\begin{lemma}
-%  \label{lem:counting:reach}
+% \begin{lemma}
+%   \label{lem:counting:reach}
 %
-%  The set $\set{ A_k(h) : h \in H(L) }$ of $k$ interval-length histories of
-%  $L$ is computable when $L$ is a finite-state library.
+%   The set $\set{ A_k(h) : h \in H(L) }$ of $k$ interval-length histories of
+%   $L$ is computable when $L$ is a finite-state library.
 %
-%\end{lemma}
+% \end{lemma}
 %
-%\begin{proof}
+% \begin{proof}
 %
-%  BY REACHABILITY IN PETRI NETS
+%   BY REACHABILITY IN PETRI NETS
 %
-%\end{proof}
+% \end{proof}
 %
-%XXX WORK THE FOLLOWING INTO THE PREVIOUS PROOF
+% XXX WORK THE FOLLOWING INTO THE PREVIOUS PROOF
 %
-%We define the program $P_K$, that generates the counting representations of all
-%histories of length at most $K$. When composed with a particular library $L$,
-%$P_K\x L$ generates only counting representations of histories of $L$.
+% We define the program $P_K$, that generates the counting representations of
+% all histories of length at most $K$. When composed with a particular library
+% $L$, $P_K\x L$ generates only counting representations of histories of $L$.
 %
-%The program $P_K$ stores the counting representation of the current execution's
-%history in an integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow \<Nats>$. It
-%updates the function $\pi$ at every call and return action. These updates
-%correspond to a particular construction of the counting representation of a
-%history~\footnote{Lemma~\ref{lem:representation} proves only the existence of
-%the canonical form (counting representation) of a history, without giving an
-%effective construction.} and respectively, of a given execution's history.
+% The program $P_K$ stores the counting representation of the current
+% execution's history in an integer map $\pi:\<Methods>\x \<Nats>^2\rightarrow
+% \<Nats>$. It updates the function $\pi$ at every call and return action. These
+% updates correspond to a particular construction of the counting representation
+% of a history~\footnote{Lemma~\ref{lem:representation} proves only the
+% existence of the canonical form (counting representation) of a history,
+% without giving an effective construction.} and respectively, of a given
+% execution's history.
 %
-%The program $P_K$ is built according to the online algorithm in
-%Figure~\ref{fig:online_alg}. Its states are formed of values for the mappings
-%$\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$. The set of
-%executions of $P_K$, projected on call and return actions, is exactly the set
-%of all well-formed sequences $e$ over $C\cup R$ such that $H(e)$ is of length
-%at most $K$. Every call action is preceded by a \alert{program action}
-%corresponding to the updates in the top part of Figure~\ref{fig:online_alg} and
-%every return action is followed by a \alert{program action} corresponding to
-%the updates in the bottom part of Figure~\ref{fig:online_alg}. The following
-%theorem states that $P_K$ generates the counting representations of all
-%histories of length at most $K$.
+% The program $P_K$ is built according to the online algorithm in
+% Figure~\ref{fig:online_alg}. Its states are formed of values for the mappings
+% $\pi$ and $\theta$, and the variables $\<time>$ and $\<finished>$. The set of
+% executions of $P_K$, projected on call and return actions, is exactly the set
+% of all well-formed sequences $e$ over $C\cup R$ such that $H(e)$ is of length
+% at most $K$. Every call action is preceded by a \alert{program action}
+% corresponding to the updates in the top part of Figure~\ref{fig:online_alg}
+% and every return action is followed by a \alert{program action} corresponding
+% to the updates in the bottom part of Figure~\ref{fig:online_alg}. The
+% following theorem states that $P_K$ generates the counting representations of
+% all histories of length at most $K$.
