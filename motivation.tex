@@ -159,7 +159,7 @@ int pop() {
 \node[lnode] (x1)  [below of=x0,label=left:$\<push>(1)$] {};
 \node[lnode] (x2)  [below of=x1,label=left:$\<ret>$] {}; %label=above:$x$
 \node[lnode] (x3)  [below of=x2,label=left:$\<pop>()$] {}; 
-\node[lnode] (x4)  [below of=x3,label=left:$^8$] {}; 
+\node[lnode] (x4)  [below of=x3,label=left:{\tt preempted}] {}; 
 
 \node[node] (z0)  [below= .2cm of x1] {}; 
 \node[node] (z1)  [right= .3cm of x1,yshift=-2mm] {{\tt n=0xFF}}; 
