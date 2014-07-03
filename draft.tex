@@ -68,7 +68,27 @@
 \begin{document}
 
   \maketitle
-  
+
+  \begin{abstract}
+
+    Efficient implementations of concurrent objects such as atomic registers,
+    locks, semaphores, and data structures are essential to modern computing.
+    Programming them however is error prone: in attempting to minimize the
+    overhead of synchronization between concurrent operations, one risks
+    breaking conformance to reference implementations. Testing this conformance
+    even within a single execution is intractable, and existing approaches are
+    limited to executions with very few object invocations.
+
+    In this work we develop a polynomial-time approximation to conformance
+    checking. We parametrize the problem by an accuracy $n \in \<Nats>$, which
+    represents a degree to which conformance violations are visible: in
+    principle, more violations are detectable as $n$ increases, and in the
+    limit, all are detectable. In practice, we find that most, if not all,
+    violations can be detected with small $n$, and our approximation can be
+    efficiently implemented.
+
+  \end{abstract}
+
   \input intro
   \input refinement
   \input histories
