@@ -1,0 +1,130 @@
+%!TEX root = draft.tex
+
+\section{Motivating Example}
+
+\begin{figure*}[t]
+\lstset{numbers=left, 
+            numberstyle=\tiny\tt, 
+            stepnumber=1, 
+            firstnumber=1,
+            % numberfirstline=true,
+            numbersep=4pt}
+\begin{minipage}{5cm}
+\begin{program}
+struct node {
+	int data;
+	struct node *next;
+}
+struct stack {
+	struct node *Top
+}
+  
+struct stack *S;
+\end{program}
+\end{minipage}
+\begin{minipage}{6.5cm}
+{\bf Lock-based stack:}
+\begin{program}
+void push(int v) {
+	lock();
+	struct node *n;
+	n = malloc(sizeof( *x));
+	n->data = v;
+	n->next = S->Top;
+	S->Top = n;
+	unlock();
+}
+
+\end{program}
+\end{minipage}
+\begin{minipage}{6cm}
+{\bf Treiber's stack:}
+\begin{program}
+void push(int v) {
+	struct node *n,*t;
+	n = malloc(sizeof( *n));
+	n->data = v;
+	do {
+		struct node *t = S->Top;
+		n->next = t;
+	} while (! CAS (&S->Top, t, n))
+}
+\end{program}
+\end{minipage}
+
+%{\bf Treiber's stack:}
+\begin{minipage}{5cm}
+\lstset{numbers=none}
+{\bf Client program $P$:}
+
+\begin{minipage}{1.7cm}
+\begin{program}
+push(1);
+x = pop();
+y = pop();
+\end{program}
+\end{minipage}
+\hspace{1mm}
+{\large $\bigparallel$}
+\hspace{2mm}
+\begin{minipage}{2cm}
+\begin{program}
+z = pop();
+push(2);
+push(3);
+\end{program}
+\end{minipage}
+\end{minipage}
+\begin{minipage}{6.5cm}
+\lstset{firstnumber=10}
+\begin{program}
+int pop() {
+	lock()
+	struct node *t = S->Top;
+	if (t==NULL)
+		return EMPTY;
+	S->Top = t->next;
+	unlock()
+	return t-> data;
+}
+\end{program}
+\end{minipage}
+\begin{minipage}{6cm}
+\lstset{firstnumber=10}
+\begin{program}
+int pop() {
+	struct node *n,*t;
+	do {
+		*t = S->Top;
+		if (t==NULL)
+			return EMPTY;
+		n = t->next;
+	} while (! CAS (&S->Top, t, n))
+	int result = t->data;
+	free(t);
+	return result;
+}
+
+\end{program}
+\end{minipage}
+\caption{A reference lock-based implementation of a concurrent stack and Treiber's stack implementation. The client program $P$ consists of two concurrent threads; $\parallel$ denotes the fact that these two threads may interleave.}
+\label{fig:stacks}
+\end{figure*}
+
+Figure~\ref{fig:stacks} contains a reference lock-based implementation for a concurrent stack and an implementation of the non-blocking Treiber's stack~\cite{Treiber'86}. Both implementations represent the stack using a singly-linked list rooted at {\tt S->Top}. The methods of the reference implementation execute all statements in one atomic step while in Treiber's stack, methods execute non-atomically and their statements may interleave. The variable {\tt S->Top} of Treiber's stack is updated using the primitive CAS (compare-and-swap), which assigns {\tt x} to {\tt S->Top} only if its current value equals the second argument {\tt t} (the equality test and the assignment are performed in one atomic step).
+
+The implementation of Treiber's stack is more efficient because it minimizes the synchronization overhead when updating the stack. However, it is known that this implementation does not conform to the reference stack implementation (based on locks) because it suffers from the infamous ABA bug due to freeing popped nodes.
+
+A classic formalization of conformance to reference implementations is called \emph{observational refinement}. Essentially, an implementation $L_1$ is an observational refinement of another implementation $L_2$ if every observable behavior of a client program $P$ using $L_1$ is also possible when $P$ uses $L_2$. For example, Treiber's stack is not an observational refinement of the lock-based implementation because the program $P$ given in the bottom-left part of Figure~\ref{fig:stacks} can reach a state where $x=3$ and $y={\tt EMPTY}$ when using Treiber's stack but not when using the lock-based implementation. Intuitively, reaching this state corresponds to an incorrect behavior of the stack because when popping $3$ from the stack, the latter should still contain the value $2$ (it shouldn't be empty).
+
+
+
+
+
+
+
+
+
+
+
+
