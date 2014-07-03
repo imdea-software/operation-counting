@@ -278,6 +278,42 @@ $n\leq k$.
 
 \end{lemma}
 
+XXX BEGIN WORKING HERE
+
+The interval shifting operation $\overleftarrow{\pi}$ of a counting
+representation $\pi$ is defined as follows: for all $@l \in \<Labels>$, and $0
+\le i \le j \le k$, if $@l$ is completed then
+\begin{align*}
+  \overleftarrow{\pi}(@l,[i,j])
+  & = @n(\pi(@l,[i+1,j+1]), i<k \land j<k) \\
+  & + @n(\pi(@l,[i,j+1]), i=0 \land j<k) \\
+  & + @n(\pi(@l,[i+1,j]), i<k \land j=0) \\
+  & + @n(\pi(@l,[i,j]), i=0 \land j=0)
+\end{align*}
+and if $@l$ is pending then
+\begin{align*}
+  \overleftarrow{\pi}(@l,[i,j])
+  = @n(\pi(@l,[i+1,k]), i<k) + @n(\pi(@l,[i,k]), i=0)
+\end{align*}
+where the conditional function $@n : \<Nats> \x \<Bools> -> \<Nats>$ is defined by
+\begin{align*}
+  @n(n,@p) = \left\{
+  \begin{array}{ll}
+    n & \text{ if } @p \text{ is valid} \\
+    0 & \text{ otherwise.}
+  \end{array}
+  \right.
+\end{align*}
+
+\begin{lemma}
+
+  If $h$ is a $k$-interval-length history, and $\pi = \Pi(h)$, then
+  $\overleftarrow{\pi} = \Pi(A_{k-1}(h))$.
+
+\end{lemma}
+
+XXX END WORKING HERE
+
 We define an online algorithm for computing the recency abstraction of an
 execution's history $H(e)$, that reads the stream of call/return actions in $e$
 and computes the counting representation of the recency abstraction $A_k(H(e))$.
@@ -355,36 +391,27 @@ for each $o$ such that $I(o) = [i,j]$.
   \SetKw{False}{false}
   \SetKw{Increment}{incr}
   \SetKw{Decrement}{decr}
-  \SetKw{To}{to}
-  \SetKwFunction{Shift}{Shift}
-  \SetKwData{Counters}{counters}
-  \SetKwData{NewPast}{newPast}
-  \SetKwData{Time}{time}
-  \SetKwData{StartTime}{startTime}
-  \SetKw{Procedure}{procedure}
   
-  \Input{interval length $k \in \<Nats>$}
-  \Input{stream $(C\u R)^{@w}$ of call/return actions}
-  \Output{stream of counting representations}
-  \KwData{$\Time: \<Nats>$, $\NewPast: \<Bools>$, $\StartTime[\<Ops>]: \<Nats>$}
-  \Init{$\Time = 0$, $\NewPast = \False$, $\Counters[\_,\_,\_] = 0$}
+  \KwData{Interval length $k \in \<Nats>$}
+  \KwData{Stream $e \in (C\u R)^{@w}$ of call/return actions}
+  \KwResult{counting representation $\Pi(A_k(H(e)))$}
+  \Init{$n = 0$, $s = @0$, $\pi = @0$} \;
   \Switch{input action}{
     \Case{call action $m(u)_o$}{
-      \If{$\NewPast$}{
-        \lIf{$\Time < k$}{ \Increment $\Time$ }
-        \lElse{ \Shift{\Counters, \StartTime} }
-        $\NewPast <- \False$
+      \If{previous action was return}{
+        \Increment $n$ \;
+        \lIf{ $n > k$ }{ $\pi <- \overleftarrow{\pi}$ }
       }
-      $\StartTime[o] <- \Time$ \;
-      \Increment $\Counters[m(u) => \bot,\StartTime[o],k]$ \;
+      $s(o) <- n$ \;
+      \Increment $\pi(m(u) => \bot, [\min(n,k),k])$ \;
     }
     \Case{return action $ \<ret>(v)_o$}{
-      \Decrement $\Counters[m(u) => \bot,\StartTime[o],k]$ \;
-      \Increment $\Counters[m(u) => v,\StartTime[o],\Time]$ \;
-      $\NewPast <- \True$
+      $i = s(o) - \max(n-k,0)$ \;
+      \Decrement $\pi(m(u) => \bot, [i,k])$ \;
+      \Increment $\pi(m(u) => v, [i,\min(n,k)])$ \;
     }
   }
-  \Yield $\Counters$ \;
+  \Yield $\pi$ \;
   \caption{An online operation algorithm for computing the approximation
     $\Pi(A_k(H(e)))$ of a given history $H(e)$.}
   \label{alg:counting}
