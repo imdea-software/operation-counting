@@ -9,7 +9,10 @@
             firstnumber=1,
             % numberfirstline=true,
             numbersep=4pt}
-\begin{minipage}{5cm}
+{\footnotesize
+
+\begin{minipage}{14cm}
+\begin{minipage}{3.7cm}
 \begin{program}
 struct node {
 	int data;
@@ -18,11 +21,10 @@ struct node {
 struct stack {
 	struct node *Top
 }
-  
 struct stack *S;
 \end{program}
 \end{minipage}
-\begin{minipage}{6.5cm}
+\begin{minipage}{4.7cm}
 {\bf Lock-based stack:}
 \begin{program}
 void push(int v) {
@@ -34,7 +36,6 @@ void push(int v) {
 	S->Top = n;
 	unlock();
 }
-
 \end{program}
 \end{minipage}
 \begin{minipage}{6cm}
@@ -53,11 +54,11 @@ void push(int v) {
 \end{minipage}
 
 %{\bf Treiber's stack:}
-\begin{minipage}{5cm}
+\begin{minipage}{3.7cm}
 \lstset{numbers=none}
 {\bf Client program $P$:}
-
-\begin{minipage}{1.8cm}
+\\
+\begin{minipage}{1.7cm}
 %\begin{center}
 %{\bf Thread 1}
 %\end{center}
@@ -71,13 +72,13 @@ x = pop();
 y = pop();
 \end{program}
 \end{minipage}
-\begin{minipage}{.5cm}
+%\begin{minipage}{.5cm}
 %\hspace{1mm}
-\vspace{6mm}
-{\large $\bigparallel$}
+%\vspace{6mm}
+%{\large $\bigparallel$}
 %\hspace{2mm}
-\end{minipage}
-\begin{minipage}{2cm}
+%\end{minipage}
+\begin{minipage}{1.6cm}
 \bigskip
 {\bf Thread2:}
 \vspace{-1mm}
@@ -88,7 +89,7 @@ push(3);
 \end{program}
 \end{minipage}
 \end{minipage}
-\begin{minipage}{6.5cm}
+\begin{minipage}{4.7cm}
 \lstset{firstnumber=10}
 \begin{program}
 int pop() {
@@ -120,36 +121,97 @@ int pop() {
 
 \end{program}
 \end{minipage}
+\end{minipage}
+%
+%\hspace{.2cm}
+%\begin{tikzpicture}[node distance=.7cm]
+%\tikzstyle{node}=[minimum size=10pt]
+%\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
+%\node[node] (y)  [below of=x] {}; %label=above:$x$
+%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
+%\end{tikzpicture}
+%\hspace{0.7cm}
+%\begin{tikzpicture}[node distance=.7cm]
+%\tikzstyle{node}=[minimum size=10pt]
+%\node[node] (x)  [] at (1, 0) {{\tt free (0xFFFF0000)}};
+%\node[node] (y)  [below of=x] {}; %label=above:$x$
+%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
+%\end{tikzpicture}
+%\hspace{2.8cm}
+%\begin{tikzpicture}[node distance=.7cm]
+%\tikzstyle{node}=[minimum size=10pt]
+%\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
+%\node[node] (y)  [below of=x] {}; %label=above:$x$
+%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
+%\end{tikzpicture}
+%
+%\vspace{-1cm}
+%\[
+%\underbrace{\<push>(1)_1\ldots \<ret>_1\ \<pop>_2\ldots ^{8}}_{\tt {\bf Thread 1}} \ddagger\
+%\underbrace{\<pop>()_3\ldots \<ret>(1)_3\ z=1\ \<push>(2)_4\ldots \<ret>_4\ \<push>(3)_5\ldots \<ret>_5}_{\tt {\bf Thread 2}} \ddagger\ 
+%\underbrace{^{8}\ldots  \<ret>(3)_2\ x=3\ \<pop>()_6\ldots \<ret>({\tt EMPTY})_6\ y={\tt EMPTY}}_{\tt {\bf Thread 1}}
+%\]
+\begin{minipage}{2cm}
+\begin{tikzpicture}[node distance=.5cm]
+\tikzstyle{node}=[minimum size=0pt]
+\tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
+\node[node] (x0)  [] at (0, 0) {{\tt{\bf Thread1}}};
+\node[lnode] (x1)  [below of=x0,label=left:$\<push>(1)$] {};
+\node[lnode] (x2)  [below of=x1,label=left:$\<ret>$] {}; %label=above:$x$
+\node[lnode] (x3)  [below of=x2,label=left:$\<pop>()$] {}; 
+\node[lnode] (x4)  [below of=x3,label=left:$^8$] {}; 
 
-{\footnotesize
-\hspace{.2cm}
-\begin{tikzpicture}[node distance=.7cm]
-\tikzstyle{node}=[minimum size=10pt]
-\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
-\node[node] (y)  [below of=x] {}; %label=above:$x$
-\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-\end{tikzpicture}
-\hspace{0.7cm}
-\begin{tikzpicture}[node distance=.7cm]
-\tikzstyle{node}=[minimum size=10pt]
-\node[node] (x)  [] at (1, 0) {{\tt free (0xFFFF0000)}};
-\node[node] (y)  [below of=x] {}; %label=above:$x$
-\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-\end{tikzpicture}
-\hspace{2.8cm}
-\begin{tikzpicture}[node distance=.7cm]
-\tikzstyle{node}=[minimum size=10pt]
-\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
-\node[node] (y)  [below of=x] {}; %label=above:$x$
-\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-\end{tikzpicture}
+\node[node] (z0)  [below= .2cm of x1] {}; 
+\node[node] (z1)  [right= .3cm of x1,yshift=-2mm] {{\tt n=0xFF}}; 
 
-\vspace{-1cm}
-\[
-\underbrace{\<push>(1)_1\ldots \<ret>_1\ \<pop>_2\ldots ^{8}}_{\tt {\bf Thread 1}} \ddagger\
-\underbrace{\<pop>()_3\ldots \<ret>(1)_3\ z=1\ \<push>(2)_4\ldots \<ret>_4\ \<push>(3)_5\ldots \<ret>_5}_{\tt {\bf Thread 2}} \ddagger\ 
-\underbrace{^{8}\ldots  \<ret>(3)_2\ x=3\ \<pop>()_6\ldots \<ret>({\tt EMPTY})_6\ y={\tt EMPTY}}_{\tt {\bf Thread 1}}
-\]
+\node[node] (y0)  [right = .3cm of x3]  {{\tt{\bf Thread2}}};
+\node[lnode] (y1)  [right = .7cm of x4,yshift=-2mm,label=right:$\<pop>()$] {}; 
+\node[lnode] (y2)  [below of=y1,label=right:$\<ret>(1)$] {}; 
+\node[lnode] (y3)  [below of=y2,label=right:${\tt z=1}$] {}; 
+\node[lnode] (y4)  [below of= y3,label=right:$\<push>(2)$] {}; 
+\node[lnode] (y5)  [below of=y4,label=right:$\<ret>$] {}; 
+\node[lnode] (y6)  [below of=y5,label=right:$\<push>(3)$] {}; 
+\node[lnode] (y7)  [below of=y6,label=right:$\<ret>$] {}; 
+
+\node[node] (u0)  [below= .2cm of y1] {}; 
+\node[node] (u1)  [left= .3cm of y1,yshift=-6mm] {{\tt free(0xFF)}}; 
+
+\node[node] (v0)  [below= .2cm of y6] {}; 
+\node[node] (v1)  [left= .3cm of y6,yshift=1mm] {{\tt n=0xFF}}; 
+
+
+\node[lnode] (x5)  [left= .7cm of y7,label=left:$^{8}$,yshift=-2mm] {}; %label=above:$x$
+\node[lnode] (x6)  [below of=x5,label=left:$\<ret>(3)$] {}; 
+\node[lnode] (x7)  [below of= x6,label=left:${\tt x=3}$] {}; 
+\node[lnode] (x8)  [below of= x7,label=left:$\<pop>()$] {}; 
+\node[lnode] (x9)  [below of =x8,label=left:$\<ret>({\tt EMPTY})$] {}; 
+\node[lnode] (x10)  [below of= x9,label=left:${\tt y=EMPTY}$] {}; 
+
+
+\draw[] (x1) -- (x2); %node[draw=none,right] {$h$}
+\draw[] (x2) -- (x3);
+\draw[] (x3) -- (x4);
+
+\draw[] (y1) -- (y2);
+\draw[] (y2) -- (y3);
+\draw[] (y3) -- (y4);
+\draw[] (y4) -- (y5);
+\draw[] (y5) -- (y6);
+\draw[] (y6) -- (y7);
+
+\draw[dotted] (x4) -- (x5); %node[draw=none,right] {$h$}
+\draw[] (x5) -- (x6);
+\draw[] (x6) -- (x7);
+\draw[] (x7) -- (x8);
+\draw[] (x8) -- (x9);
+\draw[] (x9) -- (x10);
+
+\draw[->] (z0) -- (z1);
+\draw[->] (u0) -- (u1);
+\draw[->] (v0) -- (v1);
+
+\end{tikzpicture}
+\end{minipage}
 }
 \caption{A reference lock-based implementation of a concurrent stack and Treiber's stack implementation ({\tt EMPTY} is a special value denoting the empty stack). The client program $P$ consists of two concurrent threads executing the statements in the left and respectively, the right of the $\parallel$ symbol.}
 \label{fig:stacks}
