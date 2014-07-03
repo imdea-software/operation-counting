@@ -57,17 +57,30 @@ void push(int v) {
 \lstset{numbers=none}
 {\bf Client program $P$:}
 
-\begin{minipage}{1.7cm}
+\begin{minipage}{1.8cm}
+%\begin{center}
+%{\bf Thread 1}
+%\end{center}
+\bigskip
+{\bf Thread 1:}
+\vspace{-1mm}
+%$\mbox{\bf Thread 1:}$
 \begin{program}
 push(1);
 x = pop();
 y = pop();
 \end{program}
 \end{minipage}
-\hspace{1mm}
+\begin{minipage}{.5cm}
+%\hspace{1mm}
+\vspace{6mm}
 {\large $\bigparallel$}
-\hspace{2mm}
+%\hspace{2mm}
+\end{minipage}
 \begin{minipage}{2cm}
+\bigskip
+{\bf Thread 2:}
+\vspace{-1mm}
 \begin{program}
 z = pop();
 push(2);
@@ -107,7 +120,7 @@ int pop() {
 
 \end{program}
 \end{minipage}
-\caption{A reference lock-based implementation of a concurrent stack and Treiber's stack implementation. The client program $P$ consists of two concurrent threads; $\parallel$ denotes the fact that these two threads may interleave.}
+\caption{A reference lock-based implementation of a concurrent stack and Treiber's stack implementation ({\tt EMPTY} is a special value denoting the empty stack). The client program $P$ consists of two concurrent threads executing the statements in the left and respectively, the right of the $\parallel$ symbol.}
 \label{fig:stacks}
 \end{figure*}
 
@@ -115,7 +128,7 @@ Figure~\ref{fig:stacks} contains a reference lock-based implementation for a con
 
 The implementation of Treiber's stack is more efficient because it minimizes the synchronization overhead when updating the stack. However, it is known that this implementation does not conform to the reference stack implementation (based on locks) because it suffers from the infamous ABA bug due to freeing popped nodes.
 
-A classic formalization of conformance to reference implementations is called \emph{observational refinement}. Essentially, an implementation $L_1$ is an observational refinement of another implementation $L_2$ if every observable behavior of a client program $P$ using $L_1$ is also possible when $P$ uses $L_2$. For example, Treiber's stack is not an observational refinement of the lock-based implementation because the program $P$ given in the bottom-left part of Figure~\ref{fig:stacks} can reach a state where $x=3$ and $y={\tt EMPTY}$ when using Treiber's stack but not when using the lock-based implementation. Intuitively, reaching this state corresponds to an incorrect behavior of the stack because when popping $3$ from the stack, the latter should still contain the value $2$ (it shouldn't be empty).
+A classic formalization of conformance to reference implementations is called \emph{observational refinement}. Essentially, an implementation $L_1$ is an observational refinement of another implementation $L_2$ if every observable behavior of a client program $P$ using $L_1$ is also possible when $P$ uses $L_2$. For example, Treiber's stack is not an observational refinement of the lock-based implementation because the program $P$ given in the bottom-left part of Figure~\ref{fig:stacks} can reach a state where $x=3$ and $y={\tt EMPTY}$ when using Treiber's stack but not when using the lock-based implementation. Intuitively, reaching this state corresponds to an incorrect behavior of the stack: when popping $3$ from the stack, the latter should still contain the value $2$ (it shouldn't be empty).
 
 
 
