@@ -1,34 +1,5 @@
-%
-%\hspace{.2cm}
-%\begin{tikzpicture}[node distance=.7cm]
-%\tikzstyle{node}=[minimum size=10pt]
-%\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
-%\node[node] (y)  [below of=x] {}; %label=above:$x$
-%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-%\end{tikzpicture}
-%\hspace{0.7cm}
-%\begin{tikzpicture}[node distance=.7cm]
-%\tikzstyle{node}=[minimum size=10pt]
-%\node[node] (x)  [] at (1, 0) {{\tt free (0xFFFF0000)}};
-%\node[node] (y)  [below of=x] {}; %label=above:$x$
-%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-%\end{tikzpicture}
-%\hspace{2.8cm}
-%\begin{tikzpicture}[node distance=.7cm]
-%\tikzstyle{node}=[minimum size=10pt]
-%\node[node] (x)  [] at (1, 0) {${\tt n} = {\tt 0xFFFF 0000}$};
-%\node[node] (y)  [below of=x] {}; %label=above:$x$
-%\draw[->] (x) -- (y); %node[draw=none,right] {$h$}
-%\end{tikzpicture}
-%
-%\vspace{-1cm}
-%\[
-%\underbrace{\<push>(1)_1\ldots \<ret>_1\ \<pop>_2\ldots ^{8}}_{\tt {\bf Thread 1}} \ddagger\
-%\underbrace{\<pop>()_3\ldots \<ret>(1)_3\ z=1\ \<push>(2)_4\ldots \<ret>_4\ \<push>(3)_5\ldots \<ret>_5}_{\tt {\bf Thread 2}} \ddagger\ 
-%\underbrace{^{8}\ldots  \<ret>(3)_2\ x=3\ \<pop>()_6\ldots \<ret>({\tt EMPTY})_6\ y={\tt EMPTY}}_{\tt {\bf Thread 1}}
-%\]
-
 \begin{tikzpicture}[node distance=.5cm]
+
 \tikzstyle{node}=[minimum size=0pt]
 \tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
 \tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
