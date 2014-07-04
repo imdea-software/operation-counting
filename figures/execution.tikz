@@ -8,7 +8,7 @@
 \node[lnode] (x2)  [below of=x1,label=right:$\<ret>$] {}; %label=above:$x$
 \node[lnode] (x3)  [below of=x2,label=right:$\<pop>()$] {}; 
 \node[nnode] (x4)  [below of=x3] {}; 
-\node[nnode] (x41) [below= 2.5mm of x4,label={[left=3mm,yshift=-1mm,rotate=90]left:{\it preemption at line 8}}] {};
+\node[nnode] (x41) [below= 2.5mm of x4,label={[left=3mm,yshift=-1mm,rotate=90]left:{\it preemption at line 18}}] {};
 
 \node[node] (z0)  [below=1mm of x1] {}; 
 \node[node] (z1)  [right=19mm of x1,yshift=-5mm] {{\tt n=0xFF}}; 
