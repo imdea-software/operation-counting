@@ -84,7 +84,13 @@ a given operation starts) cannot be incomparable.
 In this work we consider only histories of well-formed executions, i.e.,~those
 forming interval orders, without explicit qualification.
 
-%\paragraph{History comparison}
+\paragraph{History comparison} We define an order relation between histories,
+which is essential for proving the main result of this section but also, for defining
+our approximation for refinement checking. Basically, a history $h_1$
+is \emph{weaker than} another history $h_2$ if $h_2$ contains all the completed operations in $h_1$ and
+it preserves the order between these operations. The pending operations of $h_1$
+can be either omitted or completed in $h_2$.
+
 \begin{definition}
 Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
 \emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
@@ -102,6 +108,12 @@ where $(m_1(u_1) => v_1) \preceq (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
 u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. 
 \end{definition}
+
+\begin{example}
+
+SHOW TWO HISTORIES SATISFYING THE WEAKER THAN RELATION.
+
+\end{example}
 
 Throughout this
 work we do not distinguish between equivalent histories, and we assume every
