@@ -2,35 +2,31 @@
 \section{Observational Refinement}
 \label{sec:refinement}
 
-%Standard correctness criteria for software library implementations are their
-%conformance to \emph{reference implementations}. The literature captures such
-%conformance with the notion of \emph{observational refinement}: is every
-%behavior of a program using a given library also possible when using instead
-%its reference implementation? 
-%We formalize the criterion of \emph{observational refinement} using a simple yet
-%universal model of computation for libraries and programs, namely labeled
-%transition systems (LTS). 
-We give in this section a formal definition of  \emph{observational refinement}. 
-We consider concurrent programs with an arbitrary number of threads, using a 
-finite number of variables that can be either local (to a thread) or shared between 
-threads, and calling methods (and waiting for their return values) provided 
-by some external library.
-To abstract away from a particular programming language, we consider 
-a simple yet universal model of computation for libraries and programs, namely labeled
-transition systems (LTS). 
+% Standard correctness criteria for software library implementations are their
+% conformance to \emph{reference implementations}. The literature captures such
+% conformance with the notion of \emph{observational refinement}: is every
+% behavior of a program using a given library also possible when using instead
+% its reference implementation?
+
+We formalize the criterion of \emph{observational refinement} using a simple
+yet universal model of computation, namely labeled transition systems (LTS).
+This model captures shared-memory programs with an arbitrary number of threads,
+abstracting away the details of any particular programming system irrelevant to
+our development.
 
 \paragraph{LTSs}
-A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over alphabet $@S$ is a
-set $Q$ of states with initial state $q_0 \in Q$, and a transition relation $@d
-\subseteq Q \x @S \x Q$ (the sets $Q$ and $@S$ can be infinite). 
-For any sequence $e \in @S^*$, $e_i$ denotes the $i$th symbol in $e$.
-An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
-that for some $q_1, q_2, .., q_{|e|} \in Q$ we have $@d(q_i,e_i,q_{i+1})$ for
-each $i$ such that $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$
-over alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$
-their projections over $@G$. The \emph{synchronous product} $A_1 \x A_2$ of two
-LTSs is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) =
-E(A_1)|@S_2 \n E(A_2)|@S_1$.
+
+A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over the
+possibly-infinite alphabet $@S$ is a possibly-infinite set $Q$ of states with
+initial state $q_0 \in Q$, and a transition relation $@d \subseteq Q \x @S \x
+Q$. The $i$th symbol of a sequence $e \in @S^*$ is denoted $e_i$. An
+\emph{execution} of $A$ is a sequence $e \in @S^*$ such that for some $q_1,
+q_2, .., q_{|e|} \in Q$, we have $@d(q_i,e_i,q_{i+1})$ for each $i$ such that
+$0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$ over
+alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$ their
+projections over $@G$. The \emph{synchronous product} $A_1 \x A_2$ of two LTSs
+is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) = E(A_1)|@S_2 \n
+E(A_2)|@S_1$.
 
 %\begin{example}
 %  \label{ex:threads:1}
@@ -50,7 +46,7 @@ E(A_1)|@S_2 \n E(A_2)|@S_1$.
 %
 %\end{example}
 
-\paragraph{Libraries}
+\paragraph{Executions}
 
 Programs interact with libraries by calling named library \emph{methods}, which
 receive \emph{parameter values} and yield \emph{return values} upon completion.
@@ -60,32 +56,34 @@ parameter/return values.
 \begin{example}
   \label{ex:methods}
 
-  The method and value sets for the stack implementations in Figure~\ref{fig:stacks} are
-%  \begin{align*}
-    $\<Methods> = \set{ \<push>, \<pop> }$ and 
-    $\<Vals> = \<Nats> \u \set{ {\tt EMPTY} }$.
-%  \end{align*}
-%  where $\<EMPTY>$ is the return value of $\<pop>$ when the stack.
+  The method and value sets for the stack implementations in
+  Figure~\ref{fig:stacks} are $\<Methods> = \set{ \<push>, \<pop> }$ and
+  $\<Vals> = \<Nats> \u \set{ {\tt EMPTY} }$.
 
 \end{example}
 
-Libraries are abstractly defined by their interface with 
-the clients, i.e., by considering the set of all possible sequences of method calls and returns, 
-with their associated input and output values, that can be observed when the library methods are
-invoked by any program. 
+% XXX MJE DOES NOT UNDERSTAND THE VALUE OF THIS PARAGRAPH
+% Libraries are abstractly defined by their interface with the clients, i.e., by
+% considering the set of all possible sequences of method calls and returns,
+% with their associated input and output values, that can be observed when the
+% library methods are invoked by any program.
 
+\noindent
 We fix an arbitrary set $\<Ops>$ of operation identifiers, and for given sets
-$\<Methods>$ and $\<Vals>$ of methods and values, we fix the sets $C = \set{
-m(v)_o : m \in \<Methods>, v \in \<Vals>, o \in \<Ops> }$ of \emph{call
-actions} and $R = \set{ \<ret>(v)_o : v \in \<Vals>, o \in \<Ops> }$ of
-\emph{return actions}; each call action $m(v)_o$ combines a method $m \in
-\<Methods>$ and value $v \in \<Vals>$ with an \emph{operation identifier} $o
-\in \<Ops>$. Operation identifiers are used to pair call and return actions.
-We denote the operation identifier of a call/return action $c$ by
-$\<op>(c)$. Call and return actions $c \in C$ and $r \in R$ are
-\emph{matching}, written $c \match r$, when $\<op>(c) = \<op>(r)$. A word $e
-\in @S^*$ over alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well
-formed} when:
+$\<Methods>$ and $\<Vals>$ of methods and values, we fix the sets
+\begin{align*}
+  & C = \set{ m(v)_o : m \in \<Methods>, v \in \<Vals>, o \in \<Ops> }
+  \text{, and } \\
+  & R = \set{ \<ret>(v)_o : v \in \<Vals>, o \in \<Ops> }  
+\end{align*}
+of \emph{call actions} and \emph{return actions}; each call action $m(v)_o$
+combines a method $m \in \<Methods>$ and value $v \in \<Vals>$ with an
+\emph{operation identifier} $o \in \<Ops>$. Operation identifiers are used to
+pair call and return actions. We denote the operation identifier of a
+call/return action $c$ by $\<op>(c)$. Call and return actions $c \in C$ and $r
+\in R$ are \emph{matching}, written $c \match r$, when $\<op>(c) = \<op>(r)$. A
+word $e \in @S^*$ over alphabet $@S$, such that $(C \u R) \subseteq @S$, is
+\emph{well formed} when:
 \begin{itemize}
 
   \item Each return is preceded by a matching call: \\
@@ -106,11 +104,9 @@ Well-formed words represent executions. We assume every set of well-formed
 words is closed under isomorphic renaming of operation identifiers. For
 notational convenience, we often associate $\<Ops>$ with $\<Nats>$,
 e.g.,~writing $m(u)_1$ and $\<ret>(v)_2$ in place of $m(u)_{o_1}$ and
-$\<ret>(v)_{o_2}$.
-%
-An operation $o$ of an execution $e$ is called \emph{completed} iff 
-both the call $m(u)_o$ and the return action  $\<ret>(v)_o$ of $o$ 
-occur in $e$
+$\<ret>(v)_{o_2}$. An operation $o$ of an execution $e$ is \emph{completed}
+when both call and return actions $m(u)_o$ and $\<ret>(v)_o$ of $o$ occur in
+$e$, and is otherwise \emph{pending}.
 
 \begin{example}
   \label{ex:executions}
@@ -129,8 +125,8 @@ occur in $e$
   while operation $3$ is pending in the second, it has no matching return.
 
 \end{example}
- 
-%\todo{Closure properties are motivated by the fact that we consider only concurrent libraries. In sequential libraries, they do not hold}
+
+\paragraph{Libraries}
 
 Libraries dictate the execution of methods between their call and return
 points. Accordingly, a library cannot prevent a method from being called,
@@ -140,33 +136,33 @@ call have been made earlier, and/or the return made later. Our technical
 results rely on these properties. Formally, 
 
 \begin{definition}
-A library $L$ is an LTS over
-alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
-\begin{itemize}
 
-  \item Call actions $c \in C$ cannot be disabled: \\
-  $e \cdot e' \in E(L)$ implies $e \cdot c \cdot e' \in E(L)$
-  if $e \cdot c \cdot e'$ is well formed.
+  A \emph{library} $L$ is an LTS over alphabet $C \u R$ such that each
+  execution $e \in E(L)$ is well formed, and
+  \begin{itemize}
+
+    \item Call actions $c \in C$ cannot be disabled: \\
+    $e \cdot e' \in E(L)$ implies $e \cdot c \cdot e' \in E(L)$
+    if $e \cdot c \cdot e'$ is well formed.
   
-  \item Call actions $c \in C$ cannot disable other actions: \\
-  $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e \in E(L)$.
+    \item Call actions $c \in C$ cannot disable other actions: \\
+    $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e \in E(L)$.
   
-  \item Return actions $r \in R$ cannot enable other actions: \\
-  $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
+    \item Return actions $r \in R$ cannot enable other actions: \\
+    $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
   
-\end{itemize}
+  \end{itemize}
+
 \end{definition}
-
-Note that even a library that implements
-\emph{atomic methods}, e.g.,~by guarding method bodies with a global-lock
-acquisition like the lock-based implementation in Figure~\ref{fig:stacks}, 
-admits executions in which method calls and returns overlap.
-A library which accesses the client's thread identifiers can be modeled by 
-taking thread identifiers as method parameters.
-
-We write $e_1 ~> e_2$ when $e_1=e_2$ or $e_2$ can be derived form $e_1$ by applying one or
+We write $e_1 ~> e_2$ when $e_2$ can be derived form $e_1$ by applying zero or
 more of the above rules. The \emph{closure} of a set $E$ of executions under
-$~>$ is denoted $\overline{E}$. 
+$~>$ is denoted $\overline{E}$.
+
+Note that even a library that implements \emph{atomic methods}, e.g.,~by
+guarding method bodies with a global-lock acquisition like the lock-based
+implementation in Figure~\ref{fig:stacks}, admits executions in which method
+calls and returns overlap. A library which accesses the client's thread
+identifiers can be modeled by taking thread identifiers as method parameters.
 
 \begin{example}
   \label{ex:libraries}
@@ -227,25 +223,36 @@ as specifications for concurrent objects.
 
 \begin{example}
 
-A library $L$ is called an \emph{atomic stack} iff the
-kernel $\ker E(L)$ consists of all sequential executions with only completed operations such that 
-the return value of any $\<pop>$ invocation $o$ is:
-\begin{itemize}
-	\item {\tt EMPTY}, if the number of $\<push>$ invocations before $o$ 
-equals the number of $\<pop>$ invocations before $o$, 
-	\item $v$, where $v$ is the input of the last $\<push>$ invocation, otherwise.
-\end{itemize}
-The lock-based stack implementation in Figure~\ref{fig:stacks} is an atomic stack.
+  A library $L$ is called an \emph{atomic stack} iff the kernel $\ker E(L)$
+  consists of all sequential executions with only completed operations such
+  that the return value of any $\<pop>$ invocation $o$ is:
+  \begin{itemize}
+
+  	\item {\tt EMPTY}, if the number of $\<push>$ invocations before $o$ equals
+  	the number of $\<pop>$ invocations before $o$,
+
+  	\item $v$, where $v$ is the input of the last $\<push>$ invocation,
+  	otherwise.
+
+  \end{itemize}
+  The lock-based stack implementation in Figure~\ref{fig:stacks} is an atomic
+  stack.
 
 \end{example}
 
-By minimality, the kernel of an atomic library cannot contain sequential executions with pending operations.
-Thus, if $\ker E(L)$ were to contain a sequential execution $e = e' \cdot m(u)_o$, then it should also contain $e'$ since 
-$E(L)$ is prefix-closed and $e \not\leadsto e'$. But, since $e' ~> e$, by minimality, $\ker E(L)$ should contain only $e'$.
+TODO CLARIFY AND LOCALIZE THIS COMMENT TO WHERE IT IS RELEVANT
+By minimality, the kernel of an atomic library cannot contain sequential
+executions with pending operations. Thus, if $\ker E(L)$ were to contain a
+sequential execution $e = e' \cdot m(u)_o$, then it should also contain $e'$
+since $E(L)$ is prefix-closed and $e \not\leadsto e'$. But, since $e' ~> e$, by
+minimality, $\ker E(L)$ should contain only $e'$.
 
-%a sequential execution $e$ with one pending operation at the end,
-%The kernel contains only completed executions ... for a sequential execution $e$ with a pending operation at the end, the execution without this pending operation is also in the library because of prefix closure and it is a generator for $e$ (by applying the first closure rule)
+% a sequential execution $e$ with one pending operation at the end,
 
+% The kernel contains only completed executions ... for a sequential execution
+% $e$ with a pending operation at the end, the execution without this pending
+% operation is also in the library because of prefix closure and it is a
+% generator for $e$ (by applying the first closure rule)
 
 \paragraph{Programs}
 
@@ -256,33 +263,28 @@ have been made later, and/or the return made earlier. A program is defined
 by the set of all possible sequences of actions, that can be observed when the program 
 uses any implementation of the invoked methods. Formally, 
 
-\begin{definition}\label{def:programs}
-A program $P$
-over actions $@S$ such that $@S \cap (C \cup R) = @0$ is an LTS over alphabet
-$(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
-\begin{itemize}
+\begin{definition}
+  \label{def:programs}
 
-	\item Call actions $c \in C$ cannot enable other actions: \\
-  $e \cdot c \cdot a \cdot e' \in E(P)$ implies
-  $c \match a$ or $e \cdot a \cdot c \cdot e' \in E(P)$.
+  A \emph{program} $P$ over actions $@S$ such that $@S \cap (C \cup R) = @0$ is
+  an LTS over alphabet $(@S \cup C \cup R)$ such that each execution $e \in
+  E(P)$ is well formed, and
+  \begin{itemize}
 
-  \item Return actions $r \in R$ cannot disable other actions: \\
-  $e \cdot a \cdot r \cdot e' \in E(P)$ implies
-  $a \match r$ or $e \cdot r \cdot a \cdot e \in E(P)$.
+  	\item Call actions $c \in C$ cannot enable other actions: \\
+    $e \cdot c \cdot a \cdot e' \in E(P)$ implies
+    $c \match a$ or $e \cdot a \cdot c \cdot e' \in E(P)$.
 
-  \item Return actions $r \in R$ cannot be disabled: \\
-  $e \cdot e' \in E(P)$ implies $e \cdot r \cdot e' \in E(L)$
-  if $e \cdot r \cdot e'$ is well formed.
+    \item Return actions $r \in R$ cannot disable other actions: \\
+    $e \cdot a \cdot r \cdot e' \in E(P)$ implies
+    $a \match r$ or $e \cdot r \cdot a \cdot e \in E(P)$.
 
-\end{itemize}
+    \item Return actions $r \in R$ cannot be disabled: \\
+    $e \cdot e' \in E(P)$ implies $e \cdot r \cdot e' \in E(L)$
+    if $e \cdot r \cdot e'$ is well formed.
+
+  \end{itemize}
 \end{definition}
-
-%Concurrent programs can be modeled as usual by a parallel
-%composition of LTSs.
-
-%Note that since even call actions specify return values, if a program allows
-%methods to return different values, then call actions for each possible return
-%value should be enabled, in order to accept any returned value.
 
 \begin{example}
   \label{ex:programs}
@@ -331,8 +333,9 @@ $(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
 %\end{example}
 
 \paragraph{Observational refinement}
-Finally, refinement between libraries $L_1$ and $L_2$ means that any program
-execution possible in its composition with $L_1$ is also possible with $L_2$.
+
+Refinement between libraries $L_1$ and $L_2$ means that any program execution
+possible in its composition with $L_1$ is also possible with $L_2$.
 \begin{definition}
 
   The library $L_1$ \emph{refines} $L_2$, written $L_1 \leq L_2$, iff
@@ -344,7 +347,7 @@ execution possible in its composition with $L_1$ is also possible with $L_2$.
 \end{definition}
 As library and program alphabets only intersect on call and return actions
 $C \cup R$, our formalization does not directly capture other means of
-communication, e.g., through shared random-access memory.
+communication, e.g.,~through shared random-access memory.
 
 \begin{example}
 
