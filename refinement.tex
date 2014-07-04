@@ -2,17 +2,29 @@
 \section{Observational Refinement}
 \label{sec:refinement}
 
-Standard correctness criteria for software library implementations are their
-conformance to \emph{reference implementations}. The literature captures such
-conformance with the notion of \emph{observational refinement}: is every
-behavior of a program using a given library also possible when using instead
-its reference implementation? We formalize this criterion using a simple yet
-universal model of computation for libraries and programs, namely labeled
-transition systems (LTS).
+%Standard correctness criteria for software library implementations are their
+%conformance to \emph{reference implementations}. The literature captures such
+%conformance with the notion of \emph{observational refinement}: is every
+%behavior of a program using a given library also possible when using instead
+%its reference implementation? 
+%We formalize the criterion of \emph{observational refinement} using a simple yet
+%universal model of computation for libraries and programs, namely labeled
+%transition systems (LTS). 
+We give in this section a formal definition of  \emph{observational refinement}. 
+We consider concurrent programs with an arbitrary number of threads, using a 
+finite number of variables that can be either local (to a thread) or shared between 
+threads, and calling methods (and waiting for their return values) provided 
+by some external library.
+To abstract away from a particular programming language, we consider 
+a simple yet universal model of computation for libraries and programs, namely labeled
+transition systems (LTS). 
 
+\paragraph{LTSs}
 A \emph{labeled transition system} $A = (Q,@S,q_0,@d)$ over alphabet $@S$ is a
 set $Q$ of states with initial state $q_0 \in Q$, and a transition relation $@d
-\subseteq Q \x @S \x Q$. An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
+\subseteq Q \x @S \x Q$ (the sets $Q$ and $@S$ can be infinite). 
+For any sequence $e \in @S^*$, $e_i$ denotes the $i$th symbol in $e$.
+An \emph{execution} of $A$ is a sequence $e \in @S^*$ such
 that for some $q_1, q_2, .., q_{|e|} \in Q$ we have $@d(q_i,e_i,q_{i+1})$ for
 each $i$ such that $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$
 over alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$
@@ -20,43 +32,47 @@ their projections over $@G$. The \emph{synchronous product} $A_1 \x A_2$ of two
 LTSs is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) =
 E(A_1)|@S_2 \n E(A_2)|@S_1$.
 
-\begin{example}
-  \label{ex:threads:1}
-
-  A multithreaded system $\tup{S,L,@S,s_0,@l_0,n,->}$ of $n$ threads with
-  shared states $S$, local states $L$, actions $@S$, and per-thread transition
-  relation $-> \subseteq (S \x L) \x @S \x (S \x L)$ is modeled by the LTS
-  $\tup{Q,@S,q_0,@d}$ with states $Q = S \x L^n$ and initial state $q_0 =
-  \tup{s_0, @l_0, .., @l_0}$, which includes a transition
-  \begin{align*}
-    @d(\tup{s, @l_1, .., @l_n}, a, \tup{s', @l_1', .., @l_n'})
-  \end{align*}
-  iff $\tup{s,@l_i} \overset{a}{\rightarrow} \tup{s',@l_i'}$ for some $i$, and
-  $@l_j = @l_j'$ for $j \neq i$.
-  
-  \todo{actions should be associated to a thread}
-
-\end{example}
+%\begin{example}
+%  \label{ex:threads:1}
+%
+%  A multithreaded system $\tup{S,L,@S,s_0,@l_0,n,->}$ of $n$ threads with
+%  shared states $S$, local states $L$, actions $@S$, and per-thread transition
+%  relation $-> \subseteq (S \x L) \x @S \x (S \x L)$ is modeled by the LTS
+%  $\tup{Q,@S,q_0,@d}$ with states $Q = S \x L^n$ and initial state $q_0 =
+%  \tup{s_0, @l_0, .., @l_0}$, which includes a transition
+%  \begin{align*}
+%    @d(\tup{s, @l_1, .., @l_n}, a, \tup{s', @l_1', .., @l_n'})
+%  \end{align*}
+%  iff $\tup{s,@l_i} \overset{a}{\rightarrow} \tup{s',@l_i'}$ for some $i$, and
+%  $@l_j = @l_j'$ for $j \neq i$.
+%  
+%  \todo{actions should be associated to a thread}
+%
+%\end{example}
 
 \paragraph{Libraries}
 
 Programs interact with libraries by calling named library \emph{methods}, which
 receive \emph{parameter values} and yield \emph{return values} upon completion.
 We fix arbitrary sets $\<Methods>$ and $\<Vals>$ of method names and
-parameter/return values.
+parameter/return values. 
 
 \begin{example}
   \label{ex:methods}
 
-  The method and value sets for a simple pushdown-stack data structure which
-  stores only natural numbers is
-  \begin{align*}
-    \<Methods> = \set{ \<push>, \<pop> }
-    \quad \<Vals> = \<Nats> \u \set{ \<empty> }
-  \end{align*}
-  where $\<empty>$ signifies the return value of an empty stack.
+  The method and value sets for the stack implementations in Figure~\ref{fig:stacks} are
+%  \begin{align*}
+    $\<Methods> = \set{ \<push>, \<pop> }$ and 
+    $\<Vals> = \<Nats> \u \set{ {\tt EMPTY} }$.
+%  \end{align*}
+%  where $\<EMPTY>$ is the return value of $\<pop>$ when the stack.
 
 \end{example}
+
+Libraries are abstractly defined by their interface with 
+the clients, i.e., by considering the set of all possible sequences of method calls and returns, 
+with their associated input and output values, that can be observed when the library methods are
+invoked by any program. 
 
 We fix an arbitrary set $\<Ops>$ of operation identifiers, and for given sets
 $\<Methods>$ and $\<Vals>$ of methods and values, we fix the sets $C = \set{
@@ -64,7 +80,8 @@ m(v)_o : m \in \<Methods>, v \in \<Vals>, o \in \<Ops> }$ of \emph{call
 actions} and $R = \set{ \<ret>(v)_o : v \in \<Vals>, o \in \<Ops> }$ of
 \emph{return actions}; each call action $m(v)_o$ combines a method $m \in
 \<Methods>$ and value $v \in \<Vals>$ with an \emph{operation identifier} $o
-\in \<Ops>$. We denote the operation identifier of a call/return action $c$ by
+\in \<Ops>$. Operation identifiers are used to pair call and return actions.
+We denote the operation identifier of a call/return action $c$ by
 $\<op>(c)$. Call and return actions $c \in C$ and $r \in R$ are
 \emph{matching}, written $c \match r$, when $\<op>(c) = \<op>(r)$. A word $e
 \in @S^*$ over alphabet $@S$, such that $(C \u R) \subseteq @S$, is \emph{well
@@ -116,7 +133,10 @@ points. Accordingly, a library cannot prevent a method from being called,
 though it can decide not to return. Furthermore, any library action performed
 in the interval between call and return points can also be performed should the
 call have been made earlier, and/or the return made later. Our technical
-results rely on these properties. Formally, a library $L$ is an LTS over
+results rely on these properties. Formally, 
+
+\begin{definition}
+A library $L$ is an LTS over
 alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
 \begin{itemize}
 
@@ -131,11 +151,18 @@ alphabet $C \u R$ such that each execution $e \in E(L)$ is well formed, and
   $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.
   
 \end{itemize}
-We write $e_1 ~> e_2$ when $e_2$ can be derived form $e_1$ by applying one or
-more of the above rules. The \emph{closure} of a set $E$ of executions under
-$~>$ is denoted $\overline{E}$. Note that even a library that implements
+\end{definition}
+
+Note that even a library that implements
 \emph{atomic methods}, e.g.,~by guarding method bodies with a global-lock
-acquisition, admits executions in which method calls and returns overlap.
+acquisition like the lock-based implementation in Figure~\ref{fig:stacks}, 
+admits executions in which method calls and returns overlap.
+A library which accesses the client's thread identifiers can be modeled by 
+taking thread identifiers as method parameters.
+
+We write $e_1 ~> e_2$ when $e_1=e_2$ or $e_2$ can be derived form $e_1$ by applying one or
+more of the above rules. The \emph{closure} of a set $E$ of executions under
+$~>$ is denoted $\overline{E}$. 
 
 \begin{example}
   \label{ex:libraries}
@@ -207,7 +234,12 @@ The kernel contains only completed executions ... for a sequential execution $e$
 Complementary to libraries, programs control their execution outside of method
 call and return points. Accordingly, any program action performed in the
 interval between call and return points can also be performed should the call
-have been made later, and/or the return made earlier. Formally, a program $P$
+have been made later, and/or the return made earlier. A program is defined 
+by the set of all possible sequences of actions, that can be observed when the program 
+uses any implementation of the invoked methods. Formally, 
+
+\begin{definition}
+A program $P$
 over actions $@S$ such that $@S \cap (C \cup R) = @0$ is an LTS over alphabet
 $(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
 \begin{itemize}
@@ -225,6 +257,11 @@ $(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
   if $e \cdot r \cdot e'$ is well formed.
 
 \end{itemize}
+\end{definition}
+
+%Concurrent programs can be modeled as usual by a parallel
+%composition of LTSs.
+
 %Note that since even call actions specify return values, if a program allows
 %methods to return different values, then call actions for each possible return
 %value should be enabled, in order to accept any returned value.
@@ -232,21 +269,50 @@ $(@S \cup C \cup R)$ such that each execution $e \in E(P)$ is well formed, and
 \begin{example}
   \label{ex:programs}
 
-  TODO MAYBE A GOOD EXAMPLE HERE
-
+  Any program which admits the execution
+  \scriptsize
+    \begin{align*}
+    \<push>(0)_1\ \<pop>_2\ \<ret>(0)_2\ \<pop>_3\ \ x = 0\ \<ret>_1
+  \end{align*}
+  \normalsize
+  with overlapping calls to $\<push>$ and $\<pop>$ must also admit
+  \scriptsize
+  \begin{align*}
+    &\<push>(0)_1\ \<ret>_1\ \<pop>_2\ \<ret>(0)_2\ \<pop>_3\ \ x = 0\text{\normalsize,}  \\
+%    \end{align*}
+%%    \scriptsize
+%    \begin{align*}
+    & \<push>(0)_1\ \<ret>_1\ \<pop>_2\ \<ret>(0)_2\ \<pop>_3\ \<ret>({\tt EMPTY})_3\ \ x = 0 % \text{ \normalsize and }
+    \text{\normalsize,} 
+  \end{align*}
+  \normalsize
+  among others, yet need not admit an execution
+  \scriptsize
+  \begin{align*}
+    \<push>(0)_1\ \<ret>_1\ \<pop>_3\ \<pop>_2\ \<ret>(0)_2\  \ x = 0
+  \end{align*}
+  \normalsize
+  where the second call to $\<pop>$ starts before the first one. Note that $\<pop>_3$ could have been completed
+  with any return action, even with $\<ret>(1)_3$ instead of $\<ret>({\tt EMPTY})_3$. The set of executions 
+  admitted by a program considers any possible implementation of the methods.  
+%  The sequence of actions program
+%  is defined as the set of actions possible when composed with any library, not only correct implementations
+%  of a concurrent stack.
+  
 \end{example}
 
-\begin{example}
-  \label{ex:threads:2}
+%\begin{example}
+%  \label{ex:threads:2}
+%
+%  A multithreaded program $P$ with $n$ threads, e.g.,~as defined in
+%  Example~\ref{ex:threads:1}, only admits executions with at most $n$
+%  overlapping method calls. A library which accesses $P$'s thread identifiers
+%  can be modeled by defining the set $\<Methods>$ of methods to include thread
+%  identifiers as method parameters.
+%
+%\end{example}
 
-  A multithreaded program $P$ with $n$ threads, e.g.,~as defined in
-  Example~\ref{ex:threads:1}, only admits executions with at most $n$
-  overlapping method calls. A library which accesses $P$'s thread identifiers
-  can be modeled by defining the set $\<Methods>$ of methods to include thread
-  identifiers as method parameters.
-
-\end{example}
-
+\paragraph{Observational refinement}
 Finally, refinement between libraries $L_1$ and $L_2$ means that any program
 execution possible in its composition with $L_1$ is also possible with $L_2$.
 \begin{definition}
@@ -264,8 +330,14 @@ communication, e.g., through shared random-access memory.
 
 \begin{example}
 
-  An $L_1$ that admits both executions from Example~\ref{ex:executions} does
-  not refine an $L_2$ which only admits the first, as witnessed by a program
-  which calls $\<push>(0)$ and $\<pop>$ twice, in parallel.
+  As we have shown previously, the Treiber's stack implementation from Figure~\ref{fig:stacks}
+  doesn't refine the lock-based implementation. However, if we remove the {\tt free} statement
+  from the $\<pop>$ method and we consider a semantics for {\tt malloc} that doesn't return
+  previously used memory addresses, then the obtained library is a valid refinement
+  of the lock-based concurrent stack.
+  
+%  An $L_1$ that admits both executions from Example~\ref{ex:executions} does
+%  not refine an $L_2$ which only admits the first, as witnessed by a program
+%  which calls $\<push>(0)$ and $\<pop>$ twice, in parallel.
 
 \end{example}
