@@ -127,8 +127,11 @@ int pop() {
 \end{minipage}
 }
 \caption{A lock-based implementation of a concurrent stack and Treiber's stack implementation ({\tt EMPTY} is a special value denoting the empty stack) together with a client program $P$ and an execution of $P$ when using Treiber's stack. The program $P$ consists of two concurrent threads {\tt {\bf Thread1}} and {\tt {\bf Thread2}}.
-A method call is abstracted by a call and a return action; the internal actions of the library are abstracted by bolded edges since they are not visible to the client  
-(e.g., the invocation of ${\tt push}(1)$ is represented by a call action ${\tt push}(1)$ and a return action ${\tt ret}$).}
+In the execution of $P$, a call to ${\tt push(\_)}$ is abstracted by a call action ${\tt push(\_)}$ and a return action ${\tt ret}$. A method call ${\tt x=pop()}$, where the value returned by ${\tt pop}$ is stored in the variable $x$, is abstracted by a call action ${\tt pop()}$, a return action ${\tt ret(\_)}$, and an assignment ${\tt x=\_}$.
+%
+The internal actions of the library are abstracted by bolded edges since they are not visible to the client.
+%(e.g., the invocation of ${\tt push}(1)$ is represented by a call action ${\tt push}(1)$ and a return action ${\tt ret}$).
+}
 \label{fig:stacks}
 \end{figure*}
 
