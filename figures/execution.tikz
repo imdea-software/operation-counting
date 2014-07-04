@@ -83,7 +83,7 @@
 \draw[] (x6) -- (x7);
 
 \draw[dotted] (y7) -- (y8);
-\draw[line width=1pt] (y8) -- (y9);
+\draw[line width=2pt] (y8) -- (y9);
 \draw[] (y9) -- (y10);
 
 \draw[line width=1pt,->] (z0) -- (z1);
