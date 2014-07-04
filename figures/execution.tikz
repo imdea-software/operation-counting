@@ -36,14 +36,14 @@
 \node[lnode] (x1)  [below of=x0,label=right:$\<push>(1)$] {};
 \node[lnode] (x2)  [below of=x1,label=right:$\<ret>$] {}; %label=above:$x$
 \node[lnode] (x3)  [below of=x2,label=right:$\<pop>()$] {}; 
-\node[nnode] (x4)  [below of=x3,label=left:{\it preempted}] {}; 
-\node[nnode] (x41)  [below= 2.5mm of x4,label=left:{\it at line 8}] {}; 
+\node[nnode] (x4)  [below of=x3] {}; 
+\node[nnode] (x41) [below= 2.5mm of x4,label={[left=3mm,yshift=-1mm,rotate=90]left:{\it preemption at line 8}}] {};
 
-\node[node] (z0)  [below= 2mm of x1] {}; 
-\node[node] (z1)  [left= 3mm of x1,yshift=-2mm] {{\tt n=0xFF}}; 
+\node[node] (z0)  [below=1mm of x1] {}; 
+\node[node] (z1)  [right=19mm of x1,yshift=-5mm] {{\tt n=0xFF}}; 
 
-\node[node] (y0)  [right=7mm of x3,yshift=-2mm]  {{\tt{\bf Thread2}}};
-\node[lnode] (y1)  [right = 15mm of x4,yshift=-2mm,label=left:$\<pop>()$] {}; 
+\node[node] (y0)  [right=10mm of x3,yshift=-2mm]  {{\tt{\bf Thread2}}};
+\node[lnode] (y1)  [right=18mm of x4,yshift=-2mm,label=left:$\<pop>()$] {}; 
 \node[lnode] (y2)  [below of=y1,label=left:$\<ret>(1)$] {}; 
 \node[lnode] (y3)  [below of=y2,label=left:${\tt y=1}$] {}; 
 \node[lnode] (y4)  [below of= y3,label=left:$\<push>(2)$] {}; 
@@ -52,17 +52,17 @@
 \node[lnode] (y7)  [below of=y6,label=left:$\<ret>$] {}; 
 
 \node[node] (u0)  [below=1mm of y1] {}; 
-\node[node] (u1)  [left=17mm of y1,yshift=-5mm] {{\tt free(0xFF)}}; 
+\node[node] (u1)  [right=2mm of y1,yshift=-5mm] {{\tt free(0xFF)}}; 
 
 \node[node] (v0)  [below=2mm of y6] {}; 
-\node[node] (v1)  [left=18mm of y6,yshift=-5mm] {{\tt n=0xFF}}; 
+\node[node] (v1)  [right=3mm of y6,yshift=-5mm] {{\tt n=0xFF}}; 
 
 
-\node[nnode] (x5)  [left=15mm of y7,yshift=-2mm] {}; %label=left:$^{8}$
+\node[nnode] (x5)  [left=18mm of y7,yshift=-2mm] {}; %label=left:$^{8}$
 \node[lnode] (x6)  [below of=x5,label=right:$\<ret>(3)$] {}; 
 \node[lnode] (x7)  [below of= x6,label=right:${\tt x=3}$] {}; 
 
-\node[lnode] (y8)  [right = 15mm of x7,yshift=-5mm,label=left:$\<pop>()$] {}; 
+\node[lnode] (y8)  [right=18mm of x7,yshift=-5mm,label=left:$\<pop>()$] {}; 
 \node[lnode] (y9)  [below of =y8,label=left:$\<ret>({\tt EMPTY})$] {}; 
 \node[lnode] (y10)  [below of= y9,label=left:${\tt z=EMPTY}$] {}; 
 
