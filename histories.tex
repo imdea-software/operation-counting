@@ -11,6 +11,7 @@ equivalent notion based on concise abstractions of program executions called
 helps expose the structure of the refinement problem, and suggests practical
 means of automation which we develop in Section~\ref{sec:counting}.
 
+\paragraph{Histories}
 For given sets $\<Methods>$ and $\<Vals>$ of methods and values, we fix a set
 $\<Labels> = \<Methods> \x \<Vals> \x (\<Vals> \u \set{\bot})$ of
 \emph{operation labels}, and denote the label $\tup{m,u,v}$ by $m(u) => v$. A
@@ -44,6 +45,7 @@ The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
 
 \end{example}
 
+%\paragraph{Histories are interval orders}
 While the general concept of histories allows arbitrary partial orders of
 operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
 restricted class called \emph{interval orders}. Intuitively, this is because
@@ -82,6 +84,8 @@ a given operation starts) cannot be incomparable.
 In this work we consider only histories of well-formed executions, i.e.,~those
 forming interval orders, without explicit qualification.
 
+%\paragraph{History comparison}
+\begin{definition}
 Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
 \emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
 injection $g: O_2 -> O_1$ such that
@@ -96,11 +100,27 @@ injection $g: O_2 -> O_1$ such that
 \end{itemize}
 where $(m_1(u_1) => v_1) \preceq (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
 u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
-\emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. Throughout this
+\emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. 
+\end{definition}
+
+Throughout this
 work we do not distinguish between equivalent histories, and we assume every
 set $H$ of histories is closed under inclusion of equivalent histories,
 i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in H$, then $h_2 \in H$ as
 well.
+
+\paragraph{Observational refinement vs. history inclusion}
+We prove that 
+%a library $L_1$ refines another library $L_2$ iff $H(L_1)\subseteq H(L_2)$.
+refinement between two libraries is equivalent to containment between their
+histories.
+Before that, we give two lemmas which characterize the set of histories $H(L)$ of a library $L$.
+%
+First, the closure properties on $E(L)$ imply that whenever $H(L)$ contains some history $h_1$, it also 
+contains all histories $h_2$ weaker than $h_1$. Thus, if $h_1$ is the history of an execution $e$
+and $h_2\preceq h_1$, then there exists another execution $e'$ such that $e ~> e'$
+and $h_2$ is the history of a prefix of $e'$. Being the history of a prefix of $e'$ allows $h_2$ to have
+less completed operations than $h_1$.
 
 \begin{lemma}
   \label{lem:lib:closed}
@@ -109,11 +129,24 @@ well.
 
 \end{lemma}
 
-\begin{proof}
+%\begin{proof}
+%
+%  TODO GIVE A PROPER PROOF
+%
+%\end{proof}
 
-  TODO GIVE A PROPER PROOF
+In general, a history is an abstraction of a set of executions, that can differ only in the order between successive call (resp., return) actions.
+For example, $\<push>(0)_1\ \<pop>_2\ \<ret>_1\ \<ret>(0)_2$ and $ \<pop>_2\ \<push>(0)_1\ \<ret>(0)_2\ \<ret>_1$
+have the same history. The closure properties on $E(L)$ imply that a library $L$ contains all executions $e$ with $H(e)=h$, whenever
+$h\in H(L)$.
 
-\end{proof}
+%have the same history, i.e., $H(e)=H(e')$. The next lemma shows that $H(L)$ contains some history 
+%
+%which are
+%uninterrupted by return (resp., call) actions
+%
+%histories abstract away the order between successive call (resp., return) actions, which are
+%uninterrupted by return (resp., call) actions, i.e. any two executions
 
 \begin{lemma}
   \label{lem:lib:execs}
@@ -122,16 +155,20 @@ well.
 
 \end{lemma}
 
-\begin{proof}
+%\begin{proof}
+%
+%  TODO GIVE A PROPER PROOF
+%
+%\end{proof}
 
-  TODO GIVE A PROPER PROOF
+%\noindent
 
-\end{proof}
+Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply the
+equivalence between refinement and history inclusion.
+%refinement between two libraries is equivalent to containment between their
+%histories.
 
-\noindent
-Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply that
-refinement between two libraries is equivalent to containment between their
-histories.
+%The main result of this section is stated in the following theorem.
 
 \begin{theorem}
   \label{thm:equivalence}
@@ -172,10 +209,14 @@ histories.
     & \quad \text{ if } f(o) = m(\_) => \bot \text{ then} \\
     & \qquad q[o |-> \top,\bot] \xrightarrow{\<ret>(v)_o} q[o |-> \top,\top]
   \end{align*}
-  In any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
+  The program $P_h$ satisfies all the closure rules from Definition~\ref{def:programs}.
+  Moreover, in any execution $e \in E(P_h)$, the call $m(u)_o$ of any operation $o$ must
   come after the return $\<ret>(v)_{o'}$ of each $o'<o$. Furthermore, all
   completed operations of $h$ are completed in $e$ if and only if $(e|@S) =
-  a^n$. It follows that $|(e|@S)| = n \implies h \preceq H(e)$.
+  a^n$. Note that $e$ may contain more completed operations than $h$ (because
+  of the last transition rule) but less pending operations (because the transition
+  rule corresponding to the call of a pending operation may not have been applied in $e$). 
+  It follows that $|(e|@S)| = n \implies h \preceq H(e)$.
 
   ($\Leftarrow$)
   Let $P$ be a program over actions $@S$, and $e \in E(P \x L_1)$; we show that
