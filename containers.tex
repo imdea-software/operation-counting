@@ -22,7 +22,7 @@ The formula representing the atomic queue up to $k$ is defined by
 \begin{align*}
 \queueform{k}=\lnot\<removev> /| \lnot\<fifov> /| \lnot\<emptyv>
 \end{align*}
-
+The formulas $\<removev>$ and $\<fifov>$ are literal translations of the informal statements given above.
 
 Define the container formulas by
 \begin{align*}
@@ -39,21 +39,20 @@ from Figure~\ref{fig:spec:ds}.
     \<total>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,i',j') \quad\quad \<total>(x)=\sum_{0\leq i\leq j\leq k}\<total>(x,i,j)
   \end{align*}
   \begin{align*}
-    \<isCAdd>(x)    = \<CAdd>(x)\land \<total>(x) > 0 \quad\quad
-    \<isCRem>(x)  = \<CRem>(x)\land \<total>(x) > 0 \quad\quad
-    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
+    \<isP>(x) = \<P>(x)\land \<total>(x) > 0,\mbox{ for all predicates $\<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>}$} %\quad\quad
+%    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
   \end{align*}
   \begin{align*}
     \<before>(x,y) = \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 
 \end{align*}
 \begin{align*}
-    \<removev> &= \exists x.\ \<isCRem>(x)  /| \big( \forall y. \neg (\<isPAdd>(y) \vee \<SameVal>(x,y)) \vee \<total>(x)\geq 2\big)
+    \<removev> &= \exists x.\ \<isCRem>(x)  /| \big( \forall y. \neg (\<isPAdd>(y) \vee \<SameVal>(x,y)) \vee \<total>(x)\geq 2\big)\hspace{5.9cm}
   \end{align*}
   \begin{align*}
     \<fifov>= \exists x_1, x_2, y_1, y_2.\ & \<isCAdd>(x_1) /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
                  & /| \<before>(x_1,x_2) /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
                  & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \vee
-                 \big(  \<total>(y_1) = 0 /| \forall y_3.\ ( \neg \<PRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) 
+                 \big(  \<total>(y_1) = 0 /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) 
     \end{align*}
 %  \begin{align*}
 %    \<lifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
