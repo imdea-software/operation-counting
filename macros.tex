@@ -30,7 +30,9 @@
 \newcommand{\closure}{{\mathit Cl}}
 \newcommand{\kernel}{{\mathit K}}
 \newcommand{\regform}[1]{\<register>[{#1}]}
+\newcommand{\queueform}[1]{\<fifo>[{#1}]}
 \newcommand{\lreg}{L_{\<reg>}}
+\newcommand{\lqueue}{L_{\<fifo>}}
 
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
@@ -141,9 +143,9 @@
 \metalangkeyword{push,pop,enqueue,dequeue}
 \metalangkeyword{noWrites,isRead,isCompleted,sameVal,amongLastWr,isWrite,overlaps,readFrom,rf,intersects,Register,Reg,Read,Write,Rf,Completed,register,init}
 
-\metalangkeyword{isAdd,isRem,sameVal,emptyVal}
+\metalangkeyword{isAdd,isRem,sameVal,emptyVal,Add,Rem,CompletedRem,PendingAdd,SameVal,CRem,CAdd,PRem,PAdd,isCRem,isCAdd,isPRem,isPAdd}
 \metalangkeyword{pending,completed,total,is,before}
-\metalangkeyword{removev,fifov,lifov,emptyv}
+\metalangkeyword{removev,fifov,lifov,emptyv,fifo,queue}
 
 
 \semanticdomain{%

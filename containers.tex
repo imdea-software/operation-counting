@@ -2,17 +2,28 @@
 \section{Containers}
 \label{sec:containers}
 
+We show in this section that there exist $\ocl$ formulas representing atomic containers, e.g., sets, stacks, and queues, up to some bound $k$.
+We consider the case of an atomic queue, the other formulas can be obtained in a similar way. 
+The atomic queue $\lqueue$ has two methods $\<add>(\cdot)$ and $\<rem>$, and the kernel consists of all executions of a sequential stack, e.g.,
+$
+\<add>(1)_1\ \<ret>_1\ \<add>(2)_2\ \<ret>_2\ \<rem>_3\ \<ret>(1)_3\ \<rem>_4\ \<ret>(2)_4
+$.
+Moreover, using a data independence argument~\cite{DBLP:conf/tacas/AbdullaHHJR13,DBLP:conf/popl/Wolper86}, we assume that any data value is added at most once.
 
+Following the approach in \citet{DBLP:conf/concur/HenzingerSV13}, a history $h$ is \emph{not} a valid history of $\lqueue$ iff one of the following holds:
+\begin{description}
+	\item[Remove violation:] a $\<rem>$ operation returns a value which is not inserted by an $\<add>$ operation or two different $\<rem>$ operations return the same value.
+	\item[Ordering violation:] an $\<add>(v_1)$ operation finishes before another $\<add>(v_2)$ operation, and either (1) a $\<rem> =>v_2$ operation finishes before a $\<rem>=>v_1$ operation or (2) $h$ contains no $\<rem>=>v_1$ operation but it contains a $\<rem>=>v_2$ operation, that doesn't overlap with any pending $\<rem>$ operation. 
+	\item[Empty violation:] the queue is never logically empty during the execution of a $\<rem>=>{\tt EMPTY}$ operation.
+\end{description}
+
+Figure~\ref{fig:spec:ds} lists the $\ocl$ formulas $\<removev>$, $\<fifov>$, and $\<emptyv>$, characterizing remove, ordering, and respectively, empty violations.
+The formula representing the atomic queue up to $k$ is defined by
 \begin{align*}
-\<total>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,,i',j') \\
-\exists t_a,t_r\ \exists x,y.\ &
-\sum_{i\leq t_r}\<total>(\<rem>\triangleright x,i,j) < \<total>(\<add>(x),0,t_a) \\[1mm]
-&\land\ \<total>(\<rem>\triangleright y,0,t_r) > \sum_{i\leq t_a} \<total>(\<add>(y),i,j) \\[3mm]
-\forall t_a,t_r\ \forall x,y.\ &
-\sum_{i\leq t_r}\<total>(\<rem>\triangleright x,i,j) \geq \<total>(\<add>(x),0,t_a) \\[1mm]
-&\lor\ \<total>(\<rem>\triangleright y,0,t_r) \leq \sum_{i\leq t_a} \<total>(\<add>(y),i,j)
+\queueform{k}=\lnot\<removev> /| \lnot\<fifov> /| \lnot\<emptyv>
 \end{align*}
-  
+
+
 Define the container formulas by
 \begin{align*}
   @Y_\mathrm{stack} &= \lnot\<removev> /| \lnot\<lifov> /| \lnot\<emptyv> \text{, and } \\
@@ -20,34 +31,46 @@ Define the container formulas by
 \end{align*}
 from Figure~\ref{fig:spec:ds}.
 
-\begin{figure}
+\begin{figure*}
+%  \begin{align*}
+%    \<pending>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \quad\quad    \<completed>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') 
+%  \end{align*}
   \begin{align*}
-    \<pending>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \\
-    \<completed>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') \\
-    \<total>(x,i,j) &= \<pending>(x,i,j) + \<completed>(x,i,j) \\
-    \<before>(x,y) &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
-    \<is>(x)    &= \<total>(x) > 0 \\
-    \<removev> &= \exists x,y.\ \<isAdd>(x) /| \<isRem>(y) /| \<sameVal>(x,y) \\
-               &  \quad /| \<total>(x) > \<completed>(y) \\
-    \<fifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_2) \\
-                 & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
-                 & /| \<isRem>(y_1) /| \<isRem>(y_2) \\
-                 & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
-                 & /| (\<is>(y_1) => \<before>(y_2,y_1)) \\
-                 & /| (\lnot\<is>(y_1) => \lnot\exists y_3.\ \<isRem>(y_3) \\
-                 & \quad /| \<pending>(y_3) /| \lnot\<before>(y_2,y_3)) \\
-    \<lifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
-              & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
-              & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
-              & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
+    \<total>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,i',j') \quad\quad \<total>(x)=\sum_{0\leq i\leq j\leq k}\<total>(x,i,j)
+  \end{align*}
+  \begin{align*}
+    \<isCAdd>(x)    = \<CAdd>(x)\land \<total>(x) > 0 \quad\quad
+    \<isCRem>(x)  = \<CRem>(x)\land \<total>(x) > 0 \quad\quad
+    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
+  \end{align*}
+  \begin{align*}
+    \<before>(x,y) = \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 
+\end{align*}
+\begin{align*}
+    \<removev> &= \exists x.\ \<isCRem>(x)  /| \big( \forall y. \neg (\<isPAdd>(y) \vee \<SameVal>(x,y)) \vee \<total>(x)\geq 2\big)
+  \end{align*}
+  \begin{align*}
+    \<fifov>= \exists x_1, x_2, y_1, y_2.\ & \<isCAdd>(x_1) /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
+                 & /| \<before>(x_1,x_2) /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
+                 & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \vee
+                 \big(  \<total>(y_1) = 0 /| \forall y_3.\ ( \neg \<PRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) 
+    \end{align*}
+%  \begin{align*}
+%    \<lifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
+%              & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
+%              & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
+%              & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
+%  \end{align*}
+  \begin{align*}  
     \<emptyv> &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
               & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
               & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
               & /| \<before>(x,y) /| \<before>(y,z)
   \end{align*}
-  \caption{}
+  \caption{Formulas characterizing atomic queue violations.}
   \label{fig:spec:ds}
-\end{figure}
+\end{figure*}
+
 
 We say that a formula $@Y$ has a \emph{cutoff} $n \in \<Nats>$ when for each
 history $h |= @Y$ there exists some $h' \preceq h$ such that $h' |= @Y$.

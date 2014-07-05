@@ -31,7 +31,7 @@
 \label{fig:register}
 \end{figure*}
 
-We define the $\ocl$ formula $\regform{k}$ representing the atomic register up to $k$. The atomic register, denoted by $\lreg$, is defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists of all sequential executions where every read returns the last written value (or the initial value $0$ if it is not preceded by a write). 
+We define the $\ocl$ formula $\regform{k}$ representing the atomic register up to some bound $k$. The atomic register, denoted by $\lreg$, is defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists of all sequential executions where every read returns the last written value (or the initial value $0$ if it is not preceded by a write). 
 %Formally, $\ker E(L)$ is the set of all sequential executions with only completed operations such that the return value of any $\<read>$ invocation $o$ is the value $v$, where $\<write>(v)$ is the last $\<write>$ invocation before $o$, or $0$, if $o$ is not preceded by a $\<write>$ invocation.
 Thus, a history $h$ belongs to $H(\lreg)$ iff it is weaker than the history of a sequential execution $e$ of $\lreg$, i.e.,  $h\preceq H(e)$.
 
