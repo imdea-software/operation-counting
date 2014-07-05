@@ -110,13 +110,16 @@ operation's pasts.
   number of its distinct pasts.
 
 \end{definition}
+We denote the length of the interval order $\tup{O,<}$ underlying a history
+$h = \tup{O,f,<}$ as $\len h$.
 
 Our history-weakening approximation functions $A_k$ map histories to weaker
 histories whose corresponding interval orders have length at most $k$. While
 there are various ways to define such a function $A_k$, any such function
 enables the polynomial-time inclusion check $A_k(h) \in H(L)$ which we
-demonstrate in the following; Section~\ref{sec:counting:monitor} describes an
-instantiation of $A_k$ which we have found useful in practice.
+demonstrate in the following; Section~\ref{sec:counting:monitor} describes a
+polynomial-time computable instantiation of $A_k$ which we have found useful in
+practice.
 
 Interval orders have canonical representations which associate to operations
 integer-bounded intervals on the real number line; their canonical
