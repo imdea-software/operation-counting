@@ -39,14 +39,17 @@ from Figure~\ref{fig:spec:ds}.
     \<total>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,i',j') \quad\quad \<total>(x)=\sum_{0\leq i\leq j\leq k}\<total>(x,i,j)
   \end{align*}
   \begin{align*}
-    \<isP>(x) = \<P>(x)\land \<total>(x) > 0,\mbox{ for all predicates $\<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>}$} %\quad\quad
+    \<isP>(x) = \<P>(x)\land \<total>(x) > 0,\mbox{ for all predicates $\<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>}$} \quad
+    \<isAdd>(x) = (\<PAdd>(x)\vee \<CAdd>(x))\land \<total>(x) > 0
 %    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
   \end{align*}
   \begin{align*}
     \<before>(x,y) = \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 
 \end{align*}
 \begin{align*}
-    \<removev> &= \exists x.\ \<isCRem>(x)  /| \big( \forall y. \neg (\<isPAdd>(y) \vee \<SameVal>(x,y)) \vee \<total>(x)\geq 2\big)\hspace{5.9cm}
+    \<noAdd>(x) &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
+   \<lessAdds>(x) &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
+    \<removev> &= \exists x.\ \<isCRem>(x)  /|  (\<noAdd>(x) \vee \<lessAdds>(x) )  
   \end{align*}
   \begin{align*}
     \<fifov>= \exists x_1, x_2, y_1, y_2.\ & \<isCAdd>(x_1) /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
