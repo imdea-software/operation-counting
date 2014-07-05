@@ -3,367 +3,67 @@
 \section{Atomic Registers}
 \label{sec:registers}
 
-We prove that for every $k$, there exists an effectively computable $\ocl$ formula 
-$\Psi_{\<reg>}[k]$ representing the atomic register $L_{\<reg>}$ up to $k$. 
-This formula is based on a characterization of $L_{\<reg>}$ histories described hereafter.
+\begin{figure*}[t]
+{\small
+\begin{align*}
+\<total>(x,i,j) &= \hspace{-3mm}\sum_{i\le i'\le j'\le j} \#(x,i',j'), \quad
+\<isWrite>(x,\_,i) = \<Write>(x)\land \sum_{i'\le i} \#(x,i',i) > 0, \quad
+\<noWrites>(i,j) =\forall x.\ \<Write>(x)\implies \<total>(x,i,j) = 0, \
+\end{align*}
+\begin{align*}
+\<amongLastWr>(x_i,i)& = \bigvee_{i'\in [i-1]} \big( \<isWrite>(x_i,\_,i')\land \<noWrites>(i'+1,i-1)\big) % \land \neg \<noWrites>(i'+1,i)\big),
+\end{align*}
+\begin{align*}
+\<isRead>(y,i,j) = \<Read>(y)\land \<Completed>(y)\land \#(y,i,j) > 0, \quad\quad\quad
+\<overlaps>(z,i,j) = \sum_{i'\leq j,j'\geq i} \#(z,i',j') > 0,\\
+\<noWrites>_{\neq 0}(i,j) =\forall x.\ \big(\<Write>(x)\land \neg \<Write>_0(x)\big)\implies \<total>(x,i,j) = 0\quad\quad\quad 
+\<init>(y,i) = \<Read>_0(y)\land \<noWrites>_{\neq 0}(0,i-1)
+\end{align*}
 
-Let $h=\tup{O,<,f}$ be a history of $L_{\<reg>}$ and $I: O -> [n]^2$ its canonical representation. By definition,
-$h$ is weaker than a sequential history $h'$
-%, i.e., there exists a total order $h'$ 
-%on the operations in $h$ consistent with $h$'s order relation 
-where the last write before 
-a $\<read>\triangleright a$ operation is a $\<write>(a)$ operation, for every value $a$. 
-%Deciding if $h$ is a history of $L_{\<reg>}$
-%is an NP-complete problem~\cite{journals/siamcomp/GibbonsK97}. Intuitively, this holds because
-%The difficulty in characterizing such histories $h$ (or their canonical representations) is that 
-%In general, for a $\<read>\triangleright a$ operation $o\in O$, there may exist several $\<write>(a)$ operations 
-%finishing before or overlapping with $o$ in $h$, that could play the role of the last 
-%write operation before $o$ in $h'$. \todo{For example,}
-%
-We define an equivalence relation $\sim$ on read operations such that $h$ is a history of $L_{\<reg>}$
-iff the history $h_1$ obtained from $h$ by keeping only one representative from each equivalence class 
-of $\sim$ is a history of $L_{\<reg>}$ (it is also necessary that for each completed $\<read>(a)$ operation $o\in O$ there exists
-a $\<write>(a)$ operation which starts before $o$ finishes).
+\begin{align*}
+\regform{k} = \exists x_0,\ldots,x_{k-1}. \bigwedge_{i\in [k-1]} \<amongLastWr>(x_i,i)\land\ \  \forall y. \bigwedge_{i,j\in [k]}\<isRead>(y,i,j) \implies
+\big( \<init>(y,i)\vee \<Rf>(y,x_{i-1}) \vee \exists z.\ (\<Rf>(y,z) \land \<overlaps>(z,i,j))\big)
+\end{align*}
+}
+\caption{The formula ${\tt register}[k]$ representing $L_{\tt reg}$ up to $k$. The names of the predicates over operation labels are capitalized while the names of the sub-formulas of ${\tt register}[k]$ start with lower case. The predicates are defined as follows: (1) ${\tt Read}(x)$ holds for any $x={\tt read}=>\_$  (2) ${\tt Write}(x)$ holds for any $x={\tt write}(\_)=>\_$  (3) ${\tt Completed}(x)$ holds for any $x={\tt write}(\_)=>v$ or $x={\tt read}(\_)=>v$ with $v\neq\bottom$
+(4) ${\tt Read}_0(x)$ holds for $x={\tt read}=>0$ (5) ${\tt Write}_0(x)$ holds for any $x={\tt write}(0)=>\_$ and (6) ${\tt Rf}(x,y)$ holds for any pair $x={\tt read}=>v$ and $y={\tt write}(v)=>\_$.
+}
+\label{fig:register}
+\end{figure*}
 
-%weaker than a sequential history $h'$, where 
-%the last writes before any two equivalent reads are mapped by $I$ to the same interval. 
-Thus, two reads are equivalent 
-if they are mapped by $I$ to the same interval and the operations that write the same value are also  
-mapped by $I$ to the same intervals. 
-Formally, for every $\<read>\triangleright a$ operation $o\in O$, let $I_{\<w>}(o)$ be the set of intervals associated by $I$ to
-$\<write>(a)$ operations that start before $o$ finishes, i.e.,
-\[
-I_{\<w>}(o)=\set{I(o'):\mbox{$o'$ is a $\<write>(a)$ operation and $\lnot o< o' $}}.
-\]
+We define the $\ocl$ formula $\regform{k}$ representing the atomic register up to $k$. The atomic register, denoted by $\lreg$, is defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists of all sequential executions where every read returns the last written value (or the initial value $0$ if it is not preceded by a write). 
+%Formally, $\ker E(L)$ is the set of all sequential executions with only completed operations such that the return value of any $\<read>$ invocation $o$ is the value $v$, where $\<write>(v)$ is the last $\<write>$ invocation before $o$, or $0$, if $o$ is not preceded by a $\<write>$ invocation.
+Thus, a history $h$ belongs to $H(\lreg)$ iff it is weaker than the history of a sequential execution $e$ of $\lreg$, i.e.,  $h\preceq H(e)$.
 
-\todo{For example,}
+In the following, we give a non-deterministic procedure for deciding if a history $h$ belongs to $H(\lreg)$, which is used to define $\regform{k}$\footnote{\citet{journals/siamcomp/GibbonsK97} proves that this problem is NP-complete but using a different non-deterministic procedure for showing membership to NP.}.
 
-%The write operations whose intervals are in $I_{\<w>}(o)$
-%are the only possible candidates for being the last write before $o$ in a sequential history stronger than $h$.
-Let $\sim$ be an equivalence relation on read operations defined by 
-\[
-\begin{array}{ll}
-o_1\sim o_2\mbox{ iff } & f(o_1)=f(o_2)=\<read>\triangleright a, I(o_1)=I(o_2), \\[.5mm]  %=\tup{\<read>(a),true},\mbox{ for some $a$,}
-&\mbox{ and } I_{\<w>}(o_1)=I_{\<w>}(o_2).
-\end{array}
-\]
+Note that $H(\lreg)$ contains all histories where every completed $\<read>=>a$ operation\footnote{Pending $\<read>$ operations can be ignored: a history $h$ belongs to  iff the history $h'$ obtained from $h$ by deleting pending read operations belongs to $H(\lreg)$} 
+overlaps with a $\<write>(a)=>\_$ operation. Indeed, for any total ordering on the $\<write>$ operations of such a history $h$, that doesn't contradict the ordering constraints in $h$, one can insert every completed $\<read>=>a$ operation right after a $\<write>(a)=>\_$ operation in order to obtain a history of a sequential execution $e\in E(\lreg)$ with $h\preceq H(e)$. Therefore, a history $h$ may not belong to $H(\lreg)$ only if it contains completed $\<read>=>a$ operations with no overlapping $\<write>(a)=>\_$ operations. 
 
-The equivalence relation $\sim$ ignores pending read operations because they are not important for deciding if 
-$h$ is a history of $L_{\<reg>}$, i.e., $h\in H(L_{\<reg>})$ iff the history obtained from $h$ by removing pending 
-read operations belongs to $H(L_{\<reg>})$.
-
-\begin{lemma}\label{lemma:register}
-For any history $h=\tup{O,<,f}$, $h\in H(L_{\<reg>})$ iff
+Now, let $h$ be a history of $H(\lreg)$ %and $I:O->[n]^2$ its canonical representation. 
+and $o$ a completed $\<read>=>a$ operation with no overlapping $\<write>(a)=>\_$ operations. Then, one of the following must be true: 
 \begin{itemize}
-	\item for each completed $\<read>(a)$ operation $o\in O$ there exists
-a $\<write>(a)$ operation $o'$ such that $\neg o<o'$, and
-	\item any projection of $h$ over a maximal subset $O_1\subseteq O$ s.t. $\forall o_1\neq o_2\in O_1.\ o_1\not\sim o_2$
-belongs to $H(L_{\<reg>})$.
-%	$h_1=\tup{O_1,<_1,f_1}\in H(L_{\<reg>})$, where $O_1$ is the maximal subset of $O$ s.t. $\forall o_1\neq o_2\in O_1.\ o_1\not\sim o_2$
-%and $<_1$ ($f_1$, resp.) is the projection of $<$ ($f$, resp.) over $O_1$.
+	\item $a=0$ and there are no $\<write>$ operations, that finish before $o$ and write a different value, 
+	\item there exists a $\<write>(a)=>\_$ operation $o'$ finishing before $o$, such that no other $\<write>$ operation starts after $o'$ and finishes before $o$.
 \end{itemize}
-\end{lemma}
-\begin{proof}
-Clearly, $h\in H(L_{\<reg>})$ implies that the two conditions hold. For the reverse, 
-let $h_1=\tup{O_1,<_1,f_1}$ be the projection of $h$ over some $O_1$ as above.
-One can use any sequential history $h_1'$ stronger than $h_1$
-to build a sequential history $h'$ stronger than $h$. 
-Let $o_1$ be a $\<read>(a)$ operation of $h_1$ and $o_1'$  
-the last write operation before $o_1$ in $h_1'$ (since $h_1'\in H(L_{\<reg>})$, $o_1'$ is a $\<write>(a)$ operation). 
-We show that $h_1'$ can be extended to a valid sequential history of $L_{\<reg>}$ that 
-includes all the read operations equivalent to $o_1$. 
-Thus, let $o_2$ be a $\<read>(b)$ operation  of $h_1$ equivalent to $o_1$. By definition, 
-$I(o_1)=I(o_2)$ and if $a=b$ then $o_2$ can be added to $h_1'$ such that $o_1'<' o_1 <' o_2$ ($<'$ is the
-order relation in $h_1'$).
-Otherwise, since $o_1\sim o_2$ there exists a $\<write>(b)$ operation $o_2'$ of $h$ such that $I(o_2')=I(o_1')$.
-The operation $o_2$ can be added to $h_1'$ such that $o_2'<' o_2 <' o_1'<' o_1 $. 
-The new history $h_1'$ is a sequential history of $L_{\<reg>}$ stronger than 
-the projection of $h$ over $O_1\cup\{o_2\}$. Applying the same reasoning for all the other read operations, 
-one can obtain a sequential history stronger than the whole $h$.
-\end{proof}
+If we consider two $\<read>$ operations $o_1$ and $o_2$ in $h$, that have no overlapping writes (on the corresponding value), then the $\<write>$ operations $o_1'$ and $o_2'$ finishing before $o_1$, resp., $o_2$, may be the same. However, $o_1'$ and $o_2'$ must be the same when $o_1$ and $o_2$ have the same past in $h$. Indeed, the latter implies that the set of $\<write>$ operations occurring before $o_1$ and resp., $o_2$ in some sequential execution $e$ with $h\preceq H(e)$ is the same and consequently, $o_1$ and $o_2$ return a value written by the same $\<write>$ operation (the last $\<write>$ operation before $o_1$ and $o_2$ in $e$).
 
-%We prove that $h$ is a history of $L_{\<reg>}$ iff for every completed $\<read>(a)$ operation $o$ there exists
-%a $\<write>(a)$ operation which finishes before or overlaps with $o$ and the history $h_1$ obtained from $h$ by 
-%keeping only one representative from each equivalence class of $\sim$ is a history of $L_{\<reg>}$.
-%Clearly, the former implies the latter. 
+The procedure for deciding if a history $h$ belongs to $H(\lreg)$ works as follows. Roughly, for each past $p$ in $h$, it guesses a $\<write>$ operation $w_p$, that should write the value returned by all reads $o$ with $\<past>(o)=p$ and no overlapping writes, and then, it checks if this is indeed the case. Formally, the procedure works on the canonical representation $I:O->[n]^2$ of $h$, where a past in $h$ is represented by an index $i\in [n]$: 
+%and if read operations have overlapping writes.
+\begin{enumerate}
+	\item for each $i\in [n]$, guess a $\<write>$ operation $w_i$ such that: 
+	\begin{itemize}
+%		\item $I(w_i)=[\_,i-1]$ or 
+		\item $w_i$ finishes before every $\<read>$ operation $o_r$ with $I(o_r)=[i,\_]$ and no other $\<write>$ operation starts after $w_i$ and finishes before such an $o_r$, i.e., $I(w_i)=[\_,i']$ and %$i'$ is the maximum value such that 
+		there exists no $\<write>$ operation $o$ with $I(o)\subseteq [i'+1,i-1]$ 
+	\end{itemize}
+	\item check that for each completed $\<read>=>a$ operation $o$ with $I(o)=[i,j]$, one of the following holds:
+	\begin{itemize}
+		\item $a=0$ and no $\<write>(b)$ operation with $b\neq 0$ finishes before $o$, i.e., there exists no $\<write>(b)$ operation $o'$ with $I(o')\subseteq [0,i-1]$,
+		\item $a$ is the value written by $w_{i-1}$,  
+		\item there exists a $\<write>(a)$ operation overlapping with $o$, i.e., there exists a $\<write>(a)$ operation $o'$ with $I(o')\cap [i,j]\neq\emptyset$.
+	\end{itemize}
+\end{enumerate}
 
-%This result is stated in the next lemma. The existence of the sequential history $h_1'$ stronger than $h_1$ is 
-%equivalent to the existence of a mapping $\rf$ that associates to each equivalence 
-%class $e$ of $\sim$ an interval in the image of $I$ satisfying several properties. The properties of $\rf$ ensure that 
-%$\rf(e)$ is the interval of the last write operation occurring before the representative of $e$ in $h_1'$.
-%
-%For every equivalence class $e$ of $\sim$, let $\mathcal{I}_{\<r>}(e)$ be the interval associated by $I$ to the
-%read operations in $e$ (which by definition is unique) and $\mathcal{I}_{\<w>}(e)=I_{\<w>}(o)$, for some $o\in e$. 
-%Also, let $@O$ be the set of non-empty equivalence classes of $\sim$. We give a characterization of $L_{\<reg>}$
-%histories %in a logic describing their canonical representations.
-%in a logic that contains standard first-order terms and atomic formulas, quantifiers over values read or written 
-%by the operations of the register, quantifiers over operations, and quantifiers over functions from $@O$ to intervals
-%(the order relation between intervals is defined by: $I_1<I_2$ iff $\sup I_1 < \inf I_2$)
-%
-%\begin{lemma}
-%
-%Let $h=\tup{O,<,f}$ be a history and $I : O -> [n]^2$ its canonical representation. Then, 
-%$h$ is a history of $L_{\<reg>}$ iff the following two formulas hold:
-%\[
-%\begin{array}{l}
-%\bullet\ \forall a\,\forall o\in O.\ f(o)=(\<read>(a),\<true>) \\[1mm]
-%\hspace{1.5cm}\Rightarrow \exists o'\in O.\  f(o')=(\<write>(a),\_)\land \neg I(o) < I(o')\\[2mm]
-%\bullet\ \exists\ \rf:@O -> [n]^2\ \big( \\[1mm]
-%\hspace{2.3cm}\forall\ e\in @O.\ \rf(e)\in \mathcal{I}_{\<w>}(e)\ \land \\[1mm]
-%\hspace{2.3cm}\forall\ e\neq e'\in @O.\ \big(\neg (\rf(e) < \rf(e') < \mathcal{I}_{\<r>}(e))\ \land  \\[1mm]
-%\hspace{4.35cm} \neg (\rf(e) < \mathcal{I}_{\<r>}(e') < \mathcal{I}_{\<r>}(e)) \big) \\
-%\hspace{2.4cm}\big)
-%\end{array}
-%\]
-%%\begin{enumerate}
-%%	\item for every $o\in O$, if $f(o)=(\<read>(a),\<true>)$, for some $a$, then there exists $o'\in O$
-%%such that $f(o')=(\<write>(a),\_)$ and $\neg I(o) < I(o')$,
-%%\end{enumerate}
-%
-%\end{lemma}
-%
-%\begin{proof}
-%
-%\todo{}
-%
-%\end{proof}
+The formula $\regform{k}$ representing the atomic register up to $k$ is given in Figure~\ref{fig:register}. It is a mere translation of the above decision procedure in $\ocl$. The non-deterministic guessing is translated to a bounded number of existential quantifiers (since it describes histories of bounded interval length).
 
-%Otherwise, in the history $h_1'$ encoded by $f$, the write operation represented
-%by $f(e)$ is not the last write operation before the representative of $e$.
-
-Based on Lemma~\ref{lemma:register}, we prove that there exists an effectively computable $\ocl$ formula 
-characterizing $L_{\<reg>}$ up to $k$.
-Essentially, this is a consequence of the fact that $\ocl$ is expressive enough to characterize 
-the non-empty equivalence classes of $\sim$, for every history $h$ of length at most $k$, 
-and to state the conditions from Lemma~\ref{lemma:register}.
-%capture the  from 
-%the first formula in Lemma~\ref{lemma:register} and to 
-%as an $\ocl$ formula and (2) for every history $h$,  can be characterized using an $\ocl$ formula.
-%The formula $\Psi_{\<reg>}[k]$ contains several quantifiers but the satisfaction problem can still be solved
-%in polynomial time.
-
-\begin{theorem}\label{th:register}
-
-For every $k$, there exists an effectively computable $\ocl$ formula 
-$\Psi_{\<reg>}[k]$ representing $L_{\<reg>}$ up to $k$.
-%The satisfaction problem for $\Psi_{\<reg>}[k]$ can be solved in polynomial time.
-
-\end{theorem}
-
-\begin{proof}
-
-We define $\Psi_{\<reg>}[k] = \Psi_1\land \Psi_2$, where $\Psi_1$, resp., $\Psi_2$, expresses 
-the first, resp., second, condition in Lemma~\ref{lemma:register}.
-
-Thus, let $\mathcal{I}_{k}$ be the set of intervals $[i,j]$ with $0\leq i\leq j\leq k$. Also,
-let $\<isRead>(x)$ be a predicate over synopses that holds for every $x=\<read>\triangleright a$, for some $a$,
-and $\mathsf{Rd\-Wr}(x,y)$, that holds for every two synopses $x=\<read>\triangleright a$ and $y=\<write>(a)$, for some $a$. 
-Then, 
-\[
-\begin{array}{l}
-\Psi_1 = \forall x.\ \big(\<isRead>(x)\land \exists \iota\in \mathcal{I}_{k}.\  \#(x,\iota)>0)\big)\Rightarrow \\[1mm]
-\hspace{.6cm}\big(\exists y.\ \mathsf{Rd\-Wr}(x,y) %\\[1mm]
-%\hspace{2.8cm}
-\land\ \exists \iota'\in \mathcal{I}_{k}.\ (\#(y,\iota') > 0 \land \neg \iota < \iota')\big).\\[1mm]
-\end{array}
-\]
-
-For readability, $\Psi_1$ contains quantifiers over intervals in $\mathcal{I}_{k}$. 
-Since $k$ is fixed, the existential, resp., universal, quantifier over intervals 
-can be transformed in a disjunction, resp, conjunction, over all pairs of integer 
-constants $0\leq i\leq j\leq k$. Also, $\iota < \iota'$ is the order relation between intervals
-defined by $\sup \iota < \inf \iota'$. The fact that $\Psi_1$ expresses the first condition in 
-Lemma~\ref{lemma:register} is straightforward. 
-
-%The $\ocl$ characterization of the second condition in Lemma~\ref{lemma:register}
-The formula $\Psi_2$ expresses a constraint over the pairs interval -- set of intervals
-$(I(o),I_{\<w>}(o))$ with $o$ an operation in the modeled history, equivalent to the 
-second condition in Lemma~\ref{lemma:register}.
-Thus, let $\mathcal{P}_k=\mathcal{I}_{k}\times (2^{\mathcal{I}_{k}}\setminus\emptyset)$. Then,
-\[
-\Psi_2 = \bigvee_{\mathcal{P}\subseteq \mathcal{P}_k} \hspace{-1mm}\forall\ \vec{x}.\ \Big(\bigwedge_{p\in \mathcal{P}} Is(\vec{x}[p],p)
-\land \bigwedge_{p\not\in \mathcal{P}} Empty(p)\land Valid(\mathcal{P},\vec{x})\Big)
-\]
-where $\vec{x}$ is a vector of synopsis-type variables, one for each $p\in \mathcal{P}$,
-$Is(\vec{x}[p],p)$ states that $\vec{x}[p]$ is the synopsis of a read operation $o$ 
-such that $p=(I(o),I_{\<w>}(o))$, $Empty(p)$ states that there exists no read operation
-$o$ with $p=(I(o),I_{\<w>}(o))$, and $Valid(\mathcal{P},\vec{x}[p])$ states that any 
-projection of the modeled history over a maximal set of operations that contains 
-as read operations only the ones characterized by $Is(\vec{x}[p],p)$ with $p\in \mathcal{P}$
-is a valid history of $L_{\<reg>}$.
-
-More precisely,
-\[
-\begin{array}{l}
-Is(\vec{x}[p],p) = \<isRead>(\vec{x}[p])\land \#(\vec{x}[p],p|_1) > 0 \\[.5mm]
-\hspace{.7cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(\vec{x}[p],y)\land \#(y,\iota) > 0\big)  \\[.5mm]
-\hspace{.7cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Rightarrow \neg p|_1 < \iota \\[1mm]
-Empty(p) = \forall y.\ \neg Is(y,p) \\[1mm]
-\end{array}
-\]
-\[
-\begin{array}{l}
-Valid(\mathcal{P},\vec{x})= \exists\ \rf:\mathcal{P} -> \mathcal{I}_{k}\ \big(\ \forall\ p\in \mathcal{P}.\ \rf(p)\in p|_2\ \land \\[1mm]
-\hspace{.3cm}\forall\ p,p'\in \mathcal{P}.\ \<DiffVal>(\vec{x}[p],\vec{x}[p'])\Rightarrow \big(\neg (\rf(p) < \rf(p') < p|_1)  \\[1mm]
-\hspace{5cm} \land\ \neg (\rf(p) < p'|_1 < p|_1) \big) \\
-\hspace{4cm}\big)
-\end{array}
-\]
-
-The formulas $Is(\vec{x}[p],p)$ and $Empty(p)$ follow precisely the definition of the equivalence relation $\sim$.
-The formula $Valid(\mathcal{P},\vec{x})$ expresses the fact that there exists a read-from relation $\rf$
-associating to each read operation with synopsis $\vec{x}[p]$ a write operation in some interval from $p|_2$.
-The last two rows ensure that $\rf$ is a valid read-from relation: the interval of the write can not be separated from
-the interval of the read using the interval of another read or write over a different value.
-The predicate $\<DiffVal>(x,y)$ holds for any two synopses $x=\<read>\triangleright a$ and $y=\<read>\triangleright b$
-with $a\neq b$. Note that the existential quantifier over functions $\rf$ can be transformed into a bounded disjunction.
-
-%follow the definition of a valid history of $L_{reg}$ that 
-%it is not possible to separate $\rf(p)$ from the interval of the read in $e$ using $\rf(e')$ or $I_{\<r>}(e')$, for some
-%other equivalence class $e'$. Otherwise, the write operation represented by $\rf(e)$
-%cannot be the last write operation before the representative of $e$.
-
-%The first two rows state that there exists an $\vec{x}[p]$ operation whose interval is exactly the first component in $p$
-%and one $\<write>(a)$ operation in each interval from the second component of $p$. The last row states 
-%that the intervals in the second component of $p$ (corresponding to write operations) are not ordered after the 
-%first component of $p$.
-
-%$Valid(p)$ states that there exists a read operation $o$ such that $p=(I(o),I_{\<w>}(o))$
-%and $RegHistory(\mathcal{P})$ states that any projection of the modeled history over
-%a maximal set of operations that contains one representative of each equivalence class
-%is a valid history of $L_{\<reg>}$. Thus,
-%\[
-%\begin{array}{l}
-%Valid(p) = \exists x.\ \big(\ \<isRead>(x)\land \#(x,p|_1) > 0 \\[.5mm]
-%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(x,y)\land \#(y,\iota) > 0\big)  \\[.5mm]
-%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in p|_2 \Rightarrow \neg p|_1 < \iota \big)
-%\end{array}
-%\]
-%where $p|_1$, resp., $p|_2$, is the projection of $p$ on the first, resp., second, component.
-%
-%The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $p$
-%and one $\<write>(a)$ operation in each interval from the second component of $p$. The last row states 
-%that the intervals in the second component of $p$ (corresponding to write operations) are not ordered after the 
-%first component of $p$.
-%%(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
-%
-%Then, $RegHistory(\mathcal{P})$ is defined as
-%\[
-%\begin{array}{l}
-%\forall\ \vec{x}\ 
-%\exists\ \rf:\mathcal{P} -> \mathcal{I}_{k}\ \big(\ \forall\ p\in \mathcal{P}.\ \rf(p)\in p|_2\ \land \\[1mm]
-%\hspace{.3cm}\forall\ p,p'\in \mathcal{P}.\ \<DiffVal>(\vec{x}[p],\vec{x}[p'])\Rightarrow \big(\neg (\rf(p) < \rf(p') < p|_1)  \\[1mm]
-%\hspace{4.35cm} \land\ \neg (\rf(p) < p'|_1 < p|_1) \big) \\
-%\hspace{2.4cm}\big)
-%\end{array}
-%\]
-%where $\vec{x}$ is a vector of synopsis-type variables, one for each $p\in \mathcal{P}$
-%and $\<DiffVal>(x,y)$ holds if $x=\<read>\triangleright a$, $y=\<read>\triangleright b$, and $a\neq b$.
-%
-%\todo{Still working...}
-%
-%The first formula states that for every completed $\<read>(a)$ operation $o$ there exists
-%a $\<write>(a)$ operation $o'$ which finishes before or overlaps with $o$.
-%In the second formula, the second row states that $\rf(e)$ is the interval of a write operation,  
-%which writes a value read by one of the read operations in $e$. The last two rows state that 
-%it is not possible to separate $\rf(e)$ from the interval of the reads in $e$ using $\rf(e')$ or $I_{\<r>}(e')$, for some
-%other equivalence class $e'$. Otherwise, the write operation represented by $\rf(e)$
-%cannot be the last write operation before the representative of $e$. 
-%
-%
-%
-% and 
-%$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
-%
-%
-%Roughly, $\Psi_{\<reg>}[k]$ is obtained by rewriting the first formula in Lemma~\ref{lemma:register} and 
-%by adding a disjunction in front of the second formula 
-%(called $\Phi$ in the following), over all equivalence relations $\sim$. 
-%More precisely, since $\Phi$ characterizes only the intervals
-%associated to some non-empty equivalence class $e$, i.e., $\mathcal{I}_{\<r>}(e)$ and $\mathcal{I}_{\<w>}(e)$,  
-%the disjunction ranges over sets of pairs interval -- sets of intervals.
-%Furthermore, since the goal is to characterize histories of length at most $k$, the limits of the intervals 
-%are bounded by $k$.
-%
-%%Note that the canonical representation of a history of length at most $K$ uses intervals whose limits are bounded by $K$. 
-%Thus, let $\mathcal{I}_{k}$ be the set of intervals $[i,j]$ with $0\leq i\leq j\leq k$ and 
-%$\mathcal{E}_k=\mathcal{I}_{k}\times 2^{\mathcal{I}_{k}}$ the set of pairs interval -- sets of intervals.
-%
-%Let $\Psi_{\<reg>}[k]$ be the following $\ocl$ formula:
-%\[
-%\begin{array}{l}
-%\forall x.\ \big(\<read>(x)\land \exists \iota\in \mathcal{I}_{k}.\  \#(x,\<true>,\iota)>0)\big)\Rightarrow \\[1mm]
-%\hspace{.6cm}\big(\exists y.\ \mathsf{Rd\-Wr}(x,y) %\\[1mm]
-%%\hspace{2.8cm}
-%\land\ \exists \iota'\in \mathcal{I}_{k}.\ (\#(y,\_,\iota') > 0 \land \neg \iota < \iota')\big)\\[1mm]
-%\land \\[-3mm]
-%\end{array}
-%\]
-%%\[
-%%\begin{array}{l}
-%%\forall a.\ (\exists \iota\in \mathcal{I}_{K}.\ \counting{\<read>(a)}{\iota}>0)\Rightarrow \\[.5mm]
-%%\hspace{2cm}\big(\exists \iota'\in \mathcal{I}_{K}.\ (\counting{\<write>(a)}{\iota'} > 0 \land \neg \iota < \iota')\big)\\[1mm]
-%%\land \\[-3mm]
-%%\end{array}
-%%\]
-%\[
-%\bigvee_{\mathcal{E}\subseteq \mathcal{E}_k} \Phi[@O\gets \mathcal{E}]\land \bigwedge_{e\in \mathcal{E}} NonEmpty(e)
-%%\forall e\in \mathcal{E}_k.\ e\in E \Leftrightarrow NonEmpty(e),
-%\]
-%where $\Phi[@O\mapsto \mathcal{E}]$ denotes the formula $\Phi$ where $@O$ is substituted by $\mathcal{E}$ and 
-%$NonEmpty(e)$ states that $e$ represents a non-empty equivalence class of $\sim$, i.e., there exists a read operation $o$ with $I(o)=e|_1$
-%and $I_{\<w>}(o)=e|_2$ ($e|_1$, resp., $e|_2$, is the projection of $e$ on the first, resp., second, component).
-%The formula $\Psi_{\<reg>}[k]$ contains two predicates over methods, $\<read>(x)$, that holds for every method $x=\<read>(a)$, for some $a$,
-%and $\mathsf{Rd\-Wr}(x,y)$, that holds for every two methods $x=\<read>(a)$ and $y=\<write>(a)$, for some $a$. Also, for readability,
-%it contains quantifiers over intervals in $\mathcal{I}_{k}$. Since $k$ is fixed, the existential, resp., universal quantifier over intervals 
-%can be transformed in a disjunction, resp, conjunction, over all pairs of integer constants $0\leq i\leq j\leq k$.
-%
-%
-%Formally, $NonEmpty(e)$ is defined by
-%\[
-%\begin{array}{l}
-%\exists x.\ \big(\ \<read>(x)\land \#(x,\<true>,e|_1) > 0 \\[.5mm]
-%\hspace{.9cm}\land\ \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Leftrightarrow \big(\exists y.\ \mathsf{Rd\-Wr}(x,y)\land \#(y,\_,\iota) > 0\big)  \\[.5mm]
-%\hspace{.9cm}\land\ \exists\ \iota \in e|_2\land \forall\ \iota\in \mathcal{I}_{k}.\ \iota\in e|_2 \Rightarrow \neg e|_1 < \iota \big)
-%\end{array}
-%\]
-%
-%The first two rows state that there exists a $\<read>(a)$ operation whose interval is exactly the first component in $e$
-%and one $\<write>(a)$ operation in each interval from the second component of $e$. The last row states that the second
-%component of $e$ is non-empty (i.e., there exists a write operation) the intervals
-%in the second component of $e$ (corresponding to write operations) are not ordered after the first component of $e$
-%(this is to say that the intervals of the write operations are before or overlapping with the interval of the read operations).
-%
-The fact that $\Psi_{\<reg>}[k]$ represents $L_{\<reg>}$ up to $k$ is 
-a direct consequence of Lemma~\ref{lemma:register}. 
-%The satisfaction problem for this formula is in polynomial time
-%because %(1) the nesting of quantifiers is bounded and (2) 
-%the quantifiers over values ($\forall a$ and $\exists a$) need to be instantiated only over
-%values $a$ for which there exists at least one instantiation of $\<read>(a)$ or $\<write>(a)$ in the input 
-%counting representation. Note that the range of the other quantifiers (e.g., $\forall\ \iota\in \mathcal{I}_{k}$ and 
-%$\forall e\in \mathcal{E}_k$) is a domain of constant size.
-\hfill $\Box$
-\end{proof}
-
-Theorem~\ref{th:register} implies that deciding if a history of length at most $k$ belongs to $L_{\<reg>}$
-is in polynomial time. Note that the same problem is NP-complete for arbitrary histories~\cite{journals/siamcomp/GibbonsK97}.
-
-%Deciding if a history of a concurrent register, of bounded length,
-%is correct w.r.t. the atomic register, i.e., it is also a history of the atomic
-%register, is decidable in polynomial time. The same problem for arbitrary
-%histories is NP-complete since it is equivalent to deciding if an execution of
-%the concurrent register is linearizable w.r.t. a sequential register (by
-%Proposition~\ref{prop:atom}).
-%
-%\begin{theorem}
-%
-%  Let $h$ be a history of a concurrent register, of bounded length. Deciding if
-%  $h\in At[Reg]$ is polynomial time.
-%
-%\end{theorem}
-%
-%\begin{proof}
-%
-%  Let $h$ be a history of a concurrent register of length $K$.
-%
-%\end{proof}

@@ -4,6 +4,15 @@
 
 %TODO FIND OUT WHETHER TO KEEP THE FOLLOWING TEXT AND IF SO WHERE TO PUT IT
 
+Another classic criterion used to define conformance w.r.t. a reference implementation is
+linearizability~\cite{journals/toplas/HerlihyW90}. We show in this section that
+linearizability is \emph{strictly} stronger than refinement when it is applied to arbitrary libraries 
+(the fact that linearizability implies refinement has been shown in \citet{journals/tcs/FilipovicORY10})
+but it is equivalent to
+refinement when considering only atomic reference implementations~\footnote{\citet{journals/tcs/FilipovicORY10}
+also shows that linearizability is equivalent to refinement when restricting the set of executions in a library
+such that they contain no pending operation.}
+
 The equivalence between observational refinement and history inclusion is 
 similar to the relation between observational refinement and 
 linearizability~\cite{journals/tcs/FilipovicORY10}: these two notions are equivalent if the library

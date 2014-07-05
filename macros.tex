@@ -29,6 +29,8 @@
 \newcommand{\lab}{{\sf lab}}
 \newcommand{\closure}{{\mathit Cl}}
 \newcommand{\kernel}{{\mathit K}}
+\newcommand{\regform}[1]{\<register>[{#1}]}
+\newcommand{\lreg}{L_{\<reg>}}
 
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
@@ -137,6 +139,12 @@
 \mathfn{past}
 \metalangkeyword{print,sync,read,write,assume,finished,time,barriers,read,write,w,r,reg,tick,newPast,counters,startTime,Shift,foreach,rem,add,isRead,DiffVal,EMPTY}
 \metalangkeyword{push,pop,enqueue,dequeue}
+\metalangkeyword{noWrites,isRead,isCompleted,sameVal,amongLastWr,isWrite,overlaps,readFrom,rf,intersects,Register,Reg,Read,Write,Rf,Completed,register,init}
+
+\metalangkeyword{isAdd,isRem,sameVal,emptyVal}
+\metalangkeyword{pending,completed,total,is,before}
+\metalangkeyword{removev,fifov,lifov,emptyv}
+
 
 \semanticdomain{%
   Bools[\mathbb{B}],
