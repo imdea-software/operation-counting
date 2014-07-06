@@ -23,7 +23,7 @@ allowing methods to interleave their internal actions; in one atomic step, the
           numbersep=4pt}
   \footnotesize
     \lstset{numbers=none}
-  \begin{minipage}[b]{50mm}
+  \begin{minipage}[t]{50mm}
     {\normalsize \textbf{Treiber's stack}}
     \begin{program}
 void push(int v) {
@@ -70,21 +70,27 @@ z = pop();
       \end{program}
     \end{minipage}
   \end{minipage}
-  \begin{minipage}[b]{43mm}
+  \begin{minipage}[t]{43mm}
 \hspace{5mm}{\normalsize \textbf{Execution}} \\[1em]
     \input{figures/execution.tikz}
+%    \vspace{1cm}
+  \end{minipage}
+  \begin{minipage}[t]{43mm}
+\hspace{5mm}{\normalsize \textbf{History}} \\[2.5em]
+    \input{figures/history.tikz}
+%    \vspace{1.64cm}
+  \end{minipage}
+  
+%    \begin{minipage}[b]{100mm}
+%\hspace{5mm}{\normalsize \textbf{History}} \\[2em]
+%    \input{figures/history.tikz}
+%    \vspace{1.64cm}
+%  \end{minipage}
+  \begin{minipage}[t]{43mm}
+{\normalsize \textbf{Weaker history}} \\[1em]
+    \input{figures/execution-horizontal.tikz}
     \vspace{1cm}
   \end{minipage}
-  \begin{minipage}[b]{43mm}
-\hspace{5mm}{\normalsize \textbf{History}} \\[2em]
-    \input{figures/history.tikz}
-    \vspace{1.64cm}
-  \end{minipage}
-%  \begin{minipage}[b]{43mm}
-%{\normalsize \textbf{Weaker history}} \\[1em]
-%    \input{figures/execution.tikz}
-%    \vspace{1cm}
-%  \end{minipage}
   \caption{Two implementations of a concurrent stack object, a stack-using
   program, and an execution using Treiber's stack. The {\tt pop} operation
   returns the {\tt EMPTY} when the stack is empty. The execution depicts calls,
