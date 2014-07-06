@@ -1,3 +1,4 @@
+%!TEX root = draft.tex
 \section{Experiments} 
 
 \newcommand{\free}{free}
@@ -12,27 +13,24 @@
 \newcommand{\bracebug}{Brace bug}
 
 
-\begin{table}
+\begin{table*}
 \begin{tabular}{l|l|c|c|c|c|c}
-Example                             & Harness             & Barrier & Unroll  & Rounds  & Time (s)  & Safe \\\hline
-MSQueue                             & 2xEnqueue 2xDequeue & 0       & 2       & 2       &           & Yes \\
-MSQueue (atomicity bug)             & 2xEnqueue 2xDequeue & 0       & 2       & 2       &           & No \\
-Treiber (\ababug{})                 & 3xPush    4xPop     & 0       & 1       & 2       &           & No \\
-Treiber (Push atomicity bug)        & 2xPush    2xPop     & 1       & 1       & 2       &           & No \\
-Treiber (Pop atomicity bug)         & 1xPush    2xPop     & 0       & 1       & 2       &           & No \\
-Elimination Stack                   & 4xPush    1xPop     & 0       & 1       & 4       &           & Yes \\
-Elimination Stack (\bracebug)       & 4xPush    1xPop     & 0       & 1       & 4       &           & No \\
-Elimination Stack (\emptybug)       & 3xPush    1xPop     & 1       & 1       & 4       &           & No \\
-Elimination Stack (manual alloc)    & 3xPush    4xPop     & 0       & 1       & 2       &           & Yes \\
-Elimination Stack (\ababug{})       & 3xPush    4xPop     & 0       & 1       & 2       &           & No \\
-Lock-coupling Set                   & 1xAdd     2xRem     & 0       & 2       & 2       &           & Yes \\
-Lock-coupling Set (mispaced locks)  & 1xAdd     2xRem     & 0       & 2       & 2       &           & No \\
-LFDS Queue                          & 2xEnqueue 2xDequeue & 1       & 1       & 2       &           & Yes \\
-LFDS Queue (allocation bug)         & 2xEnqueue 2xDequeue & 1       & 1       & 2       &           & No 
+Example                             & Harness             & Length & Unroll  & Rounds  & Time (s)  \\\hline
+%MSQueue                             & 2xEnqueue 2xDequeue & 0       & 2       & 2       &           & Yes \\
+MSQueue (head lock bug)             & 2xEnqueue 2xDequeue & 1       & 2       & 2       &      24.76    \\
+MSQueue (tail lock bug)             & 3xEnqueue 1xDequeue & 1       & 2       & 3       &     45.44     \\
+Treiber (\ababug{})                 & 3xPush    4xPop     &  1       & 1       & 2       &      52.59     \\
+Treiber (Push atomicity bug)        & 2xPush    2xPop     & 1       & 1       & 2       &     24.46    \\
+Treiber (Pop atomicity bug)         & 2xPush    2xPop     & 1       & 1       & 2       &    15.16     \\
+Elimination Stack (\bracebug)       & 4xPush    1xPop     & 0       & 1       & 4       &    317.79        \\
+Elimination Stack (\emptybug)       & 3xPush    1xPop     & 1       & 1       & 4       &    222.04       \\
+Elimination Stack (\ababug{})       & 3xPush    4xPop     & 0       & 1       & 2       &            \\
+Lock-coupling Set (mispaced locks)  & 1xAdd     2xRem     & 0       & 2       & 2       &  11.27        \\
+LFDS Queue (allocation bug)         & 2xEnqueue 2xDequeue & 1       & 1       & 2       &      77.00   
 \end{tabular} 
 \caption{Experiments done using CSeq (backend CBMC)}
 \label{tab:exp-static}
-\end{table}
+\end{table*}
 
 We conducted our experiments using the winning tool of the SV-Comp 2014 
 competition, CSeq \citep{cseq}. CSeq takes as parameters two integers, 
@@ -43,9 +41,12 @@ CSeq then uses these parameters to create a sequential version of the program,
 which is then analyzed by CBMC (version 4.5). We report in 
 Table~\ref{tab:exp-static} the results of our experiments on several examples.
 
-For MSQueue, we replaced the lock with a faulty lock, which enables two 
-concurrent Enqueue's to try and update the queue at the same time, resulting
-in a lost update.
+MSQueue (Michael\&Scott two-lock concurrent queue~\cite{DBLP:conf/podc/MichaelS96})
+uses a different lock for the head and respectively the tail of the singly-linked list used to store
+queue elements (Enqueuers access only the tail while Dequeuers access only the head). 
+We have replaced the lock on the head (resp., tail) with a faulty lock, 
+which enables two concurrent Dequeues (resp, Enqueue's) 
+to try and update the queue at the same time, resulting in a lost update.
 
 For the Treiber Stack, we created a version where the memory management is done
 manually (using an array), in order to expose the well-known \ababug{} to the 
