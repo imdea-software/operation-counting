@@ -22,6 +22,7 @@
 \def\ttat{\mtt{@}} % the at package clobbers this
 \usepackage{at}
 
+\usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -43,20 +44,13 @@
 \newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}} 
 \newcommand{\alert}[1]{\textcolor{red}{#1}} 
 
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}{Lemma}[section]
-\newtheorem{proposition}{Proposition}[section]
-\newtheorem{definition}{Definition}[section]
-\newtheorem{corollary}{Corollary}[section]
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
 \newtheorem{example}{Example}
-\newtheorem{remark}{Remark}[section]
-\newenvironment{proof}[1][Proof]{%
-  \begin{trivlist}%
-    \item[\hskip \labelsep {\bfseries #1.}]%
-}{%
-  \end{trivlist}%
-}
-% \newtheorem{proofs}{Proof Sketch}
+\newtheorem{remark}{Remark}
 
 % \titlebanner{banner above paper title}        % These are ignored unless
 % \preprintfooter{\today}   % 'preprint' option specified.
