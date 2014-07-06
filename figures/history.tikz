@@ -1,0 +1,37 @@
+%!TEX root = ../draft.tex
+\begin{tikzpicture}[node distance=.5cm]
+
+\tikzstyle{node}=[minimum size=0pt]
+\tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
+\tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
+
+\node[lnode] (x1)  [label=left:{\footnotesize 1}] at (0, 0) {};
+\node[lnode] (x2)  [below of=x1,label=left:{\footnotesize 2}] {}; 
+\node[lnode] (x3)  [below of=x2,label=left:{\footnotesize 3}] {}; 
+\node[lnode] (x6)  [below=44mm of x3,label=left:{\footnotesize 11}] {}; 
+
+\node[lnode] (y1)  [right=18mm of x3,yshift=-7mm,label=left:{\footnotesize 4}] {}; 
+\node[lnode] (y2)  [below of=y1,label=left:{\footnotesize 5}] {}; 
+\node[lnode] (y4)  [below=1cm of y2,label=left:{\footnotesize 7}] {}; 
+\node[lnode] (y5)  [below of=y4,label=left:{\footnotesize 8}] {}; 
+\node[lnode] (y6)  [below of=y5,label=left:{\footnotesize 9}] {}; 
+\node[lnode] (y7)  [below of=y6,label=left:{\footnotesize 10}] {}; 
+
+%\node[nnode] (x5)  [left=18mm of y7,yshift=-2mm] {}; 
+
+
+\node[lnode] (y8)  [right=18mm of x6,yshift=-10mm,label=left:{\footnotesize 13}] {}; 
+\node[lnode] (y9)  [below of =y8,label=left:{\footnotesize 14}] {}; 
+
+
+\draw[line width=2pt] (x1) -- node[draw=none,right] {$\<push>(1)=>\top$} (x2); 
+\draw[line width=2pt] (x3) -- node[draw=none,right] {$\<pop>=>3$} (x6);
+%\draw[line width=2pt] (x5) -- (x6);
+
+\draw[line width=2pt] (y1) -- node[draw=none,right] {$\<pop>=>1$} (y2);
+\draw[line width=2pt] (y4) -- node[draw=none,right] {$\<push>(2)=>\top$} (y5);
+\draw[line width=2pt] (y6) -- node[draw=none,right] {$\<push>(3)=>\top$} (y7);
+\draw[line width=2pt] (y8) -- node[draw=none,right] {$\<pop>=>{\tt EMPTY}$} (y9);
+
+
+\end{tikzpicture}
