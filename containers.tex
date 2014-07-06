@@ -5,7 +5,7 @@
 Collection-based data structures such as sets, queues, and stacks are among the
 most heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In
 this section we demonstrate that our approximation is effective in uncovering
-refinement violations to such objects, in the sense that most or all violations
+refinement violations to such atomic objects, in the sense that most or all violations
 can be uncovered with coarse approximations, i.e.,~$k=0..3$, depending on the
 data structure. To obtain these results we exhibit operation counting formulae
 $@Y$ characterizing these structures with cutoff/small-model properties: for
@@ -57,21 +57,21 @@ up to equivalence relations with finite quotients.
     \<before>(x,y)  &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
     \<noAdd>(x)     &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
     \<lessAdds>(x)  &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
+    \<noPRem>(x) &= \forall y.\ ( \neg \<isPRem>(y) \vee \<before>(x,y)) \\
     @Y_\mathrm{rv}  &= \exists x.\ \<isCRem>(x)  /|  (\<noAdd>(x) \vee \<lessAdds>(x) ) \\
-    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) \\
-                    & /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
-                    & /| \<before>(x_1,x_2) /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
+    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) /| \<isAdd>(x_2) \\
+                    &  /|  \<CRem>(y_1) /| \<isCRem>(y_2) /| \<sameVal>(x_1,y_1) \\
+                    &  /| \<sameVal>(x_2,y_2) /| \<before>(x_1,x_2) \\
                     & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \\
-                    & \quad \vee \big(  \<total>(y_1) = 0 \\
-                    & \quad \quad /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
-   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
-                    & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
-                    & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
-                    & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
-    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
-                    & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
-                    & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
-                    & /| \<before>(x,y) /| \<before>(y,z)
+                    & \hspace{6mm} \vee \big(  \<total>(y_1) = 0 /| \<noPRem>(y_2) \big)\Big)\\
+%                    & \quad \quad /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
+   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) /| \<isCAdd>(x_2)  \\
+                    & /| \<isCRem>(y_1) /| \<isCRem>(y_2) /| \<sameVal>(x_1,y_1) \\
+                    & /| \<sameVal>(x_2,y_2) /| \<before>(x_1,x_2) /| \<before>(y_1,y_2) \\
+		 & /| \<before>(x_2,y_1) \\
+    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<isCAdd>(x) /| \<isCRem>(y)  \\
+                    &  /| \<sameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
+                    &  /| \<before>(y,z) /| \big( \<isCRem>(z) \vee \<noPRem>(y) \big)
   \end{align*}
   \caption{Formulas characterizing atomic data structure violations.}
   \label{fig:spec:ds}
