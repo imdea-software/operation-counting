@@ -1,0 +1,38 @@
+%!TEX root = ../draft.tex
+
+\newcommand{\elemspan}[2][10mm] {
+  \tikz[]{
+    \node[lnode] (a1c) {};
+    \node[lnode] (a1r) [right=3mm of a1c] {};
+    \node[lnode] (r1c) [right=#1 of a1r] {};
+    \node[lnode] (r1r) [right=3mm of r1c] {};  
+    \draw[line width=2pt] (a1c) -- node[above] {$\<push>(#2)$} (a1r);
+    \draw[dotted] (a1r) -- (r1c);
+    \draw[line width=2pt] (r1c) -- node[above] {$\<pop>=>#2$} (r1r);
+  }
+}
+
+\begin{tikzpicture}[node distance=.7cm]
+  \scriptsize
+
+  % \tikzstyle{node}=[minimum size=0pt]
+  % \tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
+  \tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
+  
+  \node at (0,1) {\elemspan[8mm]{1}};
+  \node at (14mm,2) {\elemspan[25mm]{2}};
+  \node at (32mm,1) {\elemspan[20mm]{3}};
+  \node at (38mm,2) (n1) {};
+  \node (n2) [right=5mm of n1] {};
+  \draw[dotted,line width=1pt] (n1) -- (n2);
+  \node at (6,2) {\elemspan{n}};
+
+  % \node (x0) at (0,1) {};
+  % \node (x1) at (5,1) {};
+  % \draw[dotted] (x0) -- (x1);
+
+  \node[lnode] (re1)  at (0mm,0) {};
+  \node[lnode] (re2)  [right=60mm of re1] {};
+  \draw[line width=2pt] (re1) -- node[below] {$\<pop> => \mathtt{EMPTY}$} (re2); 
+
+\end{tikzpicture}

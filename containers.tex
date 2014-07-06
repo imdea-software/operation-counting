@@ -137,8 +137,22 @@ The following example demonstrates this deficiency.
 
 \begin{example}
   \label{ex:emptyv}
-
-  SHOW THAT $\<emptyv>$ requires an unbounded number of intervals.
+  
+  In the history of Figure~\ref{fig:history:emptyv}, $n$ pairs of {\sf push}
+  and {\sf pop} operations ensure that throughout the span of the 
+  $\<pop>(\mathtt{EMPTY})$, some element is always present;
+  i.e.,~at every time between the call and return of $\<pop>(\mathtt{EMPTY})$,
+  there exists some element $v \in \<Vals>$ such that $\<push>(v)$ has
+  completed, yet $\<pop> => v$ has not yet begun.
+  \begin{figure}
+    \input{figures/history-empty-violation.tikz}
+    \caption{The general form of an empty violation.}
+    \label{fig:history:emptyv}
+  \end{figure}
+  It follows that any such history would not be included in the histories
+  $H(L_\mathrm{queue})$ of an atomic queue library. The empty-violation formula
+  $@Y_\mathrm{ev}$ however only captures such violations for $n=1$, i.e.,~with
+  a single {\sf push}-{\sf pop} pair spanning $\<pop>(\mathtt{EMPTY})$.
 
 \end{example}
 
