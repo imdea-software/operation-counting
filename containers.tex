@@ -1,110 +1,149 @@
 %!TEX root = draft.tex
-\section{Containers}
+\section{Atomic Collection Objects}
 \label{sec:containers}
 
-We show in this section that there exist $\ocl$ formulas representing atomic containers, e.g., sets, stacks, and queues, up to some bound $k$.
-We consider the case of an atomic queue, the other formulas can be obtained in a similar way. 
-The atomic queue $\lqueue$ has two methods $\<add>(\cdot)$ and $\<rem>$, and the kernel consists of all executions of a sequential stack, e.g.,
-$
-\<add>(1)_1\ \<ret>_1\ \<add>(2)_2\ \<ret>_2\ \<rem>_3\ \<ret>(1)_3\ \<rem>_4\ \<ret>(2)_4
-$.
-Moreover, using a data independence argument~\cite{DBLP:conf/tacas/AbdullaHHJR13,DBLP:conf/popl/Wolper86}, we assume that any data value is added at most once.
+Collection-based data structures such as sets, queues, and stacks are among the
+most heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In
+this section we demonstrate that our approximation is effective in uncovering
+refinement violations to such objects, in the sense that most or all violations
+can be uncovered with coarse approximations, i.e.,~$k=0..3$, depending on the
+data structure. To obtain these results we exhibit operation counting formulae
+$@Y$ characterizing these structures with cutoff/small-model properties: for
+any history $h$ violating $@Y$, there exists some $h' \preceq h$ violating
+$@Y$. While this $h'$ may not correspond directly to $A_k(h)$, we can deduce
+there exists some $h'$ whose $k$-approximation $A_k(h')$ violates $@Y$. Our
+results build off of previous characterizations of concurrent data
+structures~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13} into a
+small set of constituent properties.
 
-Following the approach in \citet{DBLP:conf/concur/HenzingerSV13}, a history $h$ is \emph{not} a valid history of $\lqueue$ iff one of the following holds:
-\begin{description}
-	\item[Remove violation:] a $\<rem>$ operation returns a value which is not inserted by an $\<add>$ operation or two different $\<rem>$ operations return the same value.
-	\item[Ordering violation:] an $\<add>(v_1)$ operation finishes before another $\<add>(v_2)$ operation, and either (1) a $\<rem> =>v_2$ operation finishes before a $\<rem>=>v_1$ operation or (2) $h$ contains no $\<rem>=>v_1$ operation but it contains a $\<rem>=>v_2$ operation, that doesn't overlap with any pending $\<rem>$ operation. 
-	\item[Empty violation:] the queue is never logically empty during the execution of a $\<rem>=>{\tt EMPTY}$ operation.
-\end{description}
+In Figure~\ref{fig:spec:ds} we define four operation counting formulae:
+\begin{itemize}
 
-Figure~\ref{fig:spec:ds} lists the $\ocl$ formulas $\<removev>$, $\<fifov>$, and $\<emptyv>$, characterizing remove, ordering, and respectively, empty violations.
-The formula representing the atomic queue up to $k$ is defined by
-\begin{align*}
-\queueform{k}=\lnot\<removev> /| \lnot\<fifov> /| \lnot\<emptyv>
-\end{align*}
-The formulas $\<removev>$ and $\<fifov>$ are literal translations of the informal statements given above.
+  \item $@Y_\mathrm{rv}$ characterizes \emph{remove violations} in which a
+  {\sf pop} operation returns a value for which there is no corresponding {\sf
+  push}.
 
-Define the container formulas by
-\begin{align*}
-  @Y_\mathrm{stack} &= \lnot\<removev> /| \lnot\<lifov> /| \lnot\<emptyv> \text{, and } \\
-  @Y_\mathrm{queue} &= \lnot\<removev> /| \lnot\<fifov> /| \lnot\<emptyv>
-\end{align*}
-from Figure~\ref{fig:spec:ds}.
+  \item $@Y_\mathrm{ev}$ characterizes \emph{empty violations} in which some
+  {\sf pop} operation returns {\tt EMPTY}, yet whose span is covered by the
+  presence of some {\sf push}ed element which has not (yet) been {\sf pop}ped.
 
-\begin{figure*}
+  \item $@Y_\mathrm{fv}$ characterizes \emph{FIFO violations} in which some
+  pair of {\sf pop}s occur in the \emph{opposite} order of their corresponding
+  {\sf push}es.
+
+  \item $@Y_\mathrm{lv}$ characterizes \emph{LIFO violations} in which some
+  pair of {\sf pop}s occur in the \emph{same} order as their corresponding {\sf
+  push}es.
+
+\end{itemize}
+As in previous work~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13},
+our arguments for the completeness of these properties assumes that each value
+is {\sf push}ed at most once. In practice, this condition can always be met by
+tagging each value with a unique identifier. However, in order to achieve
+bounded counting representations, we may only distinguish between these values
+up to equivalence relations with finite quotients.
+
+\begin{figure}
 %  \begin{align*}
 %    \<pending>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \quad\quad    \<completed>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') 
 %  \end{align*}
   \begin{align*}
-    \<total>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,i',j') \quad\quad \<total>(x)=\sum_{0\leq i\leq j\leq k}\<total>(x,i,j)
-  \end{align*}
-  \begin{align*}
-    \<isP>(x) = \<P>(x)\land \<total>(x) > 0,\mbox{ for all predicates $\<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>}$} \quad
-    \<isAdd>(x) = (\<PAdd>(x)\vee \<CAdd>(x))\land \<total>(x) > 0
+    \<total>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,i',j') \\
+    \<total>(x)     &= \sum_{0\leq i\leq j\leq k}\<total>(x,i,j) \\
+    \<isP>(x)       &= \<P>(x)\land \<total>(x) > 0 \\
+                    & \text{ for all predicates } \<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>} \\
+    \<isAdd>(x)     &= (\<PAdd>(x)\vee \<CAdd>(x))\land \<total>(x) > 0 \\
 %    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
+    \<before>(x,y)  &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
+    \<noAdd>(x)     &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
+    \<lessAdds>(x)  &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
+    @Y_\mathrm{rv}  &= \exists x.\ \<isCRem>(x)  /|  (\<noAdd>(x) \vee \<lessAdds>(x) ) \\
+    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) \\
+                    & /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
+                    & /| \<before>(x_1,x_2) /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
+                    & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \\
+                    & \quad \vee \big(  \<total>(y_1) = 0 \\
+                    & \quad \quad /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
+   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
+                    & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
+                    & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
+                    & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
+    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
+                    & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
+                    & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
+                    & /| \<before>(x,y) /| \<before>(y,z)
   \end{align*}
-  \begin{align*}
-    \<before>(x,y) = \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 
-\end{align*}
-\begin{align*}
-    \<noAdd>(x) &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
-   \<lessAdds>(x) &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
-    \<removev> &= \exists x.\ \<isCRem>(x)  /|  (\<noAdd>(x) \vee \<lessAdds>(x) )  
-  \end{align*}
-  \begin{align*}
-    \<fifov>= \exists x_1, x_2, y_1, y_2.\ & \<isCAdd>(x_1) /| \<isCAdd>(x_2) /|  \<CRem>(y_1) /| \<isCRem>(y_2) \\
-                 & /| \<before>(x_1,x_2) /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) \\
-                 & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \vee
-                 \big(  \<total>(y_1) = 0 /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) 
-    \end{align*}
-%  \begin{align*}
-%    \<lifov> &= \exists x_1, x_2, y_1, y_2.\ \<is>(x_1) /| \<is>(x_2) /| \<is>(y_1) \\
-%              & /| \<isAdd>(x_1) /| \<isAdd>(x_2) /| \<before>(x_1,x_2) \\
-%              & /| \<isRem>(y_1) /| \<isRem>(y_2) /| \<before>(y_1,y_2) \\
-%              & /| \<sameVal>(x_1,y_1) /| \<sameVal>(x_2,y_2) /| \<before>(x_2,y_1) \\
-%  \end{align*}
-  \begin{align*}  
-    \<emptyv> &= \exists x, y, z.\ \<is>(x) /| \<is>(y) \\
-              & /| \<isAdd>(x) /| \<isRem>(y) /| \<isRem>(z) \\
-              & /| \<sameVal>(x,z) /| \<emptyVal>(y) \\
-              & /| \<before>(x,y) /| \<before>(y,z)
-  \end{align*}
-  \caption{Formulas characterizing atomic queue violations.}
+  \caption{Formulas characterizing atomic data structure violations.}
   \label{fig:spec:ds}
-\end{figure*}
-
+\end{figure}
 
 We say that a formula $@Y$ has a \emph{cutoff} $n \in \<Nats>$ when for each
 history $h |= @Y$ there exists some $h' \preceq h$ such that $h' |= @Y$.
 
 \begin{lemma}
-  \label{lem:ds:cutoff}
+  \label{lem:ds:cutoff}  
 
-  The negation of the container formulas $\lnot@Y_\mathrm{stack}$ and
-  $\lnot@Y_\mathrm{queue}$ have cutoffs $3$ and $2$; in particular:
-  \begin{itemize}
+  The operation-counting formulae $@Y_\mathrm{rv}$, $@Y_\mathrm{ev}$,
+  $@Y_\mathrm{fv}$, and $@Y_\mathrm{lv}$ have cutoffs $0$, $2$, $2$, and $3$,
+  respectively.
 
-    \item $\<removev>$ has cutoff $0$.
-    
-    \item $\<fifov>$ has cutoff $2$.
-    
-    \item $\<lifov>$ has cutoff $3$.
-    
-    \item $\<emptyv>$ has cutoff $2$.
-
-  \end{itemize}
 \end{lemma}
 
+\begin{corollary}
+
+  The operation-counting formulae
+  \begin{align*}
+    & @Y_\mathrm{set}   = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev}
+    \text{, } \\
+    & @Y_\mathrm{stack} = @Y_\mathrm{set} /| \lnot @Y_\mathrm{lv}
+    \text{, and }
+    @Y_\mathrm{queue} = @Y_\mathrm{set} /| \lnot @Y_\mathrm{fv}
+  \end{align*}
+  have cutoffs $2$, $3$ and $2$, respectively.
+
+\end{corollary}
+
+These cutoffs allow us to formulate the completeness of our approximation for
+stack-based data structures. Formally, we define the library $L_\mathrm{stack}$
+as the set of well-formed executions whose kernel is generated by the grammar
+$\tup{X,@S,S,->}$ over variables $X = \set{S,M}$, symbols $@S = C \u R$,
+initial variable $S$, and rules
+\begin{align*}
+  S & -> S S \\
+  S & -> \mathsf{push}(v)_o\ \<ret>_o
+    & \text{ for } v \in \<Vals>, o \in \<Ops> \\
+  S & -> M \\
+  M & -> \mathsf{push}(v)_{o}\ \<ret>_o\ M\ \mathsf{pop}_{o'}\ \<ret>(v)_{o'}
+    & \text{ for } v \in \<Vals>, o,o' \in \<Ops> \\
+  M & -> @e
+\end{align*}
+defining the sequential executions of the familiar LIFO-based data structure.
+We say a history $\tup{O,f,<}$ uses \emph{unique values} when $f(o_1) = m_1(u)
+=> v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
+
+\begin{lemma}
+  \label{lem:complete:stack}
+
+  Let $h$ be a history which uses unique values.
+  Then $h \in H(L_\mathrm{stack})$ iff $h |= @Y_\mathrm{stack}$.
+
+\end{lemma}
+
+Thus our $A_3$ approximation is guaranteed to discover any stack violation in
+histories using unique values. Unfortunately this is not the case for arbitrary
+collections, since the empty-violation $@Y_\mathrm{ev}$ formula is only known
+to be complete in conjunction with the LIFO-violation formula $@Y_\mathrm{lv}$.
+The following example demonstrates this deficiency.
+
 \begin{example}
+  \label{ex:emptyv}
 
   SHOW THAT $\<emptyv>$ requires an unbounded number of intervals.
 
 \end{example}
 
-\begin{lemma}
-  \label{lem:ds:completeness}
-
-  ``These formula are \emph{almost} complete when only unique values are added.
-  The remove empty rule is incomplete.''
-
-\end{lemma}
+We believe that there is no operation-counting formula which characterizes the
+general form of empty violations from Example~\ref{ex:emptyv}. It is however
+worth noting that remove violations, order violations, and the simple form of
+empty violations characterized by $@Y_\mathrm{ev}$ are always detectable with
+$A_3$, as noted by Lemma~\ref{lem:ds:cutoff}.
