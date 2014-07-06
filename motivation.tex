@@ -22,30 +22,46 @@ allowing methods to interleave their internal actions; in one atomic step, the
           % numberfirstline=true,
           numbersep=4pt}
   \footnotesize
-  \centering
-  \begin{minipage}[b]{38mm}
-    \begin{program}
-struct node {
-  int data;
-  struct node *next;
-}
-struct stack {
-  struct node *Top
-}
-struct stack *S;
-    \end{program}
-    \bigskip
     \lstset{numbers=none}
-    \begin{minipage}[b]{17mm}
-      \textbf{Program} \\[1em]
+  \begin{minipage}[b]{50mm}
+    {\normalsize \textbf{Treiber's stack}}
+    \begin{program}
+void push(int v) {
+  struct node *n,*t;
+  n = malloc(sizeof( *n));
+  n->data = v;
+  do {
+    struct node *t = Top;
+    n->next = t;
+  } while (! CAS (&Top, t, n))
+}
+
+int pop() {
+  struct node *n,*t;
+  do {
+    *t = Top;
+    if (t==NULL)
+      return EMPTY;
+    n = t->next;
+  } while (! CAS (&Top, t, n))
+  int result = t->data;
+  free(t);
+  return result;
+}
+    \end{program}
+      {\normalsize \textbf{Program}} \\[1em]
+        \begin{minipage}[b]{17mm}
       \textbf{Thread 1}
+      \vspace{-1.5mm}
       \begin{program}
 push(1);
 x = pop();
       \end{program}
+      \vspace{6.3mm}
     \end{minipage}
     \begin{minipage}[b]{16mm}
       \textbf{Thread 2}
+      \vspace{-1.5mm}
       \begin{program}
 y = pop();
 push(2);
@@ -54,60 +70,21 @@ z = pop();
       \end{program}
     \end{minipage}
   \end{minipage}
-  \begin{minipage}[b]{44mm}
-    \textbf{Lock-based stack}
-    \begin{program}
-void push(int v) {
-  lock();
-  struct node *n;
-  n = malloc(sizeof( *x));
-  n->data = v;
-  n->next = S->Top;
-  S->Top = n;
-  unlock();
-}
-
-int pop() {
-  lock()
-  struct node *t = S->Top;
-  if (t==NULL)
-    return EMPTY;
-  S->Top = t->next;
-  unlock()
-  return t-> data;
-}
-    \end{program}
-  \end{minipage}
-  \begin{minipage}[b]{50mm}
-    \textbf{Treiber's stack}
-    \begin{program}
-void push(int v) {
-  struct node *n,*t;
-  n = malloc(sizeof( *n));
-  n->data = v;
-  do {
-    struct node *t = S->Top;
-    n->next = t;
-  } while (! CAS (&S->Top, t, n))
-}
-
-int pop() {
-  struct node *n,*t;
-  do {
-    *t = S->Top;
-    if (t==NULL)
-      return EMPTY;
-    n = t->next;
-  } while (! CAS (&S->Top, t, n))
-  int result = t->data;
-  free(t);
-  return result;
-}
-    \end{program}
+  \begin{minipage}[b]{43mm}
+\hspace{5mm}{\normalsize \textbf{Execution}} \\[1em]
+    \input{figures/execution.tikz}
+    \vspace{1cm}
   \end{minipage}
   \begin{minipage}[b]{43mm}
-    \input{figures/execution.tikz}
+\hspace{5mm}{\normalsize \textbf{History}} \\[2em]
+    \input{figures/history.tikz}
+    \vspace{1.64cm}
   \end{minipage}
+%  \begin{minipage}[b]{43mm}
+%{\normalsize \textbf{Weaker history}} \\[1em]
+%    \input{figures/execution.tikz}
+%    \vspace{1cm}
+%  \end{minipage}
   \caption{Two implementations of a concurrent stack object, a stack-using
   program, and an execution using Treiber's stack. The {\tt pop} operation
   returns the {\tt EMPTY} when the stack is empty. The execution depicts calls,
