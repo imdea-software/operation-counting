@@ -23,7 +23,7 @@ allowing methods to interleave their internal actions; in one atomic step, the
           numbersep=4pt}
   \footnotesize
     \lstset{numbers=none}
-  \begin{minipage}[t]{50mm}
+  \begin{minipage}[c]{50mm}
     {\normalsize \textbf{Treiber's stack}}
     \begin{program}
 void push(int v) {
@@ -68,13 +68,35 @@ z = pop();
       \end{program}
     \end{minipage}
   \end{minipage}
-  \begin{minipage}[t]{100mm}
-    \fbox{\normalsize\bf Execution} \\
+  \begin{minipage}[c]{120mm}
+%    \fbox{\normalsize\bf Execution} \\
+
     \input{figures/execution-horizontal.tikz}
-    \fbox{\normalsize\bf History} \\
+    
+    \vspace{-2mm}
+    \hspace{5cm}(a) An execution $e$.
+    
+    \smallskip
+    \input{figures/history-partial-order.tikz}
+    
+%    \vspace{-3mm}
+     \smallskip
+    \hspace{5cm}(b) The history $h$ of the execution $e$.
+    
+%    \fbox{\normalsize\bf History} \\
+     \smallskip
     \input{figures/history-horizontal.tikz}
-    \fbox{\normalsize\bf Weaker history} \\
+    
+%    \vspace{-3mm}
+    \smallskip
+    \hspace{5cm}(c) The canonical representation of $h$.
+        
+    \smallskip
     \input{figures/history-weak-horizontal.tikz}
+    
+%    \vspace{-3mm}
+    \smallskip
+    \hspace{5cm}(d) The canonical representation of a history weaker than $h$.
   \end{minipage}
   \caption{Two implementations of a concurrent stack object, a stack-using
   program, and an execution using Treiber's stack. The {\tt pop} operation

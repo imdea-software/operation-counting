@@ -37,15 +37,6 @@ summary, and orders non-overlapping operations:
 \end{itemize}
 The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
 
-\begin{example}
-  \label{ex:histories}
-
-  TODO DRAW THE HISTORY/IES CORRESPONDING TO A/SOME PREVIOUS EXECUTION/S
-  \todo{Show that histories are an abstraction of executions, i.e., there are
-  different executions that have the same history}
-
-\end{example}
-
 While the general concept of histories allows arbitrary partial orders of
 operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
 restricted class called \emph{interval orders}. Intuitively, this is because
@@ -79,6 +70,15 @@ a given operation starts) cannot be incomparable.
   which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
 
 \end{proof}
+
+\begin{example}
+  \label{ex:histories}
+
+  TODO DRAW THE HISTORY/IES CORRESPONDING TO A/SOME PREVIOUS EXECUTION/S
+  \todo{Show that histories are an abstraction of executions, i.e., there are
+  different executions that have the same history}
+
+\end{example}
 
 \noindent
 In this work we consider only histories of well-formed executions, i.e.,~those

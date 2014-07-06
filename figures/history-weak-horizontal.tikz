@@ -5,23 +5,23 @@
 \tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
 \tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
 \node[nnode] (x0) [] at (0,0) {};
-\node[lnode] (x1)  [right=3cm of x0,label=below:{\footnotesize 0}] {};
-\node[lnode] (x2)  [right of=x1,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (x3)  [below=.7cm of x1,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (x6)  [right of=x3,label=below:{\footnotesize 0}] {};  %8*7+4
+\node[lnode] (x1)  [right=4cm of x0,label=left:{\footnotesize 0}] {};
+\node[lnode] (x2)  [right of=x1,label=right:{\footnotesize 0}] {}; 
+\node[lnode] (x3)  [below=.5cm of x1,label=left:{\footnotesize 0}] {}; 
+\node[lnode] (x6)  [right of=x3,label=right:{\footnotesize 0}] {};  %8*7+4
 
-\node[lnode] (y1)  [below=.7cm of x3,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (y2)  [right of=y1,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (y4)  [below=.7cm of y1,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (y5)  [right of=y4,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (y6)  [below=.7cm of y4,label=below:{\footnotesize 0}] {}; 
-\node[lnode] (y7)  [right of=y6,label=below:{\footnotesize 0}] {}; 
+\node[lnode] (y1)  [below=.5cm of x3,label=left:{\footnotesize 0}] {}; 
+\node[lnode] (y2)  [right of=y1,label=right:{\footnotesize 0}] {}; 
+\node[lnode] (y4)  [below=.5cm of y1,label=left:{\footnotesize 0}] {}; 
+\node[lnode] (y5)  [right of=y4,label=right:{\footnotesize 0}] {}; 
+\node[lnode] (y6)  [below=.5cm of y4,label=left:{\footnotesize 0}] {}; 
+\node[lnode] (y7)  [right of=y6,label=right:{\footnotesize 0}] {}; 
 
 %\node[nnode] (x5)  [left=18mm of y7,yshift=-2mm] {}; 
 
 
-\node[lnode] (y8)  [right=10mm of y2,label=below:{\footnotesize 1}] {}; 1*7+3
-\node[lnode] (y9)  [right of =y8,label=below:{\footnotesize 1}] {}; 
+\node[lnode] (y8)  [right=10mm of y2,label=left:{\footnotesize 1}] {}; 1*7+3
+\node[lnode] (y9)  [right of =y8,label=right:{\footnotesize 1}] {}; 
 
 
 \draw[line width=2pt] (x1) -- node[draw=none,above] {$\<push>(1)$} (x2); 
