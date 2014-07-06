@@ -1,47 +1,60 @@
 \section{Experimental Evaluation}
 \label{sec:exp}
 
-In order to demonstrate the efficacy of our history-inclusion based
-approximation to observational refinement, we argue that our $k$-approximation:
+In order to demonstrate the efficacy of our refinement-checking approach, we
+argue that our $k$-approximation:
 \begin{itemize}
 
-  \item uncovers violations with small values of $k$, and
+  \item uncovers violations with small values of $k$,
 
-  \item can be efficiently implemented.
+  \item can be efficiently implemented for use in systematic concurrency
+  testing and long-term runtime monitoring, and
+  
+  \item can be efficiently implemented for use in static analysis.
 
 \end{itemize}
 
-To argue both points, we have studied the Scal High-Performance
-Multicore-Scalable Computing suite of concurrent data structure
-implementations\footnote{\url{http://scal.cs.uni-salzburg.at}} which include
-both LIFO- and FIFO-based container objects. Some of these objects, such as the
-Michael-Scott Queue~\cite{conf/podc/MichaelS96}, are meant to preserve
-observational refinement\footnote{More precisely, they have been designed to be
-linearizable.}, while others, such as Kirsch et al.'s
+To argue these points, we have studied actual C/C++ concurrent data structure
+implementations, including the Scal High-Performance Multicore-Scalable
+Computing suite\footnote{\url{http://scal.cs.uni-salzburg.at}}. Some of these
+implementations, such as the Michael-Scott Queue~\cite{conf/podc/MichaelS96},
+are meant to preserve observational refinement\footnote{More precisely, they
+have been designed to be linearizable.}, while others, such as Kirsch et al.'s
 $k$-FIFO~\cite{conf/pact/KirschLP13}, are meant to preserve weaker properties.
-For our experiments we have used Scal's C++ implementations without
-modification, except to annotate methods with a fixed set of possible
-preemption points, e.g.,~preceding accesses to shared storage.
+Unless otherwise noted, we use these implementations without modification,
+except to annotate methods with a fixed set of possible preemption points,
+e.g.,~preceding shared-memory accesses.
 
-To make the following comparisons, we have developed a tool for enumerating a
-(possibly large) number of alternate executions involving a limited number of
-object method invocations. We execute each operation on a separate thread, and
-ensure that all thread schedules up to a given number $n \in \<Nats>$ of thread
-preemptions (at specified preemption points) are executed, similarly to
-Microsoft's Chess tool~\cite{conf/osdi/MusuvathiQBBNN08}. With $n=0$
-preemptions, there is only one schedule/execution, though the number of
-schedules/executions grows exponentially as $n$ increases. For instance, with
-our annotation of preemptions in Scal's Michael-Scott Queue, increasing
-$n=1..5$ yields $33$, $612$, $8343$, $95434$, and $930141$ schedules, which are
-executed at a rate of roughly one million schedules per minute on a MacBook Pro
-2.6GHz Intel Core i5 machine.
+For our first two experiments (\S\ref{sec:exp:coverage},
+\S\ref{sec:exp:dynamic}), we have developed a tool for enumerating a (possibly
+large) number of alternate executions involving a limited number of object
+method invocations. We run each operation on a separate thread, and execute all
+thread schedules up to a given number $n \in \<Nats>$ of thread preemptions (at
+specified preemption points), similarly to Microsoft's Chess
+tool~\cite{conf/osdi/MusuvathiQBBNN08}. With $n=0$ preemptions, there is only
+one schedule to execute, though the number of schedules grows exponentially as
+$n$ increases. For instance, with our annotation of preemptions in Scal's
+Michael-Scott Queue, we execute $f(n)$ schedules at a rate of roughly one
+million schedules per minute, where $f$ is given by
+{\footnotesize
+\begin{align*}
+  f(1) = 33, f(2) = 612, f(3) = 8343, f(4) = 95434, f(5) = 930141
+\end{align*}}%
+While similar in spirit to the second, our third experiment
+(\S\ref{sec:exp:static}) executes all round-robin thread schedules up to a
+given number $n \in \<Nats>$ of rounds \emph{symbolically}: we use the CSeq
+tool to sequentialize a simple program which invokes a limited number of
+library methods, and then CBMC (version 4.5) to perform bounded model checking
+up to a given loop unroll bound. All measurements were made on similar MacBook
+Pro 2.XGHz Intel Core i5/i7 machines. While space prohibits including the
+entirety of our measurements, we do include a representative sample.
 
+\subsection{Coverage of Refinement Violations}
+\label{sec:exp:coverage}
 
-\subsection{Coverage of Violations}
-
-To show that most violations to observational refinement are uncovered by our
-history inclusion approximation for small values of $k$, we measure the number
-of violations detected by a traditional linearizability checker versus those
+To show that observational refinement violations are uncovered by our history
+inclusion approximation $A_k$ for small values of $k$, we measure the number of
+violations detected by a traditional linearizability checker versus those
 detected by operation counting. On the one hand, the linearizability checker
 detects exactly those histories $H(e)$ for which $H(e) \not\in H(L)$, due to
 the equivalence of Section~\ref{sec:lin}. On the other hand, operation counting
@@ -90,7 +103,8 @@ object can be captured; see Section~\ref{sec:containers}.
   \label{fig:data:coverage}
 \end{figure}
 
-\subsection{Efficiency}
+\subsection{Efficacy in Testing \& Runtime Monitoring}
+\label{sec:exp:dynamic}
 
 Figure~\ref{fig:data:runtime} compares the runtime overhead of our
 operation-counting instrumentation for $k=2$, versus a linearization-based
@@ -123,3 +137,81 @@ that runtime overhead stays within 30\%.
   }
   \label{fig:data:runtime}
 \end{figure}
+
+\subsection{Efficacy in Static Analysis}
+\label{sec:exp:static}
+
+We report the results of our experiments on several examples in
+Table~\ref{tab:exp:static}.
+
+\begin{table}[t]
+  \footnotesize
+  \begin{tabular}{llllllr}
+  Example    & Bug                 & $P$ & $k$ & $m$ & $n$ & Time \\
+  \hline
+  %MSQueue                             & 2xEnqueue 2xDequeue & 0 & 2 & 2 & & Yes \\
+  Michael-Scott & head lock      & 2x2 & 1 & 2 & 2 & 24.76s \\
+  Michael-Scott & tail lock      & 3x1 & 1 & 2 & 3 & 45.44s \\
+  Treiber & ABA                  & 3x4 & 1 & 1 & 2 & 52.59s \\
+  Treiber & non-atomic push      & 2x2 & 1 & 1 & 2 & 24.46s \\
+  Treiber & non-atomic pop       & 2x2 & 1 & 1 & 2 & 15.16s \\
+  Elimination & misplaced brace  & 4x1 & 0 & 1 & 4 & 317.79s  \\
+  Elimination & ``Empty''        & 3x1 & 1 & 1 & 4 & 222.04s  \\
+  Elimination & ABA              & 3x4 & 0 & 1 & 2 & -- \\
+  Lock-coupling & mispaced lock & 1x2 & 0 & 2 & 2 & 11.27s \\
+  LFDS Queue & allocation           & 2x2 & 1 & 1 & 2 & 77.00s   
+  \end{tabular} 
+  \caption{Results of symbolic exploration with $A_k$ approximate refinement
+    checking using CSeq \& CBMC with $m$ loop unrollings and $n$ rounds. The
+    analyzed program $X$x$Y$ contains $X$ and $Y$ invocations to {\sf push} and
+    {\sf pop} methods. All bugs were inserted.}
+  \label{tab:exp:static}
+\end{table}
+
+TODO FIGURE OUT WHAT TO SAY HERE; PERHAPS NO NEED TO DESCRIBE ALL OF THE
+STRUCTURES IN DEPTH
+
+MSQueue (Michael \& Scott two-lock concurrent
+queue~\cite{conf/podc/MichaelS96}) uses a different lock for the head and
+respectively the tail of the singly-linked list used to store queue elements
+(Enqueuers access only the tail while Dequeuers access only the head). We have
+replaced the lock on the head (resp., tail) with a faulty lock, which enables
+two concurrent Dequeues (resp, Enqueue's) to try and update the queue at the
+same time, resulting in a lost update.
+
+For the Treiber Stack, we created a version where the memory management is done
+manually (using an array), in order to expose the well-known ABA bug{} to the
+CBMC backend. With this change, CSeq was able to detect the ABA bug{}, using 3
+{\sf push}'s, and 4 {\sf pop}'s. After fixing the ABA bug{} by removing a {\sf
+free} operation, we inserted two atomicity bugs, one in the {\sf push} method,
+one in the {\sf pop} method, resulting as for the MSQueue in lost updates (and
+thus linearizability violations).
+
+The Elimination Stack \citep{conf/spaa/HendlerSY04} uses the Treiber Stack as a
+backend, and consequently also has the ABA bug. The Empty bug is a violation we
+inserted manually, and corresponds to a {\sf pop} operation meeting a {\sf
+push} operation in the collision array, but not using the value of the {\sf
+push} to return. It was created by removing the line of the code where the {\sf
+pop} copies the value of the corresponding {\sf push}.
+
+The Brace bug is a violation which we originally found accidentally by making a
+mistake when copying the code. Operations in the Elimination Stack first try to
+access directly to the underlying Treiber Stack, then go the collision array,
+and then try again to access the Treiber Stack in case nothing happened in the
+collision array. In the mistake we made, a {\sf pop} operation was able to
+return even in the case where this last access to the Treiber Stack fails, thus
+resulting in a violation of the Stack specification.
+
+The Lock-coupling Set also allows for a lost update violation when displacing
+the {\sf unlock} commands in the code. Two {\sf remove} are able to access a
+critical section at the same time, and remove the same element from the set,
+resulting in a violation of the set specification.
+ 
+In the LFDS Queue library, the user creates a queue by specifying the capacity
+of the queue. We observed a violation when we create a queue whose capacity is
+smaller than the number of {\sf enqueue}'s done. In our version of the code,
+the actual violation is that an {\sf enqueue} is able to return successfully,
+even without enqueuing anything, because of the maximum capacity of the queue
+is already reached. This results in a later {\sf dequeue} returning empty, even
+though an {\sf enqueue} finished successfully, which is a violation of the
+Queue specification.
