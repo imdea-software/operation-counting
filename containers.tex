@@ -1,5 +1,5 @@
 %!TEX root = draft.tex
-\section{Atomic Collection Objects}
+\section{Atomic Collections}
 \label{sec:containers}
 
 Collection-based data structures such as sets, queues, and stacks are among the
@@ -9,7 +9,7 @@ refinement violations to such atomic objects, in the sense that most or all viol
 can be uncovered with coarse approximations, i.e.,~$k=0..3$, depending on the
 data structure. To obtain these results we exhibit operation counting formulae
 $@Y$ characterizing these structures with cutoff/small-model properties: for
-any history $h$ violating $@Y$, there exists some $h' \preceq h$ violating
+any history $h$ violating $@Y$, there exists some $h' \preceq h$ with $\len h' \le k$ violating
 $@Y$. While this $h'$ may not correspond directly to $A_k(h)$, we can deduce
 there exists some $h'$ whose $k$-approximation $A_k(h')$ violates $@Y$. Our
 results build off of previous characterizations of concurrent data
