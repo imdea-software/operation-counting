@@ -71,14 +71,19 @@ Figure~\ref{fig:data:coverage} demonstrates that $A_k$ covers most or all
 violations with small values of $k$. While $A_4$ suffices to cover all
 violations at nearly all data points --- besides the first point, where the
 sample size of $1023$ executions is small relative to the $8$ operations ---
-all values $k > 0$ capture a nontrivial and increasing number of violations. In
-fact, as the execution-sample size increases (the x-axis is ordered by number
-of executions over operations) the value of $k$ required to capture a violation
+all values $k > 0$ capture a nontrivial and increasing number of violations.
+Note that our cutoff results of Section~\ref{sec:containers} are not undermined
+by the fact that $A_3$ and $A_4$ have missed violations; violations were missed
+due to not having encountered a diverse enough sample of executions. In fact,
+as the execution-sample size increases (the x-axis is ordered by number of
+executions over operations) the value of $k$ required to capture a violation
 appears to decrease, all violations being captured by $A_3$ after a certain
-point. Note that this data set only exhibits \emph{order violations} (see
-Section~\ref{sec:containers}), i.e.,~where elements are removed out of order;
-in general, there is no cutoff value of $k \in \<Nats>$ for which all
-\emph{empty violations} can be captured with $A_k$.
+point.
+
+% Note that this data set only exhibits \emph{order violations} (see
+% Section~\ref{sec:containers}), i.e.,~where elements are removed out of order;
+% in general, there is no cutoff value of $k \in \<Nats>$ for which all
+% \emph{empty violations} can be captured with $A_k$.
 
 \begin{figure}
   \centering
