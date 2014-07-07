@@ -3,16 +3,19 @@
 \section{Motivating Example}
 \label{sec:motivation}
 
-Figure~\ref{fig:stacks} lists two implementations of an atomic stack-based data
-structure which provides {\tt push} and {\tt pop} methods. The first lock-based
-implementation ensures that methods execute atomically by holding a lock for
-the duration of each operation, and stores {\tt push}ed elements in a
-singly-linked list rooted at {\tt S->Top}. The second implementation of
-Treiber~\cite{Treiber'86} stores its elements in the same singly-linked list
-structure, but avoids blocking lock acquisitions in favor of non-blocking
+Figure~\ref{fig:stacks} lists the implementation of the non-blocking 
+Treiber's stack~\cite{Treiber'86}, which provides {\tt push} and {\tt pop} methods. 
+This implementation stores {\tt push}ed elements in a
+singly-linked list rooted at {\tt Top}, but avoids blocking lock acquisitions in favor of non-blocking
 compare-and-swap ({\tt CAS}) operations in order to maximize parallelism,
 allowing methods to interleave their internal actions; in one atomic step, the
-{\tt CAS} operation assigns {\tt S->Top = n} only if {\tt S->Top == t}.
+{\tt CAS} operation assigns {\tt Top = n} only if {\tt Top == t}.
+%The first lock-based
+%implementation ensures that methods execute atomically by holding a lock for
+%the duration of each operation, and stores {\tt push}ed elements in a
+%singly-linked list rooted at {\tt S->Top}. The second implementation of
+%Treiber~\cite{Treiber'86} stores its elements in the same singly-linked list
+%structure, 
 
 \begin{figure*}[t]
   \lstset{numbers=left, 
@@ -68,15 +71,19 @@ z = pop();
       \end{program}
     \end{minipage}
   \end{minipage}
-  \begin{minipage}[c]{120mm}
+  \begin{minipage}[c]{130mm}
 %    \fbox{\normalsize\bf Execution} \\
 
     \input{figures/execution-horizontal.tikz}
     
-    \vspace{-2mm}
-    \hspace{5cm}(a) An execution $e$.
-    
+   % \vspace{-2mm}
+    %\hspace{5cm}
+    \centering
     \medskip
+    (a) An execution $e$ of the program; it depicts calls,
+  returns, and assignments, and time progresses from left to right.
+    
+    \bigskip
     \begin{minipage}[c]{7cm}
 %    \centering
     \input{figures/history-partial-order.tikz}
@@ -131,17 +138,16 @@ z = pop();
 %    \smallskip
 %    \hspace{5cm}(d) The canonical representation of a history weaker than $h$.
   \end{minipage}
-  \caption{Two implementations of a concurrent stack object, a stack-using
-  program, and an execution using Treiber's stack. The {\tt pop} operation
-  returns the {\tt EMPTY} when the stack is empty. The execution depicts calls,
-  returns, and assignments, and time progresses downward.}
+  \caption{An implementation of Treiber's stack. The {\tt pop} operation
+  returns the {\tt EMPTY} when the stack is empty.}
   \label{fig:stacks}
 \end{figure*}
 
 Unfortunately this nonblocking implementation suffers from a subtle concurrency
 bug, now commonly known as an ``ABA'' bug~\cite{tr/ibm/Michael04}. This bug
-manifests in the program of Figure~\ref{fig:stacks}, via the depicted
-execution. Essentially, Thread~1 wrongfully assumes the absence of interference
+manifests in the program of Figure~\ref{fig:stacks}, via the 
+execution depicted in Figure~\ref{fig:stacks}(a). 
+Essentially, Thread~1 wrongfully assumes the absence of interference
 from other threads on the successful {\tt CAS} operation. Thread~1 is preempted
 right before executing its {\tt CAS} in the {\tt pop} method; at that moment,
 its {\tt t} variable points to the first element in the list at address {\tt
@@ -158,9 +164,11 @@ pop} operation.
 
 This bug exposes the fact that our {\tt CAS}-based implementation does not
 conform to programmers' expectations of a stack object whose operations execute
-atomically. In particular, the assignment {\tt z = EMPTY} should never have
-been observed in an execution of the given program. This idea of conformance is
-rigorously captured by the formal notion of \emph{observational refinement}.
+atomically, e.g., by holding a lock for the duration of each operation.
+In particular, the assignment {\tt z = EMPTY} should never have
+been observed in an execution of the given program. 
+
+This idea of conformance is rigorously captured by the formal notion of \emph{observational refinement}.
 Essentially, an implementation $L_1$ of a concurrent object ``refines'' another
 implementation $L_2$ if every observable behavior of a program using $L_1$ is
 also observable using $L_2$. This property clearly does not hold between the
