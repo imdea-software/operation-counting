@@ -123,8 +123,8 @@ histories, i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in H$, then $h_2
 \subsection{History Inclusion is Equivalent to Refinement}
 
 We prove that refinement between two libraries is equivalent to containment
-between their \alert{sets of }histories. Before that, we give two lemmas which characterize the
-set of histories $H(L)$ of a library $L$. First, the closure properties on
+between their history sets. Before that, we give two lemmas which characterize
+the set of histories $H(L)$ of a library $L$. First, the closure properties on
 $E(L)$ imply that whenever $H(L)$ contains some history $h_1$, it also contains
 all histories $h_2$ weaker than $h_1$. Thus, if $h_1$ is the history of an
 execution $e$ and $h_2\preceq h_1$, then there exists another execution $e'$
@@ -171,17 +171,13 @@ $h\in H(L)$.
 %
 %\end{proof}
 
-%\noindent
-
 Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply the
-equivalence between refinement and history inclusion. 
-\alert{Any given history $h$ of a library $L_1$ can be captured by a program 
-whose observations witness the ordering among operations; 
-observational refinement $L_1\leq L_2$ then implies that $L_2$ must also allow 
-those observations, and thus the history $h$. For the reverse, by Lemma~\ref{lem:lib:execs},
-a library must admit all the executions with a given history and consequently, $H(L_1) \subseteq H(L_2)$
-implies that any program execution possible when using $L_1$ is also possible when
-using $L_2$.}
+equivalence between refinement and history inclusion. Essentially, any given
+history $h$ of a library $L_1$ can be captured by a program $P_h$ whose
+observations witness the ordering among $h$'s operations; the refinement $L_1
+\leq L_2$ implies that $L_2$ also admits those observations, and ultimately
+$h$. For the reverse direction, it follows from Lemma~\ref{lem:lib:execs} that
+history inclusion implies inclusion of executions, and ultimately observations.
 
 \begin{theorem}
   \label{thm:equivalence}
