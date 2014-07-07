@@ -88,10 +88,11 @@ see Section~\ref{sec:containers}.
     all executions up to $5$ preemptions on Scal's nonblocking
     bounded-reordering queue with $i \le 4$ enqueue operations and $j \le 4$
     dequeue operations. The x-axis is ordered by increasing number of
-    executions ($1023$--$2359292$) over $i\!+\!j$, and only points with over
-    $1000$ executions are shown. The largest data points measure the total
+    executions ($1023$--$2359292$) over $i\!+\!j$; we show only points with over
+    $1000$ executions. The largest data points measure the total
     number of unique histories encountered over a given set of executions.
-    Second are the number of refinement-violating histories. Following are the
+    Second are the number of those histories violating refinement.
+    Following are the
     numbers of those violations covered by $A_k$, for varying values of $k$.
   }
   \label{fig:data:coverage}
@@ -127,7 +128,8 @@ runtime monitoring, where the number of operations grows without limit.
     unmonitored execution time, over all executions up to $3$ preemptions on
     Scal's nonblocking Michael-Scott queue with $i\!\le\!10$ enqueue operations
     and $j\!\le\!10$ dequeue operations. The x-axis is ordered by increasing
-    $i\!+\!j$. Times do not include pre-calculation of sequential histories for
+    $i\!+\!j$, and each data point is sampled from up to $126600$ executions.
+    Times do not include pre-calculation of sequential histories for
     linearization-based monitoring. While our $A_k$ monitor
     scales well, maintaing under 30\% overhead, the linearization monitor
     scales \textbf{exponentially}, running with roughly \textbf{100000\%
@@ -180,7 +182,7 @@ statically.
   Treiber Stack & $\text{B}_3$ ({\tt pop})        & $2\x2$ & 1 & 1 & 2 & 15.16s \\
   Elimination Stack & $\text{B}_4$          & $4\x1$ & 0 & 1 & 4 & 317.79s \\
   Elimination Stack & $\text{B}_5$             & $3\x1$ & 1 & 1 & 4 & 222.04s \\
-  Elimination Stack & $\text{B}_2$          & $3\x4$ & 0 & 1 & 2 & -- \\
+  Elimination Stack & $\text{B}_2$          & $3\x4$ & 0 & 1 & 2 & 434.84s \\
   Lock-coupling Set & $\text{B}_6$        & $1\x2$ & 0 & 2 & 2 & 11.27s \\
   LFDS Queue & $\text{B}_7$           & $2\x2$ & 1 & 1 & 2 & 77.00s   
   \end{tabular} 
@@ -189,9 +191,9 @@ statically.
     invocations to the {\sf push} and {\sf pop} methods, we explore the
     $n$-round round-robin schedules of $P_{i\x j}$ with $m$ loop iterations
     unrolled, with a monitor for our $A_k$ approximation. Bugs are
-    ($\text{B}_1$)~non-atomic lock operation, ($\text{B}_2$)~ABA issue,
-    ($\text{B}_3$)~non-atomic CAS operation, ($\text{B}_4$)~misplaced brace,
-    ($\text{B}_5$)~forgotten assignment,
+    ($\text{B}_1$)~non-atomic lock operation, ($\text{B}_2$)~ABA
+    bug~\cite{tr/ibm/Michael04}, ($\text{B}_3$)~non-atomic CAS operation,
+    ($\text{B}_4$)~misplaced brace, ($\text{B}_5$)~forgotten assignment,
     ($\text{B}_6$)~misplaced lock, ($\text{B}_7$)~predetermined capacity
     exceeded.
   }
