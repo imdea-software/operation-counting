@@ -183,11 +183,15 @@ general, as the following example demonstrates.
 
 \end{example}
 
-We believe that there is no operation-counting formula which characterizes the
-general form of empty violations from Example~\ref{ex:emptyv} for all $n \in
-\<Nats>$. It is possible however to give a formula $@Y_{\mathrm{ev},k}$
-characterizing all empty violations up to a given interval length $k$, which
-can thus be discovered by the $A_k$ approximation. We omit this proof for lack
-of space. It is worth noticing that remove violations, order violations, and
-the simple form of empty violations characterized by $@Y_\mathrm{ev}$ are
-always detectable with $A_3$, as noted by Lemma~\ref{lem:ds:cutoff}.
+We currently do not know whether the general form of empty violations of
+Example~\ref{ex:emptyv} can be characterized by an operation-counting formula.
+However, it is possible to give a formula $@Y_{\mathrm{ev},k}$ characterizing
+all empty violations up to a given interval length $k$, which can thus be
+discovered by the $A_k$ approximation; we omit this proof for lack of space. It
+is worth noticing that remove violations, order violations, and the simple form
+of empty violations characterized by $@Y_\mathrm{ev}$ are always detectable
+with $A_3$, as noted by Lemma~\ref{lem:ds:cutoff}. Furthermore, our experience
+suggests that empty violations tend to surface with small $k$; the violation
+uncovered by our static analysis experiment in Section~\ref{sec:exp:static},
+for which bug $\text{B}_5$ was injected into the elimination stack, is an empty
+violation, and was detected with approximation $A_1$.
