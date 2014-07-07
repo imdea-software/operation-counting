@@ -463,10 +463,10 @@ overlapping operations is usally fixed and it doesn't influence the space comple
 As an online monitor program $P_k$ for history approximation,
 Algorithm~\ref{alg:counting} effectively reduces the approximate refinement
 checking problem between $L_1$ and $L_2$ to a reachability problem on the
-composition $L_1 \x P_k$: as $P_k$ tracks the approximation $A_k(H(e))$ of the
-current execution $e$ by counting, we must only check whether $P_k$'s
-$\mathsf{counters}$ satisfy the operation counting formula $@Y$ for $L_2$ up to
-$k$.
+composition $P_k \x L_1$: as $P_k$ tracks the counting representation $\pi =
+\Pi(A_k(H(e)))$ of the current execution $e$'s approximation, we must only
+verify whether $\pi$ satisfies the operation-counting formula $@Y$ for $L_2$ up
+to $k$.
 
 \begin{corollary}
 
@@ -476,6 +476,6 @@ $k$.
   \begin{align*}
     (P_k \x L_1) |= \Box @Y
   \end{align*}
-  where $@Y$ is interpreted over the $\mathsf{counters}$ array of $P_k$.
+  where $@Y$ is interpreted over $P_k$'s counting representation $\pi$.
 
 \end{corollary}
