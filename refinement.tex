@@ -122,8 +122,9 @@ Libraries dictate the execution of methods between their call and return
 points. Accordingly, a library cannot prevent a method from being called,
 though it can decide not to return. Furthermore, any library action performed
 in the interval between call and return points can also be performed should the
-call have been made earlier, and/or the return made later \alert{(call and return actions
-do not modify the state of the library)}. Our technical
+call have been made earlier, and/or the return made later.
+%\alert{(call and return actions do not modify the state of the library)}. 
+Our technical
 results rely on these properties. A library thus allows any sequence of
 invocations to its methods made by \emph{some} program.
 

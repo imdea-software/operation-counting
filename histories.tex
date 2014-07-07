@@ -41,7 +41,7 @@ While the general concept of histories allows arbitrary partial orders of
 operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
 restricted class called \emph{interval orders}. Intuitively, this is because
 our execution model assumes that operations share a common notion of global
-time: \alert{the actions in an execution are linearly ordered}.
+time: the actions in an execution are linearly ordered.
 %the \emph{pasts} of any two operations (formalized in
 %Section~\ref{sec:counting} as the set of operations that have completed before
 %a given operation starts) cannot be incomparable.
@@ -101,10 +101,10 @@ injection $g: O_2 -> O_1$ such that
 
   \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
 
-  \item $f_1(g(o)) \alert{\ll} f_2(o)$ for each $o \in O_2$.
+  \item $f_1(g(o)) \ll f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
-where $(m_1(u_1) => v_1) \alert{\ll} (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
+where $(m_1(u_1) => v_1) \ll (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
 u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. 
 \end{definition}
@@ -174,13 +174,14 @@ $h\in H(L)$.
 %\noindent
 
 Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply the
-equivalence between refinement and history inclusion. \alert{Thus, if 
-$L_1 \leq L_2$, then for any history $h\in H(L_1)$, one can build a program $P_h$ 
-which composed with the library $L_2$ has an execution $e$ such that $h\preceq H(e)$.
-Since libraries are closed under weakening and $H(e)\in H(L_2)$, it follows that $h\in H(L_2)$.
-For the reverse, if $H(L_1) \subseteq H(L_2)$, then every execution $e$ of some program $P$ 
-composed with $L_1$ is reproducible when $P$ is composed with $L_2$. This follows from
-the fact that $H(e)\in H(L_2)$ and from the closure property in Lemma~\ref{lem:lib:execs}.}
+equivalence between refinement and history inclusion. 
+\alert{Any given history $h$ of a library $L_1$ can be captured by a program 
+whose observations witness the ordering among operations; 
+observational refinement $L_1\leq L_2$ then implies that $L_2$ must also allow 
+those observations, and thus the history $h$. For the reverse, by Lemma~\ref{lem:lib:execs},
+a library must admit all the executions with a given history and consequently, $H(L_1) \subseteq H(L_2)$
+implies that any program execution possible when using $L_1$ is also possible when
+using $L_2$.}
 
 \begin{theorem}
   \label{thm:equivalence}
@@ -197,7 +198,7 @@ the fact that $H(e)\in H(L_2)$ and from the closure property in Lemma~\ref{lem:l
   \begin{align*}
     \forall e \in E(P_h).\ |(e|@S)| = n \implies h \preceq H(e) \text{,}
   \end{align*}
-  where $n = |\set{ o \in O : f(o) = \tup{\_,\<true>}}|$ is the number of
+  where $n = |\set{ o \in O : f(o) = m(u)=>v\neq \bot}|$ is the number of
   completed operations in $h$. Given such a program $P_h$, taking any execution
   $e_1 \in E(P_h \x L_1)$ with $|(e_1|@S)| = n$, we must also have an execution
   $e_2 \in E(P_h \x L_2)$ such that $(e_2|@S) = (e_1|@S)$ by definition of $L_1
