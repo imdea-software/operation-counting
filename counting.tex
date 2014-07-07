@@ -84,7 +84,9 @@ of elements ordered before $o$.
 
 \begin{example}
 
-  TODO EXAMPLE OF PASTS
+For the history $h$ in Figure~\ref{fig:stacks}(b), the $\<pop>=>3$ and $\<pop>=>1$
+operations have the same past, namely the operation $\<push>(1)$, while the past of the $\<push>(3)$
+operation consists of the $\<push>(1)$, $\<pop>=>1$, and $\<push>(2)$ operations.
   
 \end{example}
 
@@ -147,7 +149,8 @@ time by counting the distinct pasts among operations.
 
 \begin{example}
 
-  TODO EXAMPLE OF CANONICAL REPRESENTATION
+  Figure~\ref{fig:stacks}(d) pictures the canonical representation of the history $h$ in
+  Figure~\ref{fig:stacks}(b). Note that the length of $h$ is 4.
 
 \end{example}
 
@@ -170,13 +173,21 @@ representations.
 \begin{proof}
 
   Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
-
 \end{proof}
 
 \begin{example}
 
-  TODO EXAMPLE OF COUNTING REPRESENTATIONS
-
+ The counting representation of the history $h$ in Figure~\ref{fig:stacks}(b) is the multiset
+ \begin{align*}
+ \{\!\{&\tup{\<push>(1),[0,0]}, \tup{\<pop>=>1,[1,1]},\tup{\<pop>=>3,[1,3]},\\
+ &\tup{\<push>(2),[2,2]}, \tup{\<push>(3),[3,3]},\tup{\<pop>=>{\tt Empty},[4,4]}\}\!\}
+ \end{align*}
+ while the counting representation of the history $h'$ in Figure~\ref{fig:stacks}(c) is
+ \begin{align*}
+ \{\!\{&\tup{\<push>(1),[0,0]}, \tup{\<pop>=>1,[0,0]},\tup{\<push>(2),[0,0]}, \\
+ &\tup{\<push>(3),[0,0]},\tup{\<pop>=>{\tt Empty},[1,1]},\tup{\<pop>=>\bot,[1,1]},\\
+ &\tup{\<pop>=>\bot,[1,1]}\}\!\}
+ \end{align*}
 \end{example}
 
 This counting representation leads to an effective logical characterization of

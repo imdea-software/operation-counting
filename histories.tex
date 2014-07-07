@@ -37,6 +37,17 @@ summary, and orders non-overlapping operations:
 \end{itemize}
 The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
 
+\begin{example}
+
+The history $h$ of the execution $e$ in Figure~\ref{fig:stacks}(a) is pictured in Figure~\ref{fig:stacks}(b).
+Since a history abstracts away the order between successive call, resp, return, actions, an execution obtained from
+$e$ by reversing the order between the call action of the $\<pop>=>1$ operation (from the second thread) and the call action
+of the $\<pop>=>3$ operation (from the first thread) has the same history $h$. This holds also for an execution
+obtained from $e$ by reversing the order between the return action of the $\<push>(3)$ operation and
+the return action of the $\<pop>=>3$ operation.
+
+\end{example}
+
 While the general concept of histories allows arbitrary partial orders of
 operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
 restricted class called \emph{interval orders}. Intuitively, this is because
@@ -74,10 +85,10 @@ time: the actions in an execution are linearly ordered.
 \begin{example}
   \label{ex:histories}
 
-  TODO DRAW THE HISTORY/IES CORRESPONDING TO A/SOME PREVIOUS EXECUTION/S
-  \todo{Show that histories are an abstraction of executions, i.e., there are
-  different executions that have the same history}
-
+ Figure~\ref{fig:stacks}(d) pictures the history $h$ in Figure~\ref{fig:stacks}(b) as an interval order.
+ Each operation is represented by an integer-bounded interval on the real number line such that
+ $o_1<o_2$ iff the interval associated to $o_1$ finishes before the interval associated to $o_2$.
+  
 \end{example}
 
 \noindent
@@ -111,7 +122,9 @@ u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
 
 \begin{example}
 
-SHOW TWO HISTORIES SATISFYING THE WEAKER THAN RELATION.
+Figure~\ref{fig:stacks}(c) pictures a history $h'$ weaker than the history $h$ in Figure~\ref{fig:stacks}(b).
+Note that $h'$ contains two pending $\<pop>=>\bot$ operations, one of them is completed in $h$ 
+(it corresponds to the $\<pop>=>3$ operation) and one of them is omitted in $h$.
 
 \end{example}
 
