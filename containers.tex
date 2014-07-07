@@ -91,35 +91,35 @@ history $h |= @Y$ there exists some $h' \preceq h$ such that $A_n(h')|= @Y$.
 
 \begin{proof}
 
+ We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$, the other cutoffs can be proved
+ in a similar way.
+ 
  Since the formula $@Y_\mathrm{rv}$ constrains only the multiset of operation labels in a history,
  for each history $h=(O,<,f) |= @Y_\mathrm{rv}$ there exists the history $h'=(O,\emptyset,f)$
  such that $h' |= @Y_\mathrm{rv}$. The fact that $A_0(h')=h'$ implies that $@Y_\mathrm{rv}$ has
  cutoff $0$.
  
- Next, let $h=(O,<,f) |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$, $@l_3$, and $@l_4$ be the
+ Next, let $h=(O,<,f) |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$, $@l_1'$, and $@l_2'$ be the
  instances of the variables $x_1$, $x_2$, $y_1$, and $y_2$, respectively. We consider only the case
  when $total(y_1)>0$ holds (the other case is similar). Besides the constraints on operation labels, 
- the formula $@Y_\mathrm{fv}$ states that all $@l_1$ operations end before an $@l_2$ operation
- starts and all $@l_3$ operations end before an $@l_4$ operation starts. 
+ the formula $@Y_\mathrm{fv}$ states that all $@l_1$ operations end before an $@l_1'$ operation
+ starts and all $@l_2$ operations end before an $@l_2'$ operation starts. 
+ Let $I:O->[n]^2$ be the canonical representation of $h$. Also, let $j_1$ (resp., $j_2$) be the maximum upper bound
+ of an interval associated to an $@l_1$ (resp., $@l_3$) operation, i.e.,
+ \begin{align*}
+ j_1 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_1},\\
+  j_2 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_2}.
+ \end{align*}
  
-  TODO UNFINISHED
-  
- Let $O_1$ be the 
- last finishing $@l_1$ operations (i.e., the maximal elements $o\in O$ with $f(o)=@l_1$)
- and $O_3$ the last finishing $@l_3$ operations.
- We define a weaker history 
- $h'\preceq h$, which preserves only the ordering constraints $o_1<o_2$ between operations $o_1$ that end before some
- operation in $O_1$ (resp., $O_3$) ends and operations $o_2$ that start after all operations in $O_1$ (resp., $O_3$) end.
- Therefore, all operations in $h'$ that finish before 
-
- 
+ We define a weaker history $h'\preceq h$, which contains exactly the same set of operations but it 
+ preserves only the ordering constraints $o_1<o_2$ such that 
+ $I(o_1)\subseteq [0,j_1]$ and $I(o_2)\subseteq [j_1,\infty]$, or  $I(o_1)\subseteq [0,j_2]$ and $I(o_2)\subseteq [j_2,\infty]$.
  Clearly, the 
  length of $h'$ is at most 2 
 % (it can be 1 when there is no operation that starts after the last finishing 
 % $@l_1$ operation and before the last $@l_3$ operation finishes), 
  and $h'|= @Y_\mathrm{fv}$. Finally, since 
  $A_2(h')=h'$, it follows that $@Y_\mathrm{rv}$ has cutoff $2$.
-
 \end{proof}
 
 \begin{corollary}
