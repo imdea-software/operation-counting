@@ -18,10 +18,13 @@
   \node at (0,6mm) {\elemspan[8mm]{1}};
   \node at (14mm,12mm) {\elemspan[23mm]{2}};
   \node at (28mm,6mm) {\elemspan[12mm]{3}};
-  \node at (34mm,12mm) (n1) {};
+  \node at (33.5mm,12mm) (n1) {};
   \node (n2) [right=3mm of n1] {};
   \draw[dotted,line width=1pt] (n1) -- (n2);
   \node at (53mm,12mm) {\elemspan[12mm]{n\!-\!1}};
+  \node at (42mm,6mm) (n3) {};
+  \node (n4) [right=5mm of n3] {};
+  \draw[dotted,line width=1pt] (n3) -- (n4);
   \node at (61mm,6mm) {\elemspan{n}};
 
   % \node (x0) at (0,1) {};
