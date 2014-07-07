@@ -83,7 +83,7 @@ quotients.
                     &  /| \<before>(y,z) /| \big( \<isCRem>(z) \vee \<noPRem>(y) \big)
   \end{align*}
   \caption{Four families of operation-counting formulae characterizing atomic
-    data structure violations, parameterized by the constant $k \in
+    data structure violations, parameterized by the interval length $k \in
     \protect\<Nats>$. Predicates begin with capital letters, and macros begin
     in lowercase.
   }
@@ -166,7 +166,8 @@ such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
   completed, yet $\<pop> => v$ has not yet begun.
   \begin{figure}
     \input{figures/history-empty-violation.tikz}
-    \caption{The general form of an empty violation.}
+    \caption{A family of empty violations, parameterized by $n \in 
+      \protect\<Nats>$.}
     \label{fig:history:emptyv}
   \end{figure}
   It follows that any such history would not be included in the histories
