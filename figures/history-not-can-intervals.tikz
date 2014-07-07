@@ -24,7 +24,7 @@
 \node[lnode] (y9)  [right of =y8] {}; 
 
 \node[nnode] (zx1) [below= 1.3cm of x1,label=below:{\tt 0}] {};
-\node[nnode] (u1) [below= .6cm of y9,xshift=2cm] {};
+\node[nnode] (u1) [below= .6cm of y9,xshift=1cm] {};
 \node[nnode] (zx2) [below= 1.3cm of x2,label=below:{\tt 1}] {};
 \node[nnode] (zx3) [below= 1.3cm of x3,label=below:{\tt 2}] {};
 \node[nnode] (zx6) [below= 1.3cm of x6,label=below:{\tt 10}] {};
