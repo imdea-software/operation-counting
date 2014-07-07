@@ -63,7 +63,7 @@ quotients.
                     & \text{ for all predicates } \<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>} \\
     \<isAdd>(x)     &= (\<PAdd>(x)\vee \<CAdd>(x))\land \<total>(x) > 0 \\
 %    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
-    \<before>(x,y)  &= \exists i.\ \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
+    \<before>(x,y)  &= \bigvee_{0 \le i < k} \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
     \<noAdd>(x)     &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
     \<lessAdds>(x)  &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
     \<noPRem>(x) &= \forall y.\ ( \neg \<isPRem>(y) \vee \<before>(x,y)) \\
