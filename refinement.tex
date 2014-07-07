@@ -122,7 +122,8 @@ Libraries dictate the execution of methods between their call and return
 points. Accordingly, a library cannot prevent a method from being called,
 though it can decide not to return. Furthermore, any library action performed
 in the interval between call and return points can also be performed should the
-call have been made earlier, and/or the return made later. Our technical
+call have been made earlier, and/or the return made later \alert{(call and return actions
+do not modify the state of the library)}. Our technical
 results rely on these properties. A library thus allows any sequence of
 invocations to its methods made by \emph{some} program.
 
@@ -137,7 +138,7 @@ invocations to its methods made by \emph{some} program.
     if $e \cdot c \cdot e'$ is well formed.
   
     \item Call actions $c \in C$ cannot disable other actions: \\
-    $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e \in E(L)$.
+    $e \cdot a \cdot c \cdot e' \in E(L)$ implies $e \cdot c \cdot a \cdot e' \in E(L)$.
   
     \item Return actions $r \in R$ cannot enable other actions: \\
     $e \cdot r \cdot a \cdot e' \in E(L)$ implies $e \cdot a \cdot r \cdot e' \in E(L)$.

@@ -41,9 +41,10 @@ While the general concept of histories allows arbitrary partial orders of
 operations, any history $H(e)$ arising from an LTS execution $e$ falls into a
 restricted class called \emph{interval orders}. Intuitively, this is because
 our execution model assumes that operations share a common notion of global
-time: the \emph{pasts} of any two operations (formalized in
-Section~\ref{sec:counting} as the set of operations that have completed before
-a given operation starts) cannot be incomparable.
+time: \alert{the actions in an execution are linearly ordered}.
+%the \emph{pasts} of any two operations (formalized in
+%Section~\ref{sec:counting} as the set of operations that have completed before
+%a given operation starts) cannot be incomparable.
 
 \begin{definition}
 
@@ -68,7 +69,6 @@ a given operation starts) cannot be incomparable.
   that $i_1 < i_3$ and $i_2 < i_4$. Since $<$ linearly orders $\set{i_1, i_2,
   i_3, i_4}$, either $i_1 < i_4$, in which case $o_1 < o_4$, or $i_4 < i_1$, in
   which case $i_2 < i_4 < i_1 < i_3$, so $o_2 < o_3$.
-
 \end{proof}
 
 \begin{example}
@@ -101,10 +101,10 @@ injection $g: O_2 -> O_1$ such that
 
   \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
 
-  \item $f_1(g(o)) \preceq f_2(o)$ for each $o \in O_2$.
+  \item $f_1(g(o)) \alert{\ll} f_2(o)$ for each $o \in O_2$.
 
 \end{itemize}
-where $(m_1(u_1) => v_1) \preceq (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
+where $(m_1(u_1) => v_1) \alert{\ll} (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
 u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
 \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. 
 \end{definition}
@@ -123,7 +123,7 @@ histories, i.e.,~if $h_1$ and $h_2$ are equivalent and $h_1 \in H$, then $h_2
 \subsection{History Inclusion is Equivalent to Refinement}
 
 We prove that refinement between two libraries is equivalent to containment
-between their histories. Before that, we give two lemmas which characterize the
+between their \alert{sets of }histories. Before that, we give two lemmas which characterize the
 set of histories $H(L)$ of a library $L$. First, the closure properties on
 $E(L)$ imply that whenever $H(L)$ contains some history $h_1$, it also contains
 all histories $h_2$ weaker than $h_1$. Thus, if $h_1$ is the history of an
@@ -174,7 +174,13 @@ $h\in H(L)$.
 %\noindent
 
 Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply the
-equivalence between refinement and history inclusion.
+equivalence between refinement and history inclusion. \alert{Thus, if 
+$L_1 \leq L_2$, then for any history $h\in H(L_1)$, one can build a program $P_h$ 
+which composed with the library $L_2$ has an execution $e$ such that $h\preceq H(e)$.
+Since libraries are closed under weakening and $H(e)\in H(L_2)$, it follows that $h\in H(L_2)$.
+For the reverse, if $H(L_1) \subseteq H(L_2)$, then every execution $e$ of some program $P$ 
+composed with $L_1$ is reproducible when $P$ is composed with $L_2$. This follows from
+the fact that $H(e)\in H(L_2)$ and from the closure property in Lemma~\ref{lem:lib:execs}.}
 
 \begin{theorem}
   \label{thm:equivalence}
@@ -231,5 +237,4 @@ equivalence between refinement and history inclusion.
   H(L_1)$ by definition of $H(L_1)$, and then $H(e) \in H(L_2)$ by hypothesis.
   By Lemma~\ref{lem:lib:execs} we deduce $(e | C \cup R) \in E(L_2)$, and
   thus by definition of LTS composition, $e \in E(P \x L_2)$.
-
 \end{proof}
