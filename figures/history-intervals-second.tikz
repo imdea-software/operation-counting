@@ -20,7 +20,7 @@
 
 
 \node[nnode] (y1) [below= 1.2cm of x1,label=below:{\tt 0}] {};
-\node[nnode] (y2) [below= .5cm of x5,xshift=2cm] {};
+\node[nnode] (y2) [right=7cm of y1] {};
 \node[nnode] (z2) [below= .5cm of x2,label=below:{\tt 1}] {};
 \node[nnode] (z3) [below= .5cm of x3,label=below:{\tt 2}] {};
 \node[nnode] (z4) [below= .5cm of x4,label=below:{\tt 3}] {};
