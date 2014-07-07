@@ -15,12 +15,12 @@ we argue that our $k$-approximation:
 \end{itemize}
 
 To argue these points, we have studied actual concurrent data structure
-implementations in C/C++, including the Scal High-Performance
-Multicore-Scalable Computing
-suite\footnote{\url{http://scal.cs.uni-salzburg.at}}. Some of these
-implementations, such as the Michael-Scott Queue~\cite{conf/podc/MichaelS96},
-are meant to preserve observational refinement\footnote{More precisely, they
-have been designed to be linearizable.}, while others, such as Kirsch et al.'s
+implementations in C/C++, including the
+Scal\footnote{\url{http://scal.cs.uni-salzburg.at}} High-Performance
+Multicore-Scalable Computing suite. Some of these implementations, such as the
+Michael-Scott Queue~\cite{conf/podc/MichaelS96}, are meant to preserve
+observational refinement\footnote{More precisely, they have been designed to be
+linearizable.}, while others, such as Kirsch et al.'s
 $k$-FIFO~\cite{conf/pact/KirschLP13}, are meant to preserve weaker properties.
 Unless otherwise noted, we use these implementations without modification,
 except to annotate methods with a fixed set of possible preemption points,
@@ -48,9 +48,10 @@ given number $n \in \<Nats>$ of rounds \emph{symbolically}: we use
 CSeq~\cite{conf/ase/FischerIP13} to sequentialize a simple program which
 invokes a limited number of library methods, and then
 CBMC~\cite{conf/tacas/KroeningT14} (version 4.5) to perform bounded model
-checking up to a given loop unroll bound. All measurements were made on similar
+checking up to a given loop-unroll bound. All measurements were made on similar
 MacBook Pro 2.XGHz Intel Core i5/i7 machines. While space prohibits including
-the entirety of our measurements, we do include a representative sample.
+the entirety of our experiments, we do include a representative sample and
+analysis.
 
 \subsection{Coverage of Refinement Violations}
 \label{sec:exp:coverage}
@@ -69,16 +70,15 @@ i.e.,~for which $A_k(H(e')) \preceq H(e)$.
 Figure~\ref{fig:data:coverage} demonstrates that $A_k$ covers most or all
 violations with small values of $k$. While $A_4$ suffices to cover all
 violations at nearly all data points --- besides the first point, where the
-sample size of executions ($1023$) is small relative to the number of
-operations ($8$) --- all values $k > 0$ capture a nontrivial and increasing
-number of violations. In fact, as the execution-sample size increases (the
-x-axis is ordered by number of executions over operations) the value of $k$
-required to capture a violation appears to decrease, all violations being
-captured by $A_3$ after a certain point. Note that this data set only exhibits
-\emph{order violations} for a FIFO-based container object, i.e.,~where elements
-are removed out of order; in general, there is no cutoff value of $k \in
-\<Nats>$ for which all ``empty violations'' of such an object can be captured;
-see Section~\ref{sec:containers}.
+sample size of $1023$ executions is small relative to the $8$ operations ---
+all values $k > 0$ capture a nontrivial and increasing number of violations. In
+fact, as the execution-sample size increases (the x-axis is ordered by number
+of executions over operations) the value of $k$ required to capture a violation
+appears to decrease, all violations being captured by $A_3$ after a certain
+point. Note that this data set only exhibits \emph{order violations} (see
+Section~\ref{sec:containers}), i.e.,~where elements are removed out of order;
+in general, there is no cutoff value of $k \in \<Nats>$ for which all
+\emph{empty violations} can be captured with $A_k$.
 
 \begin{figure}
   \centering
@@ -141,32 +141,31 @@ runtime monitoring, where the number of operations grows without limit.
 \subsection{Operation Counting for Static Analysis}
 \label{sec:exp:static}
 
-Here we demonstrate that our approximation $A_k$ also leads to an effective
-static means of detecting refinement violations, due to the simplicity of an
-operation-counting based implementation. Essentially, in using only simple
-increment and decrement operations on integer counters, we are able to leverage
-static verification tools that are capable of integer reasoning. We have found
-that the major obstacle in leveraging such tools is concurrency: even though
-the required counter reasoning is simple, reasoning precisely about program
-concurrency is a formidable challenge, with or without our operation-counting
-instrumentation.
+Our approximation $A_k$ also leads to an effective static means of detecting
+refinement violations, due to the simplicity of an operation-counting based
+implementation. Essentially, by using only simple increment and decrement
+operations on integer counters, we are able to leverage static verification
+tools that are capable of integer reasoning. We have found that the major
+obstacle in leveraging such tools is concurrency: even though the required
+counter reasoning is simple, reasoning precisely about program concurrency is a
+formidable challenge, with or without our operation-counting instrumentation.
 
-Despite the difficultly of static concurrency reasoning, we have successfully
-applied our approach using two different static-verification backends: one
-based on SMACK~\cite{conf/cav/RakamaricE14} and Corral~\cite{conf/cav/LalQL12},
-and the other based on CSeq~\cite{conf/ase/FischerIP13} and
-CBMC~\cite{conf/tacas/KroeningT14}. Both toolchains are based on
-sequentialization~\cite{journals/fmsd/LalR09} and SMT-based bounded model
-checking. Our results in Table~\ref{tab:exp:static} report only on the latter
-toolchain. Among $5$ data structure implementations, we manually injected $9$
-realistic concurrency bugs. All bugs were uncovered as refinement violations
-with approximation $A_0$ or $A_1$, in round-robin executions of up to $4$
-rounds, of a program with at most $4$ {\sf push} and $4$ {\sf pop} operations,
-and with loops unrolled up to $2$ times. Although the time complexity of
-concurrent exploration is high independently of our operation-counting
-instrumentation, particularly as the number of rounds increases, one clearly
-observes that our approximation is effective in detecting violations even
-statically.
+Despite the difficultly of concurrency reasoning statically, we have
+successfully applied our approach using two different static-verification
+backends: one based on SMACK~\cite{conf/cav/RakamaricE14} and
+Corral~\cite{conf/cav/LalQL12}, and the other based on
+CSeq~\cite{conf/ase/FischerIP13} and CBMC~\cite{conf/tacas/KroeningT14}. Both
+toolchains are based on sequentialization~\cite{journals/fmsd/LalR09} and
+SMT-based bounded model checking. Our results in Table~\ref{tab:exp:static}
+report only on the latter toolchain. Among $5$ data structure implementations,
+we manually injected $9$ realistic concurrency bugs. All bugs were uncovered as
+refinement violations with approximation $A_0$ or $A_1$, in round-robin
+executions of up to $4$ rounds, of a program with at most $4$ {\sf push} and
+$4$ {\sf pop} operations, and with loops unrolled up to $2$ times. Although the
+time complexity of concurrent exploration is high independently of our
+operation-counting instrumentation, particularly as the number of rounds
+increases, one clearly observes that our approximation is effective in
+detecting violations statically.
 
 \begin{table}[t]
   \footnotesize
