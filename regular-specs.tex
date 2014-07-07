@@ -2,104 +2,105 @@
 \section{Atomic Libraries with Context-Free Kernels}
 \label{sec:regular}
 
-We prove that for every atomic library $L$ over a fixed-size set of methods $\<Methods>$ and values $\<Vals>$, 
- there exists an effectively computable
-$\ocl$ formula $@Y_L[k]$ representing $L$ up to $k$, for every $k$, provided that the kernel of $L$ is a context-free 
-language. This result offers a systematic method for constructing formulas that represent bounded length
-histories of atomic libraries implementing locks, read-write locks, semaphores, etc., or approximations
-of arbitrary libraries.
+While the previous sections provide operation-counting formulae for particular
+classes of atomic objects, here we provide a systematic technique to derive
+operation-counting formulae for any atomic library that can be written as a
+context-free language, including objects such as (reader-writer) locks and
+semaphores, or context-free approximations of arbitrary libraries. For this
+construction we require finite sets $\<Methods>$ and $\<Vals>$ of methods and
+values. Given an atomic library $L$ such that $\ker E(L)$ is context free, and
+an interval bound $k \in \<Nats>$, we generate a formuala $@Y_{L,k}$
+representing $L$ up to $k$.
 
-More precisely, we show that there exists a context-free regular language $\Gamma_k$, whose Parikh image is exactly 
-the set of counting representations of histories in $L$ of length at most $k$. We recall that the \emph{Parikh image} of a 
-sequence $@s \in @S$ is the multiset $\Pi(@s) : @S -> \<Nats>$ mapping each symbol $a \in @S$ to the 
-number of occurrences of $a$ in $@s$. The \emph{Parikh image} of a language $L \subseteq @S$are the images $\Pi(L) = \set{\Pi(@s) : @s \in L}$ of sequences in $L$.
-The language $\Gamma_k$ is context-free because it is the intersection between a regular language and the inverse of 
-an homomorphism from $\Gamma_k$ to some context-free language $\Lambda$, obtained from $\ker E(L)$.
-%(here, we use the closure of context-free languages under 
-%inverse homomorphisms and intersection with regular languages). 
-Then, $@Y_L[k]$ is defined as the quantifier-free Presburger
-formula representing the Parikh image of $\Gamma_k$ (which exists by Parikh theorem~\cite{journals/jacm/Parikh66}).
+Our construction relies on Parikh's Theorem~\cite{journals/jacm/Parikh66}. We
+recall that the \emph{Parikh image} of $w \in @S^*$ is the multiset $\Pi(w) :
+@S -> \<Nats>$ mapping each symbol $a \in @S$ to its number of occurrences in
+$w$, and the \emph{Parikh image} of a language $M \subseteq @S^*$ is the set
+$\Pi(M) = \set{ \Pi(w) : w \in L }$ of its words' images. We show that if $\ker
+E(L)$ is context free, then the language $M_k = \set{ e \in E(L) : \len H(e)
+\le k}$ of $L$'s executions with bounded-length histories is also context free,
+and by Parkikh's Theorem, $\Pi(M_k)$ can be represented as a Presburger
+formula, from which we derive $@Y_{L,k}$.
 
 \begin{theorem}
 
-Let $L$ be an atomic library over a set of methods $\<Methods>$ of fixed size such that  
-$\ker E(L)$ is a context-free language. Then, for every $k$, there exists an effectively computable 
-$\ocl$ formula $@Y_L[k]$ representing $L$ up to $k$.
+  Let $L$ be an atomic library over finite sets $\<Methods>$ and $\<Vals>$ of
+  methods and values such that $\ker E(L)$ is a context-free language, and let
+  $k \in \<Nats>$. Then there exists an effectively-computable
+  operation-counting formula $@Y_{L,k}$ representing $L$ up to $k$.
 
 \end{theorem}
 
 \begin{proof}
 
-Let $@L$ be the context-free language obtained from $\ker E(L)$ by replacing every pair of consecutive actions
-$m(u)_o\ \<ret>(v)_o$ by $m(u)=>v$. Note that every sequence $\sigma$ in $@L$
-represents a history $h=(O,<,f)\in H(\ker E(L))$ in the sense that the multiset of symbols in $\sigma$ is exactly the
-multiset $\mset{ f(o): o\in O}$ of operation labels in $h$ and every two operation labels in $\sigma$ occur
-in the order defined by $<$, i.e., for every two operations $o_1,o_2\in O$, if $o_1<o_2$, then $f(o_1)$ 
-occurs before $f(o_2)$ in $\sigma$.
+Let $@L$ be the context-free language obtained from $\ker E(L)$ by replacing
+every pair of consecutive actions $m(u)_o\ \<ret>(v)_o$ by $m(u)=>v$. Note that
+every sequence $\sigma$ in $@L$ represents a history $h=(O,<,f)\in H(\ker
+E(L))$ in the sense that the multiset of symbols in $\sigma$ is exactly the
+multiset $\mset{ f(o): o\in O}$ of operation labels in $h$ and every two
+operation labels in $\sigma$ occur in the order defined by $<$, i.e., for every
+two operations $o_1,o_2\in O$, if $o_1<o_2$, then $f(o_1)$ occurs before
+$f(o_2)$ in $\sigma$.
 
-Let $h=(O,<,f)\in H(L)$ be a history of length at most $k$ and $I:O -> [k]^2$ its canonical representation. 
-Since there exists a sequential history $h'=(O',<',f')\in H(\ker E(L))$ (where the operations are totally ordered) 
-such that $h\preceq h'$, $h$ can be written as a sequence
-of symbols \tup{f(o),I(o),b} that is consistent with the order between operations defined by $<'$. The boolean $b$
-is $\<true>$ iff the operation $o$ belongs to the sequential history $h'$. Formally,
-let $\<Lab>$ be the following alphabet:
-\[
-\<Lab>=\set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
-\]
+Let $h=(O,<,f)\in H(L)$ be a history of length at most $k$ and $I:O -> [k]^2$
+its canonical representation. Since there exists a sequential history
+$h'=(O',<',f')\in H(\ker E(L))$ (where the operations are totally ordered) such
+that $h\preceq h'$, $h$ can be written as a sequence of symbols
+\tup{f(o),I(o),b} that is consistent with the order between operations defined
+by $<'$. The boolean $b$ is $\<true>$ iff the operation $o$ belongs to the
+sequential history $h'$. Formally, let $\<Lab>$ be the following alphabet:
 
-Let $\lab(h):O -> \<Lab>$ be a mapping associating to each operation $o$ a symbol in $\<Lab>$:
-\[
-\lab(h)(o)=\left\{\begin{array}{ll}\tup{f(o),I(o),\<true>},\mbox{ if $o\in O'$}\\
-						\tup{f(o),I(o),\<false>},\mbox{ otherwise.}
-			\end{array}
-		\right.
-\]
+\begin{align*}
+  \<Lab> = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
+\end{align*}
 
-Then, let $\alpha(h)$ be a sequence over $\<Lab>$, that contains exactly the same 
-multiset of symbols as the range of $\lab(h)$ and for every $o_1<' o_2$, $\lab(h)(o_1)$ 
-occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
+Let $\lab(h):O -> \<Lab>$ be a mapping associating to each operation $o$ a
+symbol in $\<Lab>$:
+\begin{align*}
+  \lab(h)(o)=\left\{\begin{array}{ll}\tup{f(o),I(o),\<true>},\mbox{ if $o\in O'$}\\
+  						\tup{f(o),I(o),\<false>},\mbox{ otherwise.}
+  			\end{array}
+  		\right.
+\end{align*}
 
-%\begin{itemize}
-%	\item the multiset of symbols in $\alpha(h)$ is exactly the multiset of symbols in the range of $\lab(h)$, and 
-%	\item for every $o_1<' o_2$, $\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
-%\end{itemize}
+Then, let $\alpha(h)$ be a sequence over $\<Lab>$, that contains exactly the
+same multiset of symbols as the range of $\lab(h)$ and for every $o_1<' o_2$,
+$\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
 
-Since $h\preceq h'$, whenever an operation $o_1$ is ordered before another operation $o_2$ in 
-the sequential history $h'$, the interval $I(o_1)$ is either before or it is overlapping with $I(o_2)$.
-Therefore, the order between intervals in the sequence $\alpha(h)$ is not arbitrary. More precisely, 
-if a symbol $\tup{@l_1,i_1,j_1,b_1}$ occurs before another symbol $\tup{@l_2,i_2,j_2,b_2}$, 
-then $i_1\leq j_2$. A sequence $\sigma\in\<Lab>^*$ satisfying this property is called 
-\emph{interval-consistent}. 
+Since $h\preceq h'$, whenever an operation $o_1$ is ordered before another
+operation $o_2$ in the sequential history $h'$, the interval $I(o_1)$ is either
+before or it is overlapping with $I(o_2)$. Therefore, the order between
+intervals in the sequence $\alpha(h)$ is not arbitrary. More precisely, if a
+symbol $\tup{@l_1,i_1,j_1,b_1}$ occurs before another symbol
+$\tup{@l_2,i_2,j_2,b_2}$, then $i_1\leq j_2$. A sequence $\sigma\in\<Lab>^*$
+satisfying this property is called \emph{interval-consistent}.
 
-Now, let $\mu:\<Lab> -> \<Methods>^*$ be an homomorphism defined by
-$\mu(\tup{@l,i,j,\<true>})=@l$ and $\mu(\tup{@l,i,j,\<false>})=\epsilon$,
-%\[
-%\mu(\tup{@l,i,j,b})=\left\{\begin{array}{ll} @l,\mbox{ if $b=\<true>$}\\
-%						\epsilon,\mbox{ otherwise}
-%			\end{array}
-%		\right.
-%\]
-where $\epsilon$ is the empty sequence.
+Now, let $\mu : \<Lab> -> \<Methods>^*$ be an homomorphism defined by
+$\mu(\tup{@l,i,j,\<true>}) = @l$ and $\mu(\tup{@l,i,j,\<false>}) = @e$, where
+$@e$ denotes the empty sequence.
 
-It follows easily from definitions that $\mu(\alpha(h))\in @L$, for every history $h$. On the other hand, $\mu^{-1}(@L)$ may contain
-sequences which do not correspond to valid histories of $L$ because they are not interval-consistent. However,
-%if $_k$ is the set of all sequences $\alpha(h)$ with $h$ a history of $\atLib{S}$ of length at most $k$, i.e.,
-%$S_k=\set{\alpha(h):h\in \atLib{S}\mbox{ of length $k$}}$, then 
-one can prove that
-\[
-\Gamma_k=\set{\alpha(h):h\in H(L)\mbox{ of length $k$}}=\mu^{-1}(@L)\cap \Delta_k,
-\]
-where $\Delta_k$ is the language of all interval-consistent sequences with interval bounds at most $k$. 
-Since the latter is regular and the context-free languages
-are closed under intersection with regular languages and inverse homomorphisms, the language $\Gamma_k$ is context-free.
+It follows easily from definitions that $\mu(\alpha(h))\in @L$, for every
+history $h$. On the other hand, $\mu^{-1}(@L)$ may contain sequences which do
+not correspond to valid histories of $L$ because they are not
+interval-consistent. However, one can prove that
+\begin{align*}
+  \Gamma_k=\set{\alpha(h):h\in H(L)\mbox{ of length $k$}}=\mu^{-1}(@L)\cap \Delta_k,
+\end{align*}
+where $\Delta_k$ is the language of all interval-consistent sequences with
+interval bounds at most $k$. Since the latter is regular and the context-free
+languages are closed under intersection with regular languages and inverse
+homomorphisms, the language $\Gamma_k$ is context-free.
 
-Hence, by Parikh theorem~\cite{journals/jacm/Parikh66}, there exists a quantifier-free Presburger formula $@Y[k]$ representing the Parikh image of $\Gamma_k$.
-W.l.o.g. we assume that the free variables of $@Y[k]$ are $\# a$ with $a\in\<Lab>$ ($\# a$ is the number of 
-occurrences of $a$ in a sequence of $\Gamma_k$).
+Hence, by Parikh's theorem~\cite{journals/jacm/Parikh66}, there exists a
+quantifier-free Presburger formula $@Y$ representing the Parikh image of
+$\Gamma_k$. W.l.o.g. we assume that the free variables of $@Y$ are $\set{ \#a :
+a \in \<Lab> }$, where $\#a$ represents the number of occurrences of $a$ in a
+sequence of $\Gamma_k$.
 
-We define $@Y_L[k]$ as the quantifier-free Presburger formula obtained from 
-\[
-@Y[k]\ \land \hspace{-1mm}\bigwedge_{(@l,i,j)}\#(@l,i,j)=\# \tup{@l,i,j,\<true>} + \# \tup{@l,i,j,\<false>}
-\]
-by projecting out all variables of $@Y[k]$.
+We define $@Y_{L,k}$ as the quantifier-free Presburger formula
+\begin{align*}
+  @Y \land
+  \bigwedge_{(@l,i,j)} \#(@l,i,j) = \# \tup{@l,i,j,\<true>} + \# \tup{@l,i,j,\<false>}
+\end{align*}
+which projects away the variables of $@Y$.
 \end{proof}
