@@ -49,11 +49,9 @@ that $h\preceq h'$, $h$ can be written as a sequence of symbols
 \tup{f(o),I(o),b} that is consistent with the order between operations defined
 by $<'$. The boolean $b$ is $\<true>$ iff the operation $o$ belongs to the
 sequential history $h'$. Formally, let $\<Lab>$ be the following alphabet:
-
 \begin{align*}
   \<Lab> = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
 \end{align*}
-
 Let $\lab(h):O -> \<Lab>$ be a mapping associating to each operation $o$ a
 symbol in $\<Lab>$:
 \begin{align*}
@@ -62,7 +60,6 @@ symbol in $\<Lab>$:
   			\end{array}
   		\right.
 \end{align*}
-
 Then, let $\alpha(h)$ be a sequence over $\<Lab>$, that contains exactly the
 same multiset of symbols as the range of $\lab(h)$ and for every $o_1<' o_2$,
 $\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
