@@ -56,13 +56,12 @@ $A_k(h) \in H(L_1) \setminus H(L_2)$.
 Our key challenge is to develop approximation functions $A_k$ for which history
 inclusion can be computed in polynomial time for fixed $k$, and for which
 observational refinement violations surface with small $k$. We demonstrate the
-latter in Sections~\ref{sec:registers}--\ref{sec:exp}.
+latter in Sections~\ref{sec:containers}--\ref{sec:exp}.
 
 In this section we develop a schema of approximation functions for which the
 approximate history inclusion problem is polynomial-time computable. Our
 development exploits structural aspects of the history inclusion problem; in
-particular, we exploit the fact that histories are not arbitrary partial
-orders, but rather are \emph{interval orders}, with a natural measure of
+particular, we exploit the fact that histories are \emph{interval orders}, with a natural measure of
 complexity, i.e.,~the interval order \emph{length}~\cite{phd/Greenough76}.
 Leveraging this notion of length, we abstract each history $h$ to a weaker
 history $A_k(h)$ whose length is bounded by $k$, and represent the set $H(L)$
@@ -125,8 +124,7 @@ practice.
 
 Interval orders have canonical representations which associate to operations
 integer-bounded intervals on the real number line; their canonical
-representations minimize the number of distinct integer-bound values to one
-plus the interval-order length.
+representations minimize the interval bounds to the interval-order length.
 
 \begin{lemma}[Greenough~\cite{phd/Greenough76}]
   \label{lem:representation}
@@ -162,7 +160,7 @@ representation $I : O -> [n]^2$, as the multiset
 \end{align*}
 of label-and-interval pairs; defining $\Pi(L) = \set{ \Pi(h) : h \in
 H(L) }$ yields a criterion equivalent to history inclusion based on counting
-representations.
+representations (which follows  from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}).
 
 \begin{lemma}
 
@@ -170,10 +168,10 @@ representations.
 
 \end{lemma}
 
-\begin{proof}
-
-  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
-\end{proof}
+%\begin{proof}
+%
+%  Follows from Lemmas~\ref{lem:intervals} and~\ref{lem:representation}.
+%\end{proof}
 
 \begin{example}
 
@@ -231,29 +229,17 @@ formula $@Y$ is the maximum number of nested quantifiers in $@Y$. An operation
 counting formula $@Y$ \emph{represents a library $L$ up to $k$} when $h \in
 H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
 
-\begin{lemma}
+\begin{lemma}\label{lemma:satisfaction}
 
-  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
-  polynomial time, for fixed $k$, given an operation counting formula
-  $@Y$ for $L$ up to $k$, of fixed quantifier rank.
+  Checking if a history $h$ satisfies an operation counting formula
+  $@Y$ of fixed quantifier rank is decidable in polynomial time.
 
 \end{lemma}
 
 \begin{proof}\let\qed\relax
 
-  Since $A_k(h)$ is required to be polynomial-time computable, and deciding
-  $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
-  has length at most $k$, it remains only to show $A_k(h) |= @Y$ is
-  polynomial-time decidable. This follows from the facts that:
-  \begin{itemize}
-
-    \item $A_k(h)$ is polynomial-time computable (see Lemma~\ref{lem:representation}),
-
-    \item functions and predicates are polynomial-time computable, and
-
-    \item quantifiers are only instantiated over labels occurring in $h$.
-
-  \end{itemize}
+  This follows from the facts that: (1) the canonical representation of $h$ is polynomial-time computable (see Lemma~\ref{lem:representation}),
+  (2) functions and predicates are polynomial-time computable, and (3) quantifiers are only instantiated over labels occurring in $h$.
   The latter implies that quantifiers can be replaced by a disjunction over the
   labels occurring in $h = \tup{O,f,<}$:
   \begin{align*}
@@ -302,8 +288,8 @@ For a given history $h = \tup{O,f,<}$ let
   h \oplus \<ret>(v)_o & =
     \tup{O, f[o |-> m(u) => v], <} \text{ s.t. } f(o) = m(u) => \bot
 \end{align*}
-where $<'$ is the transitive closure of $\mathbin{<} \cup \set{ \tup{o',o} :
-f(o') = \_(\_) => \bot}$ relating all completed operations to $o$. As the
+where $<'$ is the transitive closure of $\mathbin{<} \cup \{ \tup{o',o} :
+f(o') = \_(\_) => v\neq \bot\}$ relating all completed operations to $o$. As the
 following lemma shows, the $\oplus$ operator allows us to manipulate our
 $k$-approximations $A_k(H(e))$ directly, without having to maintain the precise
 history $H(e)$ of an execution $e$. Note that besides maintaining $A_k(H(e)$,
@@ -365,7 +351,7 @@ representation $\pi$. Formally, for all $@l \in \<Labels>$, and $0 \le i \le j
   \overleftarrow{\pi}(@l,[i,j])
   & = @n(\pi(@l,[i+1,j+1]), i<k \land j<k) \\
   & + @n(\pi(@l,[i,j+1]), i=0 \land j<k) \\
-  & + @n(\pi(@l,[i+1,j]), i<k \land j=0) \\
+%  & + @n(\pi(@l,[i+1,j]), i<k \land j=0) \\
   & + @n(\pi(@l,[i,j]), i=0 \land j=0),
 \end{align*}
 and if $@l$ is pending then
@@ -445,14 +431,34 @@ computes $A_k(H(e))$.
   \label{thm:counting:alg}
 
   Algorithm~\ref{alg:counting} computes the history approximation
-  $\Pi(A_k(H(e)))$ of an execution $e$ in $O(|\<Methods>| \cdot |\<Vals>|^2)$
+  $\Pi(A_k(H(e)))$ of an execution $e$ in $O(|\<Labels>| \cdot \<width>(e))$
   space\footnote{The space complexity of Algorithm~\ref{alg:counting} is
   constant in the number of operations when the size of integers is fixed, as
   in the case of modern computer architectures; otherwise, the space complexity
   is logarithmic in the number of operations, i.e.,~in execution length.} and
-  $O(|e|)$ time.
+  $O(|e|)$ time, where $\<width>(e)$ is the maximum number of overlapping operations
+  in $e$.
 
 \end{theorem}
+
+Note that, in the worst case, $\<width>(e)=|e|$. However, in practice, the number of
+overlapping operations is usally fixed and it doesn't influence the space complexity.
+
+\begin{corollary}
+
+  The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
+  polynomial time, for fixed $k$, given an operation counting formula
+  $@Y$ for $L$ up to $k$, of fixed quantifier rank.
+
+\end{corollary}
+
+\begin{proof}
+  
+  Follows from the fact that deciding $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
+  has length at most $k$, Theorem~\ref{thm:counting:alg}, and 
+  Lemma~\ref{lemma:satisfaction}.
+\end{proof}
+
 
 As an online monitor program $P_k$ for history approximation,
 Algorithm~\ref{alg:counting} effectively reduces the approximate refinement
@@ -468,7 +474,7 @@ $k$.
   inclusion $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$ is equivalent to
   the safety verification problem
   \begin{align*}
-    (P_k \x L_1) |= \Box \lnot @Y
+    (P_k \x L_1) |= \Box @Y
   \end{align*}
   where $@Y$ is interpreted over the $\mathsf{counters}$ array of $P_k$.
 
