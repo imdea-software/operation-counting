@@ -1,0 +1,67 @@
+%!TEX root = ../draft.tex
+\begin{tikzpicture}[node distance=1.5cm]
+
+\tikzstyle{node}=[minimum size=0pt]
+\tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
+\tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
+%\node[nnode] (x0) [] at (0,0) {};
+\node[lnode] (x1)  [label=above:${\tt push}(1)$] at (0,0) {};
+\node[lnode] (x2)  [below=.7cm of x1,xshift=1.5cm,label=above:$\hspace{1mm}{\tt pop}\Rightarrow 1$] {}; 
+\node[lnode] (x3)  [right of=x2,label=above:${\tt push}(2)$] {}; 
+\node[lnode] (x4)  [right of=x3,label=above:${\tt push}(3)$] {}; 
+\node[lnode] (x5)  [right of=x4,label=above:$\hspace{4mm}{\tt pop}\Rightarrow {\tt EMPTY}$] {}; 
+
+\node[lnode] (x6)  [above=.7cm of x2] {}; %label=above:${\tt pop}\Rightarrow {\tt EMPTY}$
+\node[lnode] (x7)  [above=.7cm of x4] {};
+%\node[nnode] (x61) [above=1mm of x6] {};
+%\node[nnode] (x62) [below=1mm of x6] {};
+%\node[nnode] (x71) [above=1mm of x7] {};
+%\node[nnode] (x72) [below=1mm of x7] {};
+
+
+\node[nnode] (y1) [below= 1.2cm of x1,label=below:{\tt 0}] {};
+\node[nnode] (y2) [below= .5cm of x5,xshift=2cm] {};
+\node[nnode] (z2) [below= .5cm of x2,label=below:{\tt 1}] {};
+\node[nnode] (z3) [below= .5cm of x3,label=below:{\tt 2}] {};
+\node[nnode] (z4) [below= .5cm of x4,label=below:{\tt 3}] {};
+\node[nnode] (z5) [below= .5cm of x5,label=below:{\tt 4}] {};
+
+\draw[->,>=stealth'] (y1) -- (y2);
+\draw[line width=2pt] (x6) -- node[draw=none,above] {${\tt pop}=>3$} (x7);
+%\draw[-,thick] (x61) -- (x62);
+%\draw[-,thick] (x71) -- (x72);
+
+\draw[dotted] (x1) -- (y1);
+\draw[dotted] (x6) -- (z2);
+\draw[dotted] (x3) -- (z3);
+\draw[dotted] (x7) -- (z4);
+\draw[dotted] (x5) -- (z5);
+
+%\node[lnode] (x3)  [right of=x2,label={[xshift=.6mm] left:{\footnotesize 1}}] {}; 
+%\node[lnode] (x6)  [right=60mm of x3,label=right:{\footnotesize 3}] {};  %8*7+4
+%
+%\node[lnode] (y1)  [below=6mm of x3,xshift=7mm,label=left:{\footnotesize 1}] {}; 
+%\node[lnode] (y2)  [right of=y1,label=right:{\footnotesize 1}] {}; 
+%\node[lnode] (y4)  [right=1.4cm of y2,label=left:{\footnotesize 2}] {}; 
+%\node[lnode] (y5)  [right of=y4,label=right:{\footnotesize 2}] {}; 
+%\node[lnode] (y6)  [right of=y5,label={[xshift=.6mm] left:{\footnotesize 3}}] {}; 
+%\node[lnode] (y7)  [right of=y6,label=right:{\footnotesize 3}] {}; 
+%
+%%\node[nnode] (x5)  [left=18mm of y7,yshift=-2mm] {}; 
+%
+%
+%\node[lnode] (y8)  [below=6mm of x6,xshift=10mm,label=left:{\footnotesize 4}] {}; 1*7+3
+%\node[lnode] (y9)  [right of =y8,label=right:{\footnotesize 4}] {}; 
+
+
+%\draw[line width=2pt] (x1) -- node[draw=none,above] {$\<push>(1)$} (x2); 
+%\draw[line width=2pt] (x3) -- node[draw=none,above] {$\<pop>=>3$} (x6);
+%%\draw[line width=2pt] (x5) -- (x6);
+%
+%\draw[line width=2pt] (y1) -- node[draw=none,above] {$\<pop>=>1$} (y2);
+%\draw[line width=2pt] (y4) -- node[draw=none,above] {$\<push>(2)$} (y5);
+%\draw[line width=2pt] (y6) -- node[draw=none,above] {$\<push>(3)$} (y7);
+%\draw[line width=2pt] (y8) -- node[draw=none,above] {$\<pop>=>{\tt EMPTY}$} (y9);
+
+
+\end{tikzpicture}
