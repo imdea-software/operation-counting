@@ -11,12 +11,12 @@
 \node[lnode] (x4)  [right of=x3,label=above:${\tt push}(3)$] {}; 
 \node[lnode] (x5)  [right of=x4,label=above:$\hspace{4mm}{\tt pop}\Rightarrow {\tt EMPTY}$] {}; 
 
-\node[nnode] (x6)  [below=.7cm of x2] {}; %label=above:${\tt pop}\Rightarrow {\tt EMPTY}$
-\node[nnode] (x7)  [below=.7cm of x4] {};
-\node[nnode] (x61) [above=1mm of x6] {};
-\node[nnode] (x62) [below=1mm of x6] {};
-\node[nnode] (x71) [above=1mm of x7] {};
-\node[nnode] (x72) [below=1mm of x7] {};
+\node[lnode] (x6)  [below=.7cm of x2] {}; %label=above:${\tt pop}\Rightarrow {\tt EMPTY}$
+\node[lnode] (x7)  [below=.7cm of x4] {};
+%\node[nnode] (x61) [above=1mm of x6] {};
+%\node[nnode] (x62) [below=1mm of x6] {};
+%\node[nnode] (x71) [above=1mm of x7] {};
+%\node[nnode] (x72) [below=1mm of x7] {};
 
 
 \node[nnode] (y1) [below= 1.2cm of x1,label=below:{\tt 0}] {};
@@ -28,8 +28,8 @@
 
 \draw[->,>=stealth'] (y1) -- (y2);
 \draw[-,thick] (x6) -- node[draw=none,above,xshift=-6mm] {${\tt pop}=>3$} (x7);
-\draw[-,thick] (x61) -- (x62);
-\draw[-,thick] (x71) -- (x72);
+%\draw[-,thick] (x61) -- (x62);
+%\draw[-,thick] (x71) -- (x72);
 
 \draw[dotted] (x1) -- (y1);
 \draw[dotted] (x2) -- (z2);
