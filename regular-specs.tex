@@ -2,7 +2,7 @@
 \section{Atomic Libraries with Context-Free Kernels}
 \label{sec:regular}
 
-While the previous sections provide operation-counting formulae for particular
+While the previous section provides operation-counting formulae for particular
 classes of atomic objects, here we provide a systematic technique to derive
 operation-counting formulae for any atomic library that can be written as a
 context-free language, including objects such as (reader-writer) locks and
@@ -18,9 +18,9 @@ recall that the \emph{Parikh image} of $w \in @S^*$ is the multiset $\Pi(w) :
 $w$, and the \emph{Parikh image} of a language $M \subseteq @S^*$ is the set
 $\Pi(M) = \set{ \Pi(w) : w \in L }$ of its words' images. We show that if $\ker
 E(L)$ is context free, then the language $M_k = \set{ e \in E(L) : \len H(e)
-\le k}$ of $L$'s executions with bounded-length histories is also context free,
-and by Parkikh's Theorem, $\Pi(M_k)$ can be represented as a Presburger
-formula, from which we derive $@Y_{L,k}$.
+\le k}$ of $L$'s executions with bounded-length histories is Parikh-equivalent
+to a context-free language, and by Parkikh's Theorem, $\Pi(M_k)$ can be
+represented as a Presburger formula, from which we derive $@Y_{L,k}$.
 
 \begin{theorem}
 
