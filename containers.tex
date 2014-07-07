@@ -7,16 +7,21 @@ most heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In
 this section we demonstrate that our approximation is effective in uncovering
 refinement violations to such atomic objects, in the sense that most violations
 can be uncovered with coarse approximations, i.e.,~$k\le 3$, depending on the
-data structure. To obtain these results we exhibit operation counting formulae
-$@Y$ characterizing these structures with cutoff/small-model properties: for
-any history $h$ violating $@Y$, there exists some $h' \preceq h$ with $\len h' \le k$ violating
-$@Y$. While this $h'$ may not correspond directly to $A_k(h)$, we can deduce
-there exists some $h'$ whose $k$-approximation $A_k(h')$ violates $@Y$. Our
-results build off of previous characterizations of concurrent data
-structures~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13} into a
-small set of constituent properties.
+data structure. To obtain these results we exhibit families $@Y$ of operation
+counting formulae characterizing these structures with cutoff/small-model
+properties: for any history $h$ violating $@Y$ there exists $h' \preceq h$
+violating $@Y$ with $\len h' \le k$. While this $h'$ may not correspond
+directly to $A_k(h)$, we can deduce there exists some $h'$ whose
+$k$-approximation $A_k(h')$ violates $@Y$. Our results build off of previous
+characterizations of concurrent data structures~\cite{conf/tacas/AbdullaHHJR13,
+conf/concur/HenzingerSV13} into a small set of constituent properties.
 
-In Figure~\ref{fig:spec:ds} we define four operation counting formulae:
+A \emph{family} $@Y$ of operation-counting formulae is an indexed set $\set{
+@Y_i : i \in \<Nats> }$. We say a history $h$ \emph{satisfies} the $@Y$,
+written $h |= @Y$, when $h |= @Y_i$ for $i = \len h$. We say that a family $@Y$
+has a \emph{cutoff} $n \in \<Nats>$ when for each history $h |= @Y$ there
+exists some $h' \preceq h$ such that $A_n(h')|= @Y$. Figure~\ref{fig:spec:ds}
+defines four families of operation-counting formulae:
 \begin{itemize}
 
   \item $@Y_\mathrm{rv}$ characterizes \emph{remove violations} in which a
@@ -77,15 +82,16 @@ quotients.
                     &  /| \<sameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
                     &  /| \<before>(y,z) /| \big( \<isCRem>(z) \vee \<noPRem>(y) \big)
   \end{align*}
-  \caption{Formulas characterizing atomic data structure violations.}
+  \caption{Four families of operation-counting formulae characterizing atomic
+    data structure violations, parameterized by the constant $k \in
+    \protect\<Nats>$. Predicates begin with capital letters, and macros begin
+    in lowercase.
+  }
   \label{fig:spec:ds}
 \end{figure}
 
-We say that a formula $@Y$ has a \emph{cutoff} $n \in \<Nats>$ when for each
-history $h |= @Y$ there exists some $h' \preceq h$ such that $A_n(h')|= @Y$.
-
 \begin{lemma}
-  \label{lem:ds:cutoff}  
+  \label{lem:cutoff}  
 
   The operation-counting formulae $@Y_\mathrm{rv}$, $@Y_\mathrm{ev}$,
   $@Y_\mathrm{fv}$, and $@Y_\mathrm{lv}$ have cutoffs $0$, $2$, $2$, and $3$,
@@ -130,7 +136,7 @@ history $h |= @Y$ there exists some $h' \preceq h$ such that $A_n(h')|= @Y$.
 
 \begin{corollary}
 
-  The operation-counting formulae
+  The families of operation-counting formulae,
   \begin{align*}
     & @Y_\mathrm{set}   = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev}
     \text{, } \\
@@ -142,25 +148,12 @@ history $h |= @Y$ there exists some $h' \preceq h$ such that $A_n(h')|= @Y$.
 
 \end{corollary}
 
-These cutoffs allow us to formulate a partial completeness of our approximation
-for atomic collection libraries, such as $L_\mathrm{stack}$ of
-Example~\ref{ex:atomic_stack}, or the analogously-defined libraries
-$L_\mathrm{set}$ and $L_\mathrm{queue}$. We say a history $\tup{O,f,<}$ uses
-\emph{unique values} when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$
-implies $o_1 = o_2$.
-
-\begin{lemma}
-
-  If $h$ is a history with without completed $\<pop>(\mathtt{EMPTY})$
-  operations which uses unique values, and $x \in \set{ \mathrm{set},
-  \mathrm{stack}, \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x$.
-
-\end{lemma}
-
-It follows that the $A_3$ approximation is guaranteed to discover any stack
-violation in histories using unique values, modulo empty violations.
-Unfortunately the empty-violation formula $@Y_\mathrm{ev}$ is not complete in
-general, as the following example demonstrates.
+For simplicity we have defined $@Y_\mathrm{ev}$ to catch only empty violations
+in which the span of $\<pop>(\mathtt{EMPTY})$ operation is covered by the
+presence of a single element. While it is theoretically possible to define the
+family $@Y_\mathrm{ev}'$ for which $@Y_{\mathrm{ev},k}'$ catches all empty
+violations in histories up to length $k$, the following example implies that
+such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
 
 \begin{example}
   \label{ex:emptyv}
@@ -177,21 +170,32 @@ general, as the following example demonstrates.
     \label{fig:history:emptyv}
   \end{figure}
   It follows that any such history would not be included in the histories
-  $H(L_\mathrm{queue})$ of an atomic queue library. The empty-violation formula
+  $H(L_\mathrm{queue})$ of an atomic queue library. The empty-violation family
   $@Y_\mathrm{ev}$ however only captures such violations for $n=1$, i.e.,~with
   a single {\sf push}-{\sf pop} pair spanning $\<pop>(\mathtt{EMPTY})$.
 
 \end{example}
 
-We currently do not know whether the general form of empty violations of
-Example~\ref{ex:emptyv} can be characterized by an operation-counting formula.
-However, it is possible to give a formula $@Y_{\mathrm{ev},k}$ characterizing
-all empty violations up to a given interval length $k$, which can thus be
-discovered by the $A_k$ approximation; we omit this proof for lack of space. It
-is worth noticing that remove violations, order violations, and the simple form
-of empty violations characterized by $@Y_\mathrm{ev}$ are always detectable
-with $A_3$, as noted by Lemma~\ref{lem:ds:cutoff}. Furthermore, our experience
-suggests that empty violations tend to surface with small $k$; the violation
-uncovered by our static analysis experiment in Section~\ref{sec:exp:static},
-for which bug $\text{B}_5$ was injected into the elimination stack, is an empty
-violation, and was detected with approximation $A_1$.
+We say a history $\tup{O,f,<}$ uses \emph{unique values} when $f(o_1) = m_1(u)
+=> v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$. The following lemma
+assumes the existence of the family $@Y_{\mathrm{ev}}'$ described before
+Example~\ref{ex:emptyv}; we omit the proof of $@Y_{\mathrm{ev}}'$'s existence
+due to lack of space.
+
+\begin{lemma}
+  \label{lem:rep}
+
+  If $h$ uses unique values, and $x \in \set{ \mathrm{set}, \mathrm{stack},
+  \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x /| \lnot @Y_\mathrm{ev}'$.
+
+\end{lemma}
+
+It follows from Lemmas~\ref{lem:cutoff} and~\ref{lem:rep} that the $A_3$
+approximation is guaranteed to discover any stack/queue/set violation in
+histories using unique values, modulo the empty violations of
+Example~\ref{ex:emptyv} with $n > 3$. Despite the theoretical possibility for
+empty violations which only surface for large $n$, our practical experience
+suggests that empty violations tend to surface with small $k$; the bug
+$\text{B}_5$ injected into the elimination stack in our static analysis
+experiment in Section~\ref{sec:exp:static} surfaced as an empty violation, and
+was detected with approximation $A_1$.
