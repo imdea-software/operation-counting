@@ -150,18 +150,17 @@ $L_\mathrm{set}$ and $L_\mathrm{queue}$. We say a history $\tup{O,f,<}$ uses
 implies $o_1 = o_2$.
 
 \begin{lemma}
-  \label{lem:complete:stack}
 
-  If $h$ is a history without completed $\<pop>(\mathtt{EMPTY})$ operations and
-  $x \in \set{ \mathrm{set}, \mathrm{stack}, \mathrm{queue}}$, then $h \in
-  H(L_x)$ if{f} $h |= @Y_x$.
+  If $h$ is a history with without completed $\<pop>(\mathtt{EMPTY})$
+  operations which uses unique values, and $x \in \set{ \mathrm{set},
+  \mathrm{stack}, \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x$.
 
 \end{lemma}
 
-Thus our $A_3$ approximation is guaranteed to discover any stack violation in
-histories using unique values, modulo empty violations. Unfortunately the
-empty-violation formula $@Y_\mathrm{ev}$ is not complete in general, as the
-following example demonstrates.
+It follows that the $A_3$ approximation is guaranteed to discover any stack
+violation in histories using unique values, modulo empty violations.
+Unfortunately the empty-violation formula $@Y_\mathrm{ev}$ is not complete in
+general, as the following example demonstrates.
 
 \begin{example}
   \label{ex:emptyv}
