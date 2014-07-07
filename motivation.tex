@@ -84,31 +84,33 @@ z = pop();
 %     \smallskip
 %    \hspace{5cm}
 
+    \centering
+    \vspace{4mm}
     (b) The history $h$ of the execution $e$.
     \end{minipage}
     \begin{minipage}[c]{4cm}
     \centering
     \input{figures/history-partial-order-weaker.tikz}
-%    \vspace{-3mm}
-%     \smallskip
-%    \hspace{5cm}
+
+    \centering
     (c) A history weaker than $h$.
     \end{minipage}
     
 %    \fbox{\normalsize\bf History} \\
-     \smallskip
-    \input{figures/history-horizontal.tikz}
+     \bigskip
+     \centering
+    \input{figures/history-intervals.tikz}
     
 %    \vspace{-3mm}
     \smallskip
-    \hspace{5cm}(c) The canonical representation of $h$.
+    (d) The canonical representation of $h$.
         
-    \smallskip
-    \input{figures/history-weak-horizontal.tikz}
+%    \smallskip
+%    \input{figures/history-weak-horizontal.tikz}
     
 %    \vspace{-3mm}
-    \smallskip
-    \hspace{5cm}(d) The canonical representation of a history weaker than $h$.
+%    \smallskip
+%    \hspace{5cm}(d) The canonical representation of a history weaker than $h$.
   \end{minipage}
   \caption{Two implementations of a concurrent stack object, a stack-using
   program, and an execution using Treiber's stack. The {\tt pop} operation
