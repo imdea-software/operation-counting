@@ -213,35 +213,28 @@ parameters.
 \noindent
 This minimal $E_0$ of Lemma~\ref{lem:kernel} is called the \emph{kernel} of
 $E(L)$, and is denoted by $\ker E(L)$. A library is called \emph{atomic} if its
-kernel contains only sequential executions. Atomic libraries are typically used
-as specifications for concurrent objects.
+kernel contains only sequential executions. Note that the kernel of an atomic
+library contains only completed operations, since $e_1 \cdot e_2 ~> e_1 \cdot c
+\cdot e_2$ for any unmatched call $c$. Atomic libraries are typically used as
+specifications for concurrent objects.
 
 \begin{example}
   \label{ex:atomic_stack}
 
-  A library $L$ is called an \emph{atomic stack} iff the kernel $\ker E(L)$
-  consists of all sequential executions with only completed operations such
-  that the return value of any $\<pop>$ invocation $o$ is:
+  The \emph{atomic stack} is the library whose kernel is the set of sequential
+  executions of completed operations, such that the return value of each
+  $\<pop>$ operation is either
   \begin{itemize}
-
-  	\item {\tt EMPTY}, if the number of $\<push>$ invocations before $o$ equals
-  	the number of $\<pop>$ invocations before $o$,
-
-  	\item $v$, where $v$ is the input of the last $\<push>$ invocation,
-  	otherwise.
+    
+    \item the argument value $v$ to the last unmatched $\<push>$ operation, or
+    
+    \item {\tt EMPTY} if there are no unmatched $\<push>$ operations.
 
   \end{itemize}
-  The lock-based implementation mentioned in Section~\ref{sec:motivation} is an atomic
-  stack.
+  In practice, an atomic stack can be implemented by guarding the methods
+  of a ``sequential'' stack object by global-lock acquisition.
 
 \end{example}
-
-TODO CLARIFY AND LOCALIZE THIS COMMENT TO WHERE IT IS RELEVANT
-By minimality, the kernel of an atomic library cannot contain sequential
-executions with pending operations. Thus, if $\ker E(L)$ were to contain a
-sequential execution $e = e' \cdot m(u)_o$, then it should also contain $e'$
-since $E(L)$ is prefix-closed and $e \not\leadsto e'$. But, since $e' ~> e$, by
-minimality, $\ker E(L)$ should contain only $e'$.
 
 % a sequential execution $e$ with one pending operation at the end,
 
