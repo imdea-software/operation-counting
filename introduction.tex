@@ -121,8 +121,7 @@ violations.
 \subsection{Approximating Observational Refinement}
 \label{sec:intro:approx}
 
-\paragraph{Parameterized approximation schema}
-
+{\bf Parameterized approximation schema}
 The approach we introduce in this paper is based on fundamental properties of
 library executions and their histories. The basic idea is to consider a notion
 of \emph{weakening pre-order} $\preceq$ on histories as a means for
@@ -144,8 +143,8 @@ will be captured for a large enough parameter. Finally, and quite importantly,
 we seek for an approximation schema that is easy to implement, and which is
 able to catch refinement violations with small parameter values.
 
-\paragraph{Bounded interval-length histories}
-
+\vspace{1mm}
+{\bf Bounded interval-length histories}
 We provide such an approximation schema, exploiting a fundamental
 property of the executions of \emph{shared-memory} libraries: We show
 that histories of such executions are \emph{interval orders}. These orders
@@ -164,8 +163,8 @@ history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length at most $k$.
 %this paper, we consider approximation functions that keep precise the last $k$
 %interval bounds, and abstract all the previous ones with equality.
 
-\paragraph{Reduction to reachability using counting representations}
-
+\vspace{1mm}
+{\bf Reduction to reachability using counting representations}
 We show that interval-length bounding is a tractable approach for
 refinement checking, and that it can be implemented efficiently. A key idea for
 that is to use \emph{counting representations} for bounded interval-length
@@ -192,8 +191,8 @@ usual concurrent objects such as collection objects (like stacks or queues),
 semaphores, locks, etc, and that these OCL formulas can be constructed systematically
 for a wide class of objects.
 
-\paragraph{Demonstrating feasibility}
-
+\vspace{1mm}
+{\bf Demonstrating feasibility}
 We demonstrate in the paper that our approach
 is feasible both with a dynamic and a static state space exploration strategy.
 
