@@ -108,16 +108,18 @@ quotients.
   We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$, the other
   cutoffs can be proved in a similar way.
  
-  Since the formula $@Y_\mathrm{rv}$ constrains only the multiset of operation
+  Since the formulae in $@Y_\mathrm{rv}$ constrain only the multiset of operation
   labels in a history, for each history $h=(O,<,f) |= @Y_\mathrm{rv}$ there
   exists the history $h'=(O,\emptyset,f)$ such that $h' |= @Y_\mathrm{rv}$. The
   fact that $A_0(h')=h'$ implies that $@Y_\mathrm{rv}$ has cutoff $0$.
  
   Next, let $h=(O,<,f) |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$, $@l_1'$, and
   $@l_2'$ be the instances of the variables $x_1$, $x_2$, $y_1$, and $y_2$,
-  respectively. We consider only the case when $total(y_1)>0$ holds (the other
-  case is similar). Besides the constraints on operation labels, the formula
-  $@Y_\mathrm{fv}$ states that all $@l_1$ operations end before an $@l_1'$
+  respectively. Let $@Y_{\mathrm{fv},k}$ denote the formula parametrized by $k$ in the family $@Y_\mathrm{fv}$.
+  By definition $h |=  @Y_{\mathrm{fv},k}$, where $k=\len h$.
+  We consider only the case when $total(y_1)>0$ holds (the other
+  case is similar). Besides the constraints on operation labels, the formula $@Y_{\mathrm{fv},k}$ 
+  states that all $@l_1$ operations end before an $@l_1'$
   operation starts and all $@l_2$ operations end before an $@l_2'$ operation
   starts. Let $I:O->[n]^2$ be the canonical representation of $h$. Also, let
   $j_1$ (resp., $j_2$) be the maximum upper bound of an interval associated to
@@ -134,7 +136,7 @@ quotients.
   length of $h'$ is at most 2
   % (it can be 1 when there is no operation that starts after the last finishing
   % $@l_1$ operation and before the last $@l_3$ operation finishes),
-  and $h'|= @Y_\mathrm{fv}$. Finally, since $A_2(h')=h'$, it follows that
+  and $h'|= @Y_{\mathrm{fv},2}$. Finally, since $A_2(h')=h'$, it follows that
   $@Y_\mathrm{rv}$ has cutoff $2$.
 \end{proof}
 
