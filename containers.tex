@@ -52,7 +52,8 @@ However, in order to achieve bounded counting representations, we may only
 distinguish between these values up to equivalence relations with finite
 quotients.
 
-\begin{figure}
+\begin{figure}[t]
+  \footnotesize
 %  \begin{align*}
 %    \<pending>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \quad\quad    \<completed>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') 
 %  \end{align*}
@@ -164,7 +165,7 @@ such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
   i.e.,~at every time between the call and return of $\<pop>(\mathtt{EMPTY})$,
   there exists some element $v \in \<Vals>$ such that $\<push>(v)$ has
   completed, yet $\<pop> => v$ has not yet begun.
-  \begin{figure}
+  \begin{figure}[t]
     \input{figures/history-empty-violation.tikz}
     \caption{A family of empty violations, parameterized by $n \in 
       \protect\<Nats>$.}

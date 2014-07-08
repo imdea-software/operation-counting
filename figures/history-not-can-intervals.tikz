@@ -1,71 +1,64 @@
 %!TEX root = ../draft.tex
-\begin{tikzpicture}[node distance=.7cm]
+\begin{tikzpicture}[node distance=4mm]
+  \scriptsize
 
-\tikzstyle{node}=[minimum size=0pt]
-\tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
-\tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
-\node[nnode] (x0) [] at (0,0) {};
-\node[lnode] (x1)  [right=1.5cm of x0] {};
-\node[lnode] (x2)  [right of=x1] {}; 
-\node[lnode] (x3)  [right of=x2] {}; 
-\node[lnode] (x6)  [right=56mm of x3] {};  %8*7+4
+  \tikzstyle{node}=[minimum size=0pt]
+  \tikzstyle{nnode}=[minimum size=0pt,inner sep=0pt]
+  \tikzstyle{lnode}=[circle,draw,minimum size=2pt,inner sep=0pt]
+  \tikzstyle{opline}=[line width=2pt]
 
-\node[lnode] (y1)  [below=6mm of x3,xshift=7mm] {}; 
-\node[lnode] (y2)  [right of=y1] {}; 
-\node[lnode] (y4)  [right=1.4cm of y2] {}; 
-\node[lnode] (y5)  [right of=y4] {}; 
-\node[lnode] (y6)  [right of=y5] {}; 
-\node[lnode] (y7)  [right of=y6] {}; 
+  \node[nnode] (t0) [label=below:{\tt 0}] {};
+  \node[nnode] (t1) [right of=t0,label=below:1] {};
+  \node[nnode] (t2) [right of=t1,label=below:2] {};
+  \node[nnode] (t3) [right of=t2,label=below:3] {};
+  \node[nnode] (t4) [right of=t3,label=below:4] {};
+  \node[nnode] (t5) [right of=t4,label=below:5] {};
+  \node[nnode] (t6) [right of=t5,label=below:6] {};
+  \node[nnode] (t7) [right of=t6,label=below:7] {};
+  \node[nnode] (t8) [right of=t7,label=below:8] {};
+  \node[nnode] (t9) [right of=t8,label=below:9] {};
+  \node[nnode] (t10) [right of=t9,label=below:10] {};
+  \node[nnode] (t11) [right of=t10,label=below:11] {};
+  \node[nnode] (t12) [right of=t11,label=below:12] {};
+  \node[nnode] (t13) [right of=t12,label=below:13] {};
+  \node[nnode] (t14) [right of=t13] {};
 
-%\node[nnode] (x5)  [left=18mm of y7,yshift=-2mm] {}; 
+  \node[lnode] (x1)  [above=12mm of t0] {};
+  \node[lnode] (x2)  [above=12mm of t1] {}; 
+  \node[lnode] (x3)  [above=12mm of t2] {}; 
+  \node[lnode] (x6)  [above=12mm of t10] {};
 
+  \node[lnode] (y1)  [above=5mm of t3] {}; 
+  \node[lnode] (y2)  [above=5mm of t4] {}; 
+  \node[lnode] (y4)  [above=5mm of t6] {}; 
+  \node[lnode] (y5)  [above=5mm of t7] {}; 
+  \node[lnode] (y6)  [above=5mm of t8] {}; 
+  \node[lnode] (y7)  [above=5mm of t9] {};
 
-\node[lnode] (y8)  [below=6mm of x6,xshift=14mm] {}; 1*7+3
-\node[lnode] (y9)  [right of =y8] {}; 
+  \node[lnode] (y8)  [above=5mm of t12] {};
+  \node[lnode] (y9)  [above=5mm of t13] {}; 
 
-\node[nnode] (zx1) [below= 1.3cm of x1,label=below:{\tt 0}] {};
-\node[nnode] (u1) [below= .6cm of y9,xshift=1cm] {};
-\node[nnode] (zx2) [below= 1.3cm of x2,label=below:{\tt 1}] {};
-\node[nnode] (zx3) [below= 1.3cm of x3,label=below:{\tt 2}] {};
-\node[nnode] (zx6) [below= 1.3cm of x6,label=below:{\tt 10}] {};
-\node[nnode] (zx61) [right of=zx6,label=below:{\tt 11}] {};
+  \draw[->,>=stealth'] (t0) -- (t14);
+  \draw[dotted] (x1) -- (t0);
+  \draw[dotted] (x2) -- (t1);
+  \draw[dotted] (x3) -- (t2);
+  \draw[dotted] (x6) -- (t10);
 
-\node[nnode] (zy1) [below= 6mm of y1,label=below:{\tt 3}] {};
-\node[nnode] (zy2) [below= 6mm of y2,label=below:{\tt 4}] {};
-\node[nnode] (zy21) [right of=zy2,label=below:{\tt 5}] {};
-\node[nnode] (zy4) [below= 6mm of y4,label=below:{\tt 6}] {};
-\node[nnode] (zy5) [below= 6mm of y5,label=below:{\tt 7}] {};
-\node[nnode] (zy6) [below= 6mm of y6,label=below:{\tt 8}] {};
-\node[nnode] (zy7) [below= 6mm of y7,label=below:{\tt 9}] {};
-\node[nnode] (zy8) [below= 6mm of y8,label=below:{\tt 12}] {};
-\node[nnode] (zy9) [below= 6mm of y9,label=below:{\tt 13}] {};
+  \draw[dotted] (y1) -- (t3);
+  \draw[dotted] (y2) -- (t4);
+  \draw[dotted] (y4) -- (t6);
+  \draw[dotted] (y5) -- (t7);
+  \draw[dotted] (y6) -- (t8);
+  \draw[dotted] (y7) -- (t9);
+  \draw[dotted] (y8) -- (t12);
+  \draw[dotted] (y9) -- (t13);
 
+  \draw[opline] (x1) -- node[draw=none,above] {$\<push>(1)$} (x2); 
+  \draw[opline] (x3) -- node[draw=none,above] {$\<pop>=>3$} (x6);
 
-\draw[->,>=stealth'] (zx1) -- (u1);
-\draw[dotted] (x1) -- (zx1);
-\draw[dotted] (x2) -- (zx2);
-\draw[dotted] (x3) -- (zx3);
-\draw[dotted] (x6) -- (zx6);
-
-\draw[dotted] (y1) -- (zy1);
-\draw[dotted] (y2) -- (zy2);
-\draw[dotted] (y4) -- (zy4);
-\draw[dotted] (y5) -- (zy5);
-\draw[dotted] (y6) -- (zy6);
-\draw[dotted] (y7) -- (zy7);
-\draw[dotted] (y8) -- (zy8);
-\draw[dotted] (y9) -- (zy9);
-
-
-
-\draw[line width=2pt] (x1) -- node[draw=none,above] {$\<push>(1)$} (x2); 
-\draw[line width=2pt] (x3) -- node[draw=none,above] {$\<pop>=>3$} (x6);
-%\draw[line width=2pt] (x5) -- (x6);
-
-\draw[line width=2pt] (y1) -- node[draw=none,above] {$\<pop>=>1$} (y2);
-\draw[line width=2pt] (y4) -- node[draw=none,above] {$\<push>(2)$} (y5);
-\draw[line width=2pt] (y6) -- node[draw=none,above] {$\<push>(3)$} (y7);
-\draw[line width=2pt] (y8) -- node[draw=none,above] {$\<pop>=>{\tt EMPTY}$} (y9);
-
+  \draw[opline] (y1) -- node[draw=none,above] {$\<pop>=>1$} (y2);
+  \draw[opline] (y4) -- node[draw=none,above,xshift=-1mm] {$\<push>(2)$} (y5);
+  \draw[opline] (y6) -- node[draw=none,above,xshift=1mm] {$\<push>(3)$} (y7);
+  \draw[opline] (y8) -- node[draw=none,above] {$\<pop>=>{\tt EMPTY}$} (y9);
 
 \end{tikzpicture}

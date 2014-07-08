@@ -85,7 +85,7 @@ point.
 % in general, there is no cutoff value of $k \in \<Nats>$ for which all
 % \emph{empty violations} can be captured with $A_k$.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/coverage-bkq-2-barriers}
   \caption{Comparison of violations covered with
@@ -124,7 +124,7 @@ This scalability suggests that our approximation can be used not only for
 systematic concurrency testing with few method invocations, but also for
 runtime monitoring, where the number of operations grows without limit.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/lin-vs-counting-time}
   \caption{Comparison of runtime overhead between linearization-based monitoring
@@ -137,7 +137,7 @@ runtime monitoring, where the number of operations grows without limit.
     Times do not include pre-calculation of sequential histories for
     linearization-based monitoring. While our $A_k$ monitor scales well,
     usually maintaing under 30\% overhead, the linearization monitor scales
-    \textbf{exponentially}, running with roughly \textbf{100000\% overhead}
+    \textbf{exponentially}, running with nearly \textbf{100000\% overhead}
     with $20$ operations.
   }
   \label{fig:data:runtime}

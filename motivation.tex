@@ -72,24 +72,15 @@ z = pop();
     \end{minipage}
   \end{minipage}
   \begin{minipage}[c]{130mm}
-%    \fbox{\normalsize\bf Execution} \\
-
     \input{figures/execution-horizontal.tikz}
-    
-   % \vspace{-2mm}
-    %\hspace{5cm}
     \centering
     \medskip
     (a) An execution $e$ of the program; it depicts calls,
-  returns, and assignments, and time progresses from left to right.
+    returns, and assignments, and time progresses from left to right.
     
     \bigskip
     \begin{minipage}[c]{7cm}
-%    \centering
     \input{figures/history-partial-order.tikz}
-%    \vspace{-3mm}
-%     \smallskip
-%    \hspace{5cm}
 
     \centering
     \vspace{4mm}
@@ -103,40 +94,20 @@ z = pop();
     (c) A history weaker than $h$.
     \end{minipage}
 
-%    \fbox{\normalsize\bf History} \\
      \bigskip
      \centering
     \input{figures/history-not-can-intervals.tikz}
     
-%    \vspace{-3mm}
     \smallskip
     (d) The history $h$ as an interval order.
-
     
-%    \fbox{\normalsize\bf History} \\
      \bigskip
      \centering
     \input{figures/history-intervals-second.tikz}
     
-%    \vspace{-3mm}
     \smallskip
     (e) The canonical representation of $h$.
     
-    %    \fbox{\normalsize\bf History} \\
-%     \bigskip
-%     \centering
-%    \input{figures/history-intervals-second.tikz}
-%    
-%%    \vspace{-3mm}
-%    \smallskip
-%    (d) The canonical representation of $h$.
-        
-%    \smallskip
-%    \input{figures/history-weak-horizontal.tikz}
-    
-%    \vspace{-3mm}
-%    \smallskip
-%    \hspace{5cm}(d) The canonical representation of a history weaker than $h$.
   \end{minipage}
   \caption{An implementation of Treiber's stack. The {\tt pop} operation
   returns the {\tt EMPTY} when the stack is empty.}
