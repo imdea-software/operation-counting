@@ -22,7 +22,7 @@ Q$. The $i$th symbol of a sequence $e \in @S^*$ is denoted $e_i$. An
 q_2, .., q_{|e|} \in Q$, we have $@d(q_i,e_i,q_{i+1})$ for each $i$ such that
 $0 \le i < |e|$. The projection $e|@G$ is the maximum subsequence of $e$ over
 alphabet $@G$. $E(A)$ denotes the set of $A$'s executions, and $E(A)|@G$ their
-projections over $@G$ (note that, $E(A)$ is prefix closed). 
+projections over $@G$ (note that $E(A)$ is prefix closed). 
 The \emph{synchronous product} $A_1 \x A_2$ of two LTSs
 is defined as usual, respecting $E(A_1 \x A_2)|(@S_1 \n @S_2) = E(A_1)|@S_2 \n
 E(A_2)|@S_1$.
@@ -349,7 +349,7 @@ communication, e.g.,~through shared random-access memory.
   As we have shown previously, the Treiber's stack implementation from Figure~\ref{fig:treiber}
   doesn't refine an atomic lock-based reference implementation. However, by removing the {\tt free} statement
   from the $\<pop>$ method and by considering a semantics for {\tt malloc} that doesn't return
-  previously used memory addresses, we obtain a library, which refines
+  previously used memory addresses, we obtain a library which refines
   the lock-based concurrent stack.
   
 %  An $L_1$ that admits both executions from Example~\ref{ex:executions} does

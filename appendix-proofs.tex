@@ -18,31 +18,31 @@ $h'=(O',<',f')\in H(\ker E(L))$ (where the operations are totally ordered) such
 that $h\preceq h'$, $h$ can be written as a sequence of symbols
 \tup{f(o),I(o),b} that is consistent with the order between operations defined
 by $<'$. The boolean $b$ is $\<true>$ iff the operation $o$ belongs to the
-sequential history $h'$. Formally, let $\<Labels>_{\text I}$ be the following alphabet:
+sequential history $h'$. Formally, let $\<Labels>_{\,\text I}$ be the following alphabet:
 \begin{align*}
-  \<Labels>_{\text I} = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
+  \<Labels>_{\,\text I} = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
 \end{align*}
-Let $\lab(h):O -> \<Labels>_{\text I}$ be a mapping associating to each operation $o$ a
-symbol in $\<Labels>_{\text I}$:
+Let $\lab(h):O \rightarrow \mathbb{L}_{\,\text I}$ be a mapping associating to each operation $o$ a
+symbol in $\<Labels>_{\,\text I}$:
 \begin{align*}
   \lab(h)(o)=\left\{\begin{array}{ll}\tup{f(o),I(o),\<true>},\mbox{ if $o\in O'$}\\
   						\tup{f(o),I(o),\<false>},\mbox{ otherwise.}
   			\end{array}
   		\right.
 \end{align*}
-Then, let $\<lin>(h)$ be a sequence over $\<Labels>_{\text I}$, that contains exactly the
+Then, let $\<lin>(h)$ be a sequence over $\<Labels>_{\,\text I}$, that contains exactly the
 same multiset of symbols as the range of $\lab(h)$ and for every $o_1<' o_2$,
 $\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\<lin>(h)$.
 
 Since $h\preceq h'$, whenever an operation $o_1$ is ordered before another
-operation $o_2$ in the sequential history $h'$, the interval $I(o_1)$ is either
-before or it is overlapping with $I(o_2)$. Therefore, the order between
-intervals in the sequence $\<lin>(h)$ is not arbitrary. More precisely, if a
+operation $o_2$ in the sequential history $h'$, the interval $I(o_1)$ either ends 
+before or it is overlapping with $I(o_2)$. Therefore, 
+in the sequence $\<lin>(h)$, if a
 symbol $\tup{@l_1,i_1,j_1,b_1}$ occurs before another symbol
-$\tup{@l_2,i_2,j_2,b_2}$, then $i_1\leq j_2$. A sequence $\sigma\in\<Labels>_{\text I}^*$
+$\tup{@l_2,i_2,j_2,b_2}$, then $i_1\leq j_2$. A sequence $\sigma\in\<Labels>_{\,\text I}^*$
 satisfying this property is called \emph{interval-consistent}.
 
-Now, let $\alpha : \<Labels>_{\text I} -> \<Methods>^*$ be an homomorphism defined by
+Now, let $\alpha : \<Labels>_{\,\text I} -> \<Labels>^*$ be an homomorphism defined by
 $\alpha(\tup{@l,i,j,\<true>}) = @l$ and $\alpha(\tup{@l,i,j,\<false>}) = @e$, where
 $@e$ denotes the empty sequence.
 
