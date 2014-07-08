@@ -167,9 +167,11 @@ executions $e$ with $H(e) \in H(L)$.
 Lemmas~\ref{lem:lib:closed} and~\ref{lem:lib:execs} ultimately imply the
 equivalence between refinement and history inclusion. Essentially, any given
 history $h$ of a library $L_1$ can be captured by a program $P_h$ whose
-observations witness the ordering among $h$'s operations. The refinement $L_1
-\leq L_2$ implies that $L_2$ also admits those observations, through one more
-more possibly-stronger histories $h'$. It then follows from
+observations witness the ordering among $h$'s operations. However, its observations
+cannot forbid additional orderings between $h$'s operations (this is due to the closure
+properties in Definition~\ref{def:programs}).
+The refinement $L_1\leq L_2$ implies that $L_2$ also admits those observations, through one or more
+possibly-stronger histories $h'$. It then follows from
 Lemma~\ref{lem:lib:closed} that $L_2$ also admits $h \preceq h'$. For the
 reverse direction, it follows from Lemma~\ref{lem:lib:execs} that history
 inclusion implies inclusion of executions, and ultimately observations.
