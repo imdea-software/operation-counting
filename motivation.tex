@@ -3,19 +3,19 @@
 \section{Motivating Example}
 \label{sec:motivation}
 
-Figure~\ref{fig:stacks} lists the implementation of the non-blocking 
-Treiber's stack~\cite{Treiber'86}, which provides {\tt push} and {\tt pop} methods. 
-This implementation stores {\tt push}ed elements in a
-singly-linked list rooted at {\tt Top}, but avoids blocking lock acquisitions in favor of non-blocking
+Figure~\ref{fig:treiber} lists the implementation of the non-blocking Treiber's
+stack~\cite{Treiber'86}, which provides {\tt push} and {\tt pop} methods. This
+implementation stores {\tt push}ed elements in a singly-linked list rooted at
+{\tt Top}, but avoids blocking lock acquisitions in favor of non-blocking
 compare-and-swap ({\tt CAS}) operations in order to maximize parallelism,
 allowing methods to interleave their internal actions; in one atomic step, the
 {\tt CAS} operation assigns {\tt Top = n} only if {\tt Top == t}.
-%The first lock-based
-%implementation ensures that methods execute atomically by holding a lock for
-%the duration of each operation, and stores {\tt push}ed elements in a
-%singly-linked list rooted at {\tt S->Top}. The second implementation of
-%Treiber~\cite{Treiber'86} stores its elements in the same singly-linked list
-%structure, 
+
+% The first lock-based implementation ensures that methods execute atomically by
+% holding a lock for the duration of each operation, and stores {\tt push}ed
+% elements in a singly-linked list rooted at {\tt S->Top}. The second
+% implementation of Treiber~\cite{Treiber'86} stores its elements in the same
+% singly-linked list structure,
 
 \begin{figure}[t]
   \scriptsize
@@ -101,15 +101,14 @@ void thread2() {
 
 Unfortunately this nonblocking implementation suffers from a subtle concurrency
 bug, now commonly known as an ``ABA'' bug~\cite{tr/ibm/Michael04}. This bug
-manifests in the program of Figure~\ref{fig:stacks}, via the 
-execution depicted in Figure~\ref{fig:stacks}(a). 
-Essentially, Thread~1 wrongfully assumes the absence of interference
-from other threads on the successful {\tt CAS} operation. Thread~1 is preempted
-right before executing its {\tt CAS} in the {\tt pop} method; at that moment,
-its {\tt t} variable points to the first element in the list at address {\tt
-0xFF} added by {\tt push(1)}, and {\tt n == NULL}. While Thread~2 updates the
-list with two additional elements, added by {\tt push(2)} and {\tt push(3)},
-the {\tt t} variable of Thread~1 still points to the list's first element at
+manifests via the execution depicted in Figure~\ref{fig:stacks}(a).
+Essentially, Thread~1 wrongfully assumes the absence of interference from other
+threads on the successful {\tt CAS} operation. Thread~1 is preempted right
+before executing its {\tt CAS} in the {\tt pop} method; at that moment, its
+{\tt t} variable points to the first element in the list at address {\tt 0xFF}
+added by {\tt push(1)}, and {\tt n == NULL}. While Thread~2 updates the list
+with two additional elements, added by {\tt push(2)} and {\tt push(3)}, the
+{\tt t} variable of Thread~1 still points to the list's first element at
 address {\tt 0xFF}, which was freed by Thread~2's call to {\tt pop}, and
 reallocated in the call to {\tt push(3)}. When Thread~1 resumes, its {\tt CAS}
 succeeds, effectively removing two elements from the list instead of one. The
@@ -124,10 +123,11 @@ atomically, e.g., by holding a lock for the duration of each operation.
 In particular, the assignment {\tt z = EMPTY} should never have
 been observed in an execution of the given program. 
 
-This idea of conformance is rigorously captured by the formal notion of \emph{observational refinement}.
-Essentially, an implementation $L_1$ of a concurrent object ``refines'' another
-implementation $L_2$ if every observable behavior of a program using $L_1$ is
-also observable using $L_2$. This property clearly does not hold between the
-{\tt CAS}-based and lock-based implementations of Figure~\ref{fig:stacks},
-since {\tt y = 1; x = 3; z = EMPTY} is observable using the {\tt CAS}-based
-implementation, yet not using the lock-based implementation.
+This idea of conformance is rigorously captured by the formal notion of
+\emph{observational refinement}. Essentially, an implementation $L_1$ of a
+concurrent object ``refines'' another implementation $L_2$ if every observable
+behavior of a program using $L_1$ is also observable using $L_2$. This property
+clearly does not hold between the {\tt CAS}-based implementation of
+Figure~\ref{fig:treiber} and a lock-based implementations, since {\tt y = 1; x
+= 3; z = EMPTY} is observable using the {\tt CAS}-based implementation, yet not
+using the lock-based implementation.
