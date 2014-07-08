@@ -41,17 +41,14 @@ operation}. The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L)
 
 \begin{example}
 
-  The history $h$ of the execution $e$ in Figure~\ref{fig:stacks}(a) is
-  pictured in Figure~\ref{fig:stacks}(b) (arrows depict the order relation 
-   and some transitive orderings are omitted). Any two operations are ordered in $h$ 
-  according to the order between their return, and respectively, call actions in the execution $e$.
-  For example, the $\<push>(1)$ operation is ordered before the $\<pop>=>3$ operation in $h$ 
-  because the return action of $\<push>(1)$ comes before the call action of $\<pop>=>3$ in $e$.
-  On the other hand, the $\<pop>=>1$ operation is incomparable to the $\<pop>=>3$ operation
-  because the return action of $\<pop>=>1$ comes after the call action of $\<pop>=>3$
-  and the return action of $\<pop>=>3$ comes after the call action of $\<pop>=>1$.
-  The order between the call (resp., return) actions of two operations is irrelevant for defining
-  the history $h$.
+  Figure~\ref{fig:stacks}(b) depicts the history $h$ of the execution $e$ in
+  Figure~\ref{fig:stacks}(a). Arrows depict the order relation modulo
+  transitivity. Operations $o_1$ and $o_2$ are ordered in $h$ if $o_1$'s return
+  precedes $o_2$'s call in $e$. For example, $\<push>(1)$ precedes $\<pop>=>3$.
+  However, $\<pop>=>1$ is incomparable to $\<pop>=>3$ because $\<pop>=>1$'s
+  return comes after $\<pop>=>3$'s call in $e$, and $\<pop>=>3$'s return comes
+  after $\<pop>=>1$'s call. The order among operations' call actions is
+  irrelevant, as is the order among their return actions.
 
 \end{example}
 
