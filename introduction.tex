@@ -28,7 +28,7 @@ happens-before (partial-order) relation between invoked object methods. We
 demonstrate that refinement between libraries is equivalent to a containment
 problem between sets of histories, and a violation to refinement corresponds to
 history-set inclusion problem. In fact, even checking whether the history of a
-single execution belongs to the set of histories of a fixed library is
+single execution belongs to a given set is
 NP-hard~\cite{journals/siamcomp/GibbonsK97}.
 
 % As mentioned earlier, existing approaches for finding refinement violations
@@ -219,35 +219,28 @@ of refinement violations using existing tools for reachability analysis of
 concurrent programs such as CSeq~\cite{conf/ase/FischerIP13} (with backend CBMC~\cite{conf/tacas/KroeningT14}) and SMACK~\cite{conf/cav/RakamaricE14} (with backend Corral~\cite{conf/cav/LalQL12}) that are based on efficient symbolic
 encodings of sets of computations and the use of SAT/SMT solvers.
 
-
 \subsection{Summary of Contributions}
 
 This work makes following contributions:
 \begin{itemize}
 
   \item A characterization of observational refinement as a history inclusion
-  problem (\S\ref{sec:histories}), and 
-and the proof that history inclusion is
-  equivalent to linearizability for atomic reference implementations.
+  problem (\S\ref{sec:histories}), and an proof of equivalence with
+  linearizability for atomic reference implementations (\S\ref{sec:lin}).
 
-  \item The definition of general parameterized under-approximation schema for
-  detecting observational refinement violations based on a weakening pre-order
-  on histories, and the instantiation of this schema based on the fact that
-  histories of shared-memory libraries are interval-orders: The provided
-  approximation schema is based on considering weaker histories of bounded
-  interval-length.
+  \item An under-approximation for detecting observational refinement
+  violations based on a weakening pre-order on histories, exploiting the fact
+  that histories are interval orders (\S\ref{sec:counting}).
 
-  \item An efficient implementation of this schema using counting
-  representations: Providing (1) a reduction of bounded refinement checking to
-  a reachability problem using arithmetics-based symbolic representations of
-  sets of interval-length bounded histories, as well as (2) symbolic
-  representations for sets of histories for common data structures (such as
-  stacks and queues), and a procedure for automatic generation of these
-  representations for a class of concurrent objects. Proving a cut-off bound
-  result for refinement checking of order constraints for stacks and queues.
+  \item An efficient implementation of this approximation using counting
+  representations. Specifically, a reduction to a reachability problem
+  (\S\ref{sec:counting:monitor}) using arithmetic-based symbolic
+  representations of sets of interval-length bounded histories
+  (\S\ref{sec:counting:logic}), cut-off bounds for representations
+  collection-based data structures (\S\ref{sec:containers}), and a procedure
+  for automatic generation of these representations (\S\ref{sec:regular}).
 
-  \item Use of the reduction to reachability checking for defining dynamic and
-  static analysis algorithms for detecting refinement violations, and showing
-  the efficiency and the scalability of the approach in practice.
+  \item Experimental demonstration of the efficiency and scalability of our
+  approach both in dynamic and static analysis settings (\S\ref{sec:exp}).
 
 \end{itemize}
