@@ -17,9 +17,9 @@ recall that the \emph{Parikh image} of $w \in @S^*$ is the multiset $\Pi(w) :
 @S -> \<Nats>$ mapping each symbol $a \in @S$ to its number of occurrences in
 $w$, and the \emph{Parikh image} of a language $M \subseteq @S^*$ is the set
 $\Pi(M) = \set{ \Pi(w) : w \in L }$ of its words' images. We show that if $\ker
-E(L)$ is context free, then the language $M_k = \set{ e \in E(L) : \len H(e)
+E(L)$ is context free, then the language $E_k = \set{ e \in E(L) : \len H(e)
 \le k}$ of $L$'s executions with bounded-length histories has the same Parikh image 
-as a context-free language, and by Parkikh's Theorem, $\Pi(M_k)$ can be
+as a context-free language, and by Parkikh's Theorem, $\Pi(E_k)$ can be
 represented as a Presburger formula, from which we derive $@Y_{L,k}$.
 
 \begin{theorem}
@@ -34,9 +34,9 @@ represented as a Presburger formula, from which we derive $@Y_{L,k}$.
 
 \begin{proof}
 
-Let $@L$ be the context-free language obtained from $\ker E(L)$ by replacing
+Let $\Delta$ be the context-free language obtained from $\ker E(L)$ by replacing
 every pair of consecutive actions $m(u)_o\ \<ret>(v)_o$ by $m(u)=>v$. Note that
-every sequence $\sigma$ in $@L$ represents a history $h=(O,<,f)\in H(\ker
+every sequence $\sigma$ in $\Delta$ represents a history $h=(O,<,f)\in H(\ker
 E(L))$ in the sense that the multiset of symbols in $\sigma$ is exactly the
 multiset $\mset{ f(o): o\in O}$ of operation labels in $h$ and every two
 operation labels in $\sigma$ occur in the order defined by $<$, i.e., for every
@@ -49,51 +49,52 @@ $h'=(O',<',f')\in H(\ker E(L))$ (where the operations are totally ordered) such
 that $h\preceq h'$, $h$ can be written as a sequence of symbols
 \tup{f(o),I(o),b} that is consistent with the order between operations defined
 by $<'$. The boolean $b$ is $\<true>$ iff the operation $o$ belongs to the
-sequential history $h'$. Formally, let $\<Lab>$ be the following alphabet:
+sequential history $h'$. Formally, let $\<Labels>_{\text I}$ be the following alphabet:
 \begin{align*}
-  \<Lab> = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
+  \<Labels>_{\text I} = \set{\tup{@l,i,j,b}: @l  \in \<Labels>, 0\leq i\leq j\leq k, b\in\<Bools>}.
 \end{align*}
-Let $\lab(h):O -> \<Lab>$ be a mapping associating to each operation $o$ a
-symbol in $\<Lab>$:
+Let $\lab(h):O -> \<Labels>_{\text I}$ be a mapping associating to each operation $o$ a
+symbol in $\<Labels>_{\text I}$:
 \begin{align*}
   \lab(h)(o)=\left\{\begin{array}{ll}\tup{f(o),I(o),\<true>},\mbox{ if $o\in O'$}\\
   						\tup{f(o),I(o),\<false>},\mbox{ otherwise.}
   			\end{array}
   		\right.
 \end{align*}
-Then, let $\alpha(h)$ be a sequence over $\<Lab>$, that contains exactly the
+Then, let $\<lin>(h)$ be a sequence over $\<Labels>_{\text I}$, that contains exactly the
 same multiset of symbols as the range of $\lab(h)$ and for every $o_1<' o_2$,
-$\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\alpha(h)$.
+$\lab(h)(o_1)$ occurs before $\lab(h)(o_2)$ in $\<lin>(h)$.
 
 Since $h\preceq h'$, whenever an operation $o_1$ is ordered before another
 operation $o_2$ in the sequential history $h'$, the interval $I(o_1)$ is either
 before or it is overlapping with $I(o_2)$. Therefore, the order between
-intervals in the sequence $\alpha(h)$ is not arbitrary. More precisely, if a
+intervals in the sequence $\<lin>(h)$ is not arbitrary. More precisely, if a
 symbol $\tup{@l_1,i_1,j_1,b_1}$ occurs before another symbol
-$\tup{@l_2,i_2,j_2,b_2}$, then $i_1\leq j_2$. A sequence $\sigma\in\<Lab>^*$
+$\tup{@l_2,i_2,j_2,b_2}$, then $i_1\leq j_2$. A sequence $\sigma\in\<Labels>_{\text I}^*$
 satisfying this property is called \emph{interval-consistent}.
 
-Now, let $\mu : \<Lab> -> \<Methods>^*$ be an homomorphism defined by
-$\mu(\tup{@l,i,j,\<true>}) = @l$ and $\mu(\tup{@l,i,j,\<false>}) = @e$, where
+Now, let $\alpha : \<Labels>_{\text I} -> \<Methods>^*$ be an homomorphism defined by
+$\alpha(\tup{@l,i,j,\<true>}) = @l$ and $\alpha(\tup{@l,i,j,\<false>}) = @e$, where
 $@e$ denotes the empty sequence.
 
-It follows easily from definitions that $\mu(\alpha(h))\in @L$, for every
-history $h$. On the other hand, $\mu^{-1}(@L)$ may contain sequences which do
+It follows easily from definitions that $\alpha(\<lin>(h))\in \Delta$, for every
+history $h$. On the other hand, $\alpha^{-1}(\Delta)$ may contain sequences which do
 not correspond to valid histories of $L$ because they are not
 interval-consistent. However, one can prove that
 \begin{align*}
-  \Gamma_k=\set{\alpha(h):h\in H(L)\mbox{ of length $k$}}=\mu^{-1}(@L)\cap \Delta_k,
+  \Theta_k=\set{\<lin>(h):h\in H(L)\mbox{ and $\len h \le k$}}=\alpha^{-1}(\Delta)\cap \Upsilon_k,
 \end{align*}
-where $\Delta_k$ is the language of all interval-consistent sequences with
+where $\Upsilon_k$ is the language of all interval-consistent sequences with
 interval bounds at most $k$. Since the latter is regular and the context-free
 languages are closed under intersection with regular languages and inverse
-homomorphisms, the language $\Gamma_k$ is context-free.
+homomorphisms, the language $\Theta_k$ is context-free. Note that $\Theta_k$
+has the same Parikh image as $E_k = \set{ e \in E(L) : \len H(e) \le k}$.
 
 Hence, by Parikh's theorem~\cite{journals/jacm/Parikh66}, there exists a
 quantifier-free Presburger formula $@Y$ representing the Parikh image of
-$\Gamma_k$. W.l.o.g. we assume that the free variables of $@Y$ are $\set{ \#a :
-a \in \<Lab> }$, where $\#a$ represents the number of occurrences of $a$ in a
-sequence of $\Gamma_k$.
+$\Theta_k$. W.l.o.g. we assume that the free variables of $@Y$ are $\set{ \#a :
+a \in \<Labels>_{\text I} }$, where $\#a$ represents the number of occurrences of $a$ in a
+sequence of $\Theta_k$.
 
 We define $@Y_{L,k}$ as the quantifier-free Presburger formula
 \begin{align*}
@@ -104,4 +105,4 @@ which projects away the variables of $@Y$.
 \end{proof}
 
 This construction is useful in practice; with it we have derived formulae used
-in our static verification experiments of \S~\ref{sec:exp:static}.
+in our static verification experiments of Section~\ref{sec:exp:static}.

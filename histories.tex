@@ -3,13 +3,13 @@
 \label{sec:histories}
 
 Though we seek to develop automated techniques to check observational
-refinement between libraries, the definition of \S~\ref{sec:refinement}
+refinement between libraries, the definition of Section~\ref{sec:refinement}
 does not suggest any practical means; it only suggests enumerating every
 possible execution of every possible program. In this section we introduce an
 equivalent notion based on concise abstractions of program executions called
 \emph{histories}. Besides being independent of programs, this equivalent notion
 helps expose the structure of the refinement problem, and suggests practical
-means of automation which we develop in \S~\ref{sec:counting}.
+means of automation which we develop in Section~\ref{sec:counting}.
 
 \subsection{Histories}
 
@@ -35,8 +35,9 @@ summary, and orders non-overlapping operations:
   \right.$
 
 \end{itemize}
-An operation of $h$ labeled by $@l\in \<Labels>$ is called an \emph{$@l$ operation}.
-The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
+An operation of $h$ labeled by $@l\in \<Labels>$ is called an \emph{$@l$
+operation}. The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L)
+}$.
 
 \begin{example}
 
@@ -96,29 +97,30 @@ time: the actions in an execution are linearly ordered.
 In this work we consider only histories of well-formed executions, i.e.,~those
 forming interval orders, without explicit qualification.
 
-We define an order relation between histories, which is essential for proving
-the main result of this section but also, for defining our approximation for
-refinement checking. Basically, a history $h_1$ is \emph{weaker than} another
-history $h_2$ if $h_2$ contains all the completed operations in $h_1$ and it
-preserves the order between these operations. The pending operations of $h_1$
-can be omitted or completed in $h_2$.
+This notion of histories gives rise to a natural order relating histories by
+their operation ordering. Basically, a history $h_1$ is \emph{weaker} than
+another history $h_2$ if $h_2$ contains all completed operations of $h_1$, and
+preserves the order between $h_1$'s operations. The pending operations of $h_1$
+can be either omitted or completed in $h_2$.
 
 \begin{definition}
-Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
-\emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
-injection $g: O_2 -> O_1$ such that
-\begin{itemize}
 
-  \item $o \in \<range>(g)$ when $f_1(o) = m(u) => v$ and $v \neq \bot$,
+  Let $h_1 = \tup{O_1,<_1,f_1}$ and $h_2 = \tup{O_2,<_2,f_2}$. We say $h_1$ is
+  \emph{weaker than} $h_2$, written $h_1 \preceq h_2$, when there exists an
+  injection $g: O_2 -> O_1$ such that
+  \begin{itemize}
 
-  \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
+    \item $o \in \<range>(g)$ when $f_1(o) = m(u) => v$ and $v \neq \bot$,
 
-  \item $f_1(g(o)) \ll f_2(o)$ for each $o \in O_2$.
+    \item $g(o_1) <_1 g(o_2)$ implies $o_1 <_2 o_2$ for each $o_1, o_2 \in O_2$,
 
-\end{itemize}
-where $(m_1(u_1) => v_1) \ll (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
-u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
-\emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$. 
+    \item $f_1(g(o)) \ll f_2(o)$ for each $o \in O_2$.
+
+  \end{itemize}
+  where $(m_1(u_1) => v_1) \ll (m_2(u_2) => v_2)$ if{f} $m_1 = m_2$, $u_1 =
+  u_2$, and $v_1 \in \set{ v_2, \bot }$. We say $h_1$ and $h_2$ are
+  \emph{equivalent} when $h_1 \preceq h_2$ and $h_2 \preceq h_1$.
+
 \end{definition}
 
 \begin{example}

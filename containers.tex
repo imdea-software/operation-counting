@@ -205,5 +205,8 @@ Example~\ref{ex:emptyv} with $n > 3$. Despite the theoretical possibility for
 empty violations which only surface for large $n$, our practical experience
 suggests that empty violations tend to surface with small $k$; the bug
 $\text{B}_5$ injected into the elimination stack in our static analysis
-experiment in \S~\ref{sec:exp:static} surfaced as an empty violation, and
-was detected with approximation $A_1$.
+experiment in Section~\ref{sec:exp:static} surfaced as an empty violation, and
+was detected with approximation $A_1$. \alert{Furthermore, the history in Figure~\ref{fig:stacks}(b)
+satisfies the formula $@Y_\mathrm{ev}$ and there exists a weaker Treiber's stack history 
+of length 1 (the history in Figure~\ref{fig:stacks}(c) without one of the pending $\<pop>$ operations),
+which also satisfies $@Y_\mathrm{ev}$.}
