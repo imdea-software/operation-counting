@@ -19,36 +19,39 @@
 
 \begin{figure*}[h]
 {\small
-\begin{flalign*}
-\wellformed(x_0,\ldots,x_{k-1},\ind{1},\ldots,\ind{k'}) =\ 
-  &\exists \dela_0,\delb_0,\ldots,\dela_{k-1},\delb_{k-1}.\ 
-  \exists \delc_\ind{1},\deld_\ind{1},\ldots,\delc_\ind{k'},\deld_\ind{k'}.\\
-& \forall i,j.\ 
+\begin{align*}
+\wellformed(x_0,\ldots,x_{k},\ind{1},\ldots,\ind{k'}) =\ 
+  &\exists \dela_0,\delb_0,\ldots,\dela_{k},\delb_{k} \in [k].\ 
+  \exists \delc_\ind{1},\deld_\ind{1},\ldots,\delc_\ind{k'},\deld_\ind{k'}
+   \in [k].\\
+& \forall i,j \in [k].\ 
   \#(\xval,i,j) \geq 
   |\set{\isub : (\delc_\ind{\isub},\deld_\ind{\isub}) = (i,j)}| + \\
 &  \qquad\qquad|\set{\isub : 
-    \<IsWriteA>(x_\isub) \land
+    \<SameVal>(\xval,x_\isub) \land
     (\dela_\isub,\delb_\isub) = (i,j) }| \land\\
-& \forall \isub.\ \isub \in [\dela_\isub,\delb_\isub] \land
-  \forall \isub.\ \isub \in [\delc_\ind{\isub},\deld_\ind{\isub}]
-\end{flalign*}
+& \forall \isub \in [k].\ \isub \in [\dela_\isub,\delb_\isub] \land\\
+& \forall \isub \in [1,k'].\ \isub \in [\delc_\ind{\isub},\deld_\ind{\isub}]
+\end{align*}
 
 \begin{align*}
-\theycover(x_0,\ldots,x_{k-1},\ind{1},\ldots,\ind{k'}) =\ 
-  & \forall x,i,j.\ \<IsReadA>(x) \land \#(r,i,j) \implies\\
-  & \exists \isub \in [i-1,j].\ \<SameVal>(x,x_{\isub}) \lor\\
+\theycover(x_0,\ldots,x_{k},\ind{1},\ldots,\ind{k'}) =\ 
+  & 
+    \forall r,i,j.\ \<Read>(x) \land \<SameVal>(\xval,x) \land \#(r,i,j) > 0 
+    \implies\\
+  & \exists \isub \in [i-1,j].\ \<SameVal>(r,x_{\isub}) \lor\\
   & \exists \isub \in [1,k'].\ \ind{\isub} \in [i,j]
 \end{align*}
 
 \begin{align*}
 \regform{k} =\ 
-  &\exists x_0,\ldots,x_{k-1}.\ 
-    \bigwedge_{i \in [k-1]} \<Write>(x_i) \land\\
+  &\exists x_0,\ldots,x_{k}.\ 
+    \bigwedge_{i \in [k]} \<Write>(x_i) \land\\
   &\forall \xval.\ \<Write>(\xval) \implies
   \exists k' \leq k.\ 
-  \exists \ind{1},\ldots,\ind{k'}.\\ 
-  &\wellformed(x_0,\ldots,x_{k-1},\ind{1},\ldots,\ind{k'}) \land\\
-  &\theycover(x_0,\ldots,x_{k-1},x_\ind{1},\ldots,x_\ind{k'})
+  \exists \ind{1},\ldots,\ind{k'} \in [k].\\ 
+  &\wellformed(x_0,\ldots,x_{k},\ind{1},\ldots,\ind{k'}) \land\\
+  &\theycover(x_0,\ldots,x_{k},\ind{1},\ldots,\ind{k'})
 \end{align*}
 }
 \caption{The formula ${\tt register}[k]$ representing $L_{\tt reg}$ up to $k$. 
@@ -57,8 +60,7 @@ names of the sub-formulas of ${\tt register}[k]$ start with lower case. The
 predicates are defined as follows: 
 (1) ${\tt Read}(x)$ holds for any $x={\tt read}=>\_$  
 (2) ${\tt Write}(x)$ holds for any $x={\tt write}(\_)=>\_$  
-(3) ${\tt IsReadA}(x)$ holds for  $x={\tt read}=>\xval$ 
-(3) ${\tt IsWriteA}(x)$ holds for  $x={\tt write}(\xval)=>\_$ 
+(3) ${\tt SameVal}(x,y)$ holds for read or writes reading/writing the same value
 }
 \label{fig:register}
 \end{figure*}
@@ -99,10 +101,9 @@ $e\in E(\lreg)$ with $h\preceq H(e)$.
 Now, let $h$ be a history of $H(\lreg)$ 
 and $I:O->[\nbar]^2$ its canonical representation. 
 The procedure for deciding if a history $h$ belongs to $H(\lreg)$ works as 
-follows. First, for each $\ibar \in [\nbar-1]$, it guesses a $\<write>$ 
+follows. First, for each $\ibar \in [\nbar]$, it guesses a $\<write>$ 
 operation $w_\ibar$ which is going to be the \emph{last write} linearized 
-within this interval.
-\todo{Change ``within this interval''?}
+during or before this interval.
 Then, for each value $\xval$, it guesses which intervals are going to contain
 linearization points of $\<write>(\xval)=>\_$ operations. Finally, it checks
 that every $\<read>=>\xval$ can either read from one of the \emph{last write}
@@ -111,20 +112,20 @@ or from one of the $\<write>(\xval)=>\_$ operations just mentioned.
 Formally, the procedure is given by:
 \begin{enumerate}
   \item 
-    for each $\ibar \in [1,\nbar]$, guess a $\<write>$ operation $w_\ibar$ such
-    that $\ibar \in I(w_\ibar)$ (the last write's);
+    for each $\ibar \in [\nbar]$, guess a value $x_\ibar$ corresponding to 
+    the last written value before the end of the interval $[\ibar,\ibar]$
   \item
-    then, for each $\xval$, guess $\nbar' \leq \nbar$ $\<write>(\xval)=>\_$ 
-    operations  
-    $\grwrite{\xval}{\ind{1}},\ldots,\grwrite{\xval}{\ind{\nbar'}}$, which are
-    going to be linearized respectively in the intervals 
-    $\ind{1},\ldots,\ind{\nbar}$;
+    then, for each value $\xval$, guess $\nbar' \leq \nbar$ 
+    $\<write>(\xval)=>\_$ operations  
+    $\grwrite{\xval}{\ind{1}},\ldots,\grwrite{\xval}{\ind{\nbar'}}$, 
+    which are going to be linearized respectively in the intervals 
+    $\ind{1},\ldots,\ind{\nbar}$
   \item
     finally, check that for each completed $\<read>=>\xval$ operation $o$ with 
     $I(o)=[i,j]$, one of the following holds:
   \begin{itemize}
     \item 
-      one of the last writes $w_{i-1},\ldots,w_j$ writes the value $\xval$
+      one of the last written value $x_{i-1},\ldots,x_j$ is $\xval$
     \item 
       there is a $\grwrite{\xval}{\ind{\isub}}$ with $\ind{\isub} \in [i,j]$
   \end{itemize}
@@ -133,16 +134,12 @@ Formally, the procedure is given by:
 The formula $\regform{k}$ representing the atomic register up to $k$ is given 
 in Figure~\ref{fig:register}. It is a mere translation of the above decision 
 procedure in $\ocl$. 
-% The non-deterministic guessing is translated to a bounded 
-% number of existential quantifiers (since it describes histories of bounded 
-% interval length). 
 To simplify the formula, we use some notations such as the set comprehension 
 and the quantification over bounded integers, which can easily be translated 
 to conjunctions and disjunctions. 
 
 Moreover, without loss of generality, we assume that our history always starts 
-with a $\<write>(0)=>\_$ operation (before all other operations), and that it 
-contains enough writes to be able to choose at least one write per interval.
+with a $\<write>(0)=>\_$ operation (before all other operations).
 
 % 
 % We define the $\ocl$ formula $\regform{k}$ representing the atomic register up to some bound $k$. The atomic register, denoted by $\lreg$, is defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists of all sequential executions where every read returns the last written value (or the initial value $0$ if it is not preceded by a write). 
