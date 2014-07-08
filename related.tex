@@ -2,20 +2,25 @@
 \section{Related Work}
 \label{sec:related}
 
-~\cite{DBLP:conf/kbse/ZhangCW13} the same approach as Line-Up but for quasi-linearizability
+%~\cite{DBLP:conf/kbse/ZhangCW13} the same approach as Line-Up but for quasi-linearizability
 
 Existing work on automated verification of concurrent library implementations
 have focused on the criterion of
-\emph{linearizability}~\citep{journals/toplas/HerlihyW90}, which has recently
-been shown to coincide with observational
-refinement~\citep{journals/tcs/FilipovicORY10}. By definition, an execution
-involving concurrent operations is \emph{linearizable} with respect to a
-sequential specification $S$ if there exists some linear order $\sigma$ of
+\emph{linearizability}~\citep{journals/toplas/HerlihyW90}. 
+\citet{journals/tcs/FilipovicORY10}
+shows that linearizability is equivalent to refinement when restricting the set of executions in a library
+such that they contain only completed operations. They also show that, in general, linearizability implies
+observational refinement. 
+By definition, an execution
+involving concurrent operations is \emph{linearizable} with respect to an
+atomic reference implementation $L$ if there exists some linear order $\sigma$ of
 those operations (consistent with the partial order defined by the concurrent execution), 
-which is executable by $S$. This criterion leads to automation
+which is executable by $L$ (in our framework, $\sigma$ represents an execution in
+the kernel of $L$). 
+This criterion leads to automation
 either by determining the \emph{linearization
-point}~\citep{journals/toplas/HerlihyW90} of each operation, thus determining
-the linear order of operations by that in which their linearization points were
+point}~\citep{journals/toplas/HerlihyW90} of each operation, 
+thus determining the linear order of operations by that in which their linearization points were
 executed, or by exhausting every possible linearization. While, on the one
 hand, considering linearization points has led to several semi-automated
 approaches for proving observational refinement~\citep{DBLP:conf/cav/AmitRRSY07,conf/fm/LiuCLS09, conf/podc/OHearnRVYY10,
@@ -24,13 +29,15 @@ conf/cav/DragoiGH13}, manual human effort is often necessary in annotating
 methods with their linearization point. On the other hand, while additional
 automation can be had for detecting violations of observational refinement 
 by exhaustively considering all possible linearizations,
-for instance via the testing-based tools LineUp~\citep{conf/pldi/BurckhardtDMT10} and COLT~\citep{DBLP:conf/oopsla/ShachamBASVY11}, exponential
+for instance via the testing-based tools LineUp~\citep{conf/pldi/BurckhardtDMT10} and 
+COLT~\citep{DBLP:conf/oopsla/ShachamBASVY11}, exponential
 explosion in the number of linearizations severely limits the number of
-executed operations for which exploration is possible. 
+executed operations for which exploration is possible (as we show in \S\ref{sec:exp:dynamic}). 
 
 Others have considered the theoretical limits in verifying linearizability.
 \citet{journals/siamcomp/GibbonsK97} showed that the linearizability of a
-single execution is NP-complete, while \citet{journals/iandc/AlurMP00} showed
+single execution is NP-complete (they consider as reference implementation an atomic register), 
+while \citet{journals/iandc/AlurMP00} showed
 that determining linearizability of a library implementation with respect to a
 given regular sequential specification is in EXPSPACE, so long as the number of
 concurrent operations is bounded. \citet{conf/esop/BouajjaniEEH13} has shown that the same

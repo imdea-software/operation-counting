@@ -61,32 +61,35 @@ quotients.
     \<total>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,i',j') \\
     \<total>(x)     &= \sum_{0\leq i\leq j\leq k}\<total>(x,i,j) \\
     \<isP>(x)       &= \<P>(x)\land \<total>(x) > 0 \\
-                    & \text{ for all predicates } \<P>\in\set{\<CAdd>,\<PAdd>,\<CRem>,\<PRem>} \\
-    \<isAdd>(x)     &= (\<PAdd>(x)\vee \<CAdd>(x))\land \<total>(x) > 0 \\
+                    & \text{ for all predicates } \<P>\in\set{\<CPush>,\<PPush>,\<CPop>,\<PPop>} \\
+    \<isPush>(x)     &= (\<PPush>(x)\vee \<CPush>(x))\land \<total>(x) > 0 \\
 %    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
     \<before>(x,y)  &= \bigvee_{0 \le i < k} \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
-    \<noAdd>(x)     &= \forall y. \neg (\<isAdd>(y) \land \<SameVal>(x,y)) \\
-    \<lessAdds>(x)  &= \exists y.\ \<isAdd>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
-    \<noPRem>(x) &= \forall y.\ ( \neg \<isPRem>(y) \vee \<before>(x,y)) \\
-    @Y_\mathrm{rv}  &= \exists x.\ \<isCRem>(x)  /|  (\<noAdd>(x) \vee \<lessAdds>(x) ) \\
-    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) /| \<isAdd>(x_2) \\
-                    &  /|  \<CRem>(y_1) /| \<isCRem>(y_2) /| \<sameVal>(x_1,y_1) \\
-                    &  /| \<sameVal>(x_2,y_2) /| \<before>(x_1,x_2) \\
+    \<noPush>(x)     &= \forall y. \neg (\<isPush>(y) \land \<SameVal>(x,y)) \\
+    \<lessPush>(x)  &= \exists y.\ \<isPush>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
+    \<noPPop>(x) &= \forall y.\ ( \neg \<isPPop>(y) \vee \<before>(x,y)) \\
+    @Y_\mathrm{rv}  &= \exists x.\ \<isCPop>(x)  /|  (\<noPush>(x) \vee \<lessPush>(x) ) \\
+    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCPush>(x_1) /| \<isPush>(x_2) \\
+                    &  /|  \<CPop>(y_1) /| \<isCPop>(y_2) /| \<SameVal>(x_1,y_1) \\
+                    &  /| \<SameVal>(x_2,y_2) /| \<before>(x_1,x_2) \\
                     & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \\
-                    & \hspace{6mm} \vee \big(  \<total>(y_1) = 0 /| \<noPRem>(y_2) \big)\Big)\\
-%                    & \quad \quad /| \forall y_3.\ ( \neg \<isPRem>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
-   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<isCAdd>(x_1) /| \<isCAdd>(x_2)  \\
-                    & /| \<isCRem>(y_1) /| \<isCRem>(y_2) /| \<sameVal>(x_1,y_1) \\
-                    & /| \<sameVal>(x_2,y_2) /| \<before>(x_1,x_2) /| \<before>(y_1,y_2) \\
+                    & \hspace{6mm} \vee \big(  \<total>(y_1) = 0 /| \<noPPop>(y_2) \big)\Big)\\
+%                    & \quad \quad /| \forall y_3.\ ( \neg \<isPPop>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
+   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<isCPush>(x_1) /| \<isCPush>(x_2)  \\
+                    & /| \<isCPop>(y_1) /| \<isCPop>(y_2) /| \<SameVal>(x_1,y_1) \\
+                    & /| \<SameVal>(x_2,y_2) /| \<before>(x_1,x_2) /| \<before>(y_1,y_2) \\
 		 & /| \<before>(x_2,y_1) \\
-    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<isCAdd>(x) /| \<isCRem>(y)  \\
-                    &  /| \<sameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
-                    &  /| \<before>(y,z) /| \big( \<isCRem>(z) \vee \<noPRem>(y) \big)
+    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<isCPush>(x) /| \<isCPop>(y)  \\
+                    &  /| \<SameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
+                    &  /| \<before>(y,z) /| \big( \<isCPop>(z) \vee \<noPPop>(y) \big)
   \end{align*}
   \caption{Four families of operation-counting formulae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
     \protect\<Nats>$. Predicates begin with capital letters, and macros begin
-    in lowercase.
+    in lowercase. The predicate ${\tt CPush}(x)$ (resp., ${\tt PPush}(x)$) holds for labels of completed (resp., pending) ${\tt push}$
+    operations, i.e. $x={\tt push}(\_)$ (resp., $x={\tt push}(\_)=>\bot$). Analogously, for ${\tt CPop}(x)$ and ${\tt PPop}(x)$.
+    The predicate ${\tt SameVal}(x,y)$ holds for any pair $x={\tt push}(u)$ and $y={\tt pop}=>u$. Finally, ${\tt EmptyVal}(x)$
+    holds for $x={\tt pop}=>{\tt Empty}$.
   }
   \label{fig:spec:ds}
 \end{figure}

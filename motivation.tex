@@ -102,7 +102,8 @@ void thread2() {
 
 Unfortunately this nonblocking implementation suffers from a subtle concurrency
 bug, now commonly known as an ``ABA'' bug~\cite{tr/ibm/Michael04}. This bug
-manifests via the execution depicted in Figure~\ref{fig:stacks}(a).
+manifests via the execution depicted in Figure~\ref{fig:stacks}(a), of the two-thread
+program given in Figure~\ref{fig:treiber}.
 Essentially, Thread~1 wrongfully assumes the absence of interference from other
 threads on the successful {\tt CAS} operation. Thread~1 is preempted right
 before executing its {\tt CAS} in the {\tt pop} method; at that moment, its
