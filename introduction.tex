@@ -28,7 +28,7 @@ happens-before (partial-order) relation between invoked object methods. We
 demonstrate that refinement between libraries is equivalent to a containment
 problem between sets of histories, and a violation to refinement corresponds to
 history-set inclusion problem. In fact, even checking whether the history of a
-single execution belongs to a given set is
+single execution belongs to the set of histories of a fixed library is
 NP-hard~\cite{journals/siamcomp/GibbonsK97}.
 
 % As mentioned earlier, existing approaches for finding refinement violations
@@ -194,29 +194,28 @@ for a wide class of objects.
 
 \paragraph{Demonstrating feasibility}
 
-The reduction of interval-bounded refinement checking to reachability checking
-can be exploited in several ways. We demonstrate in the paper that our approach
+We demonstrate in the paper that our approach
 is feasible both with a dynamic and a static state space exploration strategy.
 
-In the dynamic case, we show experimentally two remarkable facts: First, our
+In the dynamic case, we show experimentally two remarkable facts. First, our
 approach is \emph{scalable}: its overhead is low and does not increase with the
 length of computations, whereas the overhead of the standard approach (used in
-existing tools such as Line-Up \cite{}) that is based on enumerating
+existing tools such as Line-Up~\cite{conf/pldi/BurckhardtDMT10}) that is based on enumerating
 linearizations of executions explodes exponentially. Second, our approach is
 \emph{efficient} and well suited for catching refinement violations: most of
 these violations in practice are detected with small bounds, i.e., for $k$
 ranging from 0 to $2$, and only few (marginal) cases need greater bounds such
-as 3 or 4. On this issue, we were actually able to prove that for the common
-data structures of stacks and queues, refinement checking for order constraints
+as 3 or 4. On this issue, we were actually able to prove that for 
+stacks and queues, refinement checking for order constraints
 can actually be reduced (without loss of completeness) to bounded refinement
 checking with small cut-off bounds, namely 3 and 2 respectively.
 
 In the static case, using the fact that sets of histories can be represented
-using arithmetical constraints, we can, for the first time check the existence
+using arithmetical constraints, we can, for the first time, check the existence
 of refinement violations using existing tools for reachability analysis of
-concurrent programs such as CSeq \cite{} (with backend CBMC \cite{}) and SMACK
-\cite{} (with backend Corral \cite{}) that are based on efficient symbolic
+concurrent programs such as CSeq~\cite{conf/ase/FischerIP13} (with backend CBMC~\cite{conf/tacas/KroeningT14}) and SMACK~\cite{conf/cav/RakamaricE14} (with backend Corral~\cite{conf/cav/LalQL12}) that are based on efficient symbolic
 encodings of sets of computations and the use of SAT/SMT solvers.
+
 
 \subsection{Summary of Contributions}
 
