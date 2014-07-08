@@ -10,7 +10,7 @@
   \node[lnode] (x2)  [right of=x1,label={[rotate=60,above=1mm]right:$\<ret>$}] {}; %label=above:$x$
   \node[lnode] (x3)  [right of=x2,label={[rotate=60,above=1mm]right:$\<pop>()$}] {}; 
   \node[nnode] (x4)  [right of=x3] {}; 
-  \node[nnode] (x41) [right= 2.5mm of x4,label={[above=1mm,xshift=15mm]above:{\it preemption at line 18}}] {};
+  \node[nnode] (x41) [right= 2.5mm of x4,label={[above=1mm,xshift=15mm]above:{\it preemption before {\tt CAS}}}] {};
 
   \node[node] (z0)  [right=3mm of x1] {}; 
   \node[node] (z1)  [below=3mm of x1,xshift=5mm] {{\tt n=0xFF}}; 
