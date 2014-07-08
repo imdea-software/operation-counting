@@ -206,7 +206,12 @@ empty violations which only surface for large $n$, our practical experience
 suggests that empty violations tend to surface with small $k$; the bug
 $\text{B}_5$ injected into the elimination stack in our static analysis
 experiment in Section~\ref{sec:exp:static} surfaced as an empty violation, and
-was detected with approximation $A_1$. \alert{Furthermore, the history in Figure~\ref{fig:stacks}(b)
-satisfies the formula $@Y_\mathrm{ev}$ and there exists a weaker Treiber's stack history 
+was detected with approximation $A_1$. 
+\alert{Similarly, the history in Figure~\ref{fig:stacks}(b)
+satisfies $@Y_\mathrm{ev}$ and there exists a weaker Treiber's stack history 
 of length 1 (the history in Figure~\ref{fig:stacks}(c) without one of the pending $\<pop>$ operations),
-which also satisfies $@Y_\mathrm{ev}$.}
+which also satisfies $@Y_\mathrm{ev}$. On the other hand, in practice, we have found that if a library
+has an empty violation, then it also has an ordering violation. For example, if we consider the execution
+in Figure~\ref{fig:stacks}(a), if the first thread would have executed another $\<push>(4)$ operation before
+$\<push>(1)$, then the last $\<pop>$ operation in the execution would have returned $4$ and the execution
+would reveal an ordering violation instead of an empty violation.}
