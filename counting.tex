@@ -419,7 +419,7 @@ history incrementally, according to the increment/decrement and shift
 operations of Lemmas~\ref{lem:incr} and~\ref{lem:shift}. The variable $n$
 maintains the interval length of the input execution's history $H(e)$, while
 the variable $s$ maintains the infimum $s(o)$ of the interval of each operation
-$o$ in $H(e)$ (the value $s(o)$ can be discarded once the operation $o$ finishes). 
+$o$ in $H(e)$ (the value $s(o)$ can be discarded once the operation $o$ completes). 
 The corresponding infimum in $A_k(H(e))$ when $o$ is invoked is
 given by $\min(n,k)$, as the interval bounds used in $A_k(H(e))$ may not exceed
 $k$. When $o$ completes, it is possible that some number of shift operations
