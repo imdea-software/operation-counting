@@ -201,20 +201,22 @@ due to lack of space.
 
 \end{lemma}
 
-It follows from Lemmas~\ref{lem:cutoff} and~\ref{lem:rep} that the $A_3$
-approximation is guaranteed to discover any stack/queue violation in
-histories using unique values, modulo the empty violations of
-Example~\ref{ex:emptyv} with $n > 3$. Despite the theoretical possibility for
-empty violations which only surface for large $n$, our practical experience
-suggests that empty violations tend to surface with small $k$; the bug
-$\text{B}_5$ injected into the elimination stack in our static analysis
-experiment in Section~\ref{sec:exp:static} surfaced as an empty violation, and
-was detected with approximation $A_1$. 
-\alert{Similarly, the history in Figure~\ref{fig:stacks}(b)
-satisfies $@Y_\mathrm{ev}$ and there exists a weaker Treiber's stack history 
-of length 1 (the history in Figure~\ref{fig:stacks}(c) without one of the pending $\<pop>$ operations),
-which also satisfies $@Y_\mathrm{ev}$. On the other hand, in practice, we have found that if a library
-has an empty violation, then it also has an ordering violation. For example, if we consider the execution
-in Figure~\ref{fig:stacks}(a), if the first thread would have executed another $\<push>(4)$ operation before
-$\<push>(1)$, then the last $\<pop>$ operation in the execution would have returned $4$ and the execution
-would reveal an ordering violation instead of an empty violation.}
+Lemmas~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation is
+guaranteed to discover any stack/queue violation in histories using unique
+values, modulo the empty violations of Example~\ref{ex:emptyv} for $n > 3$.
+
+Despite the theoretical possibility for empty violations which only surface for
+large $n$, our practical experience suggests small $n$ tends to suffice. The
+bug $\text{B}_5$ of our static analysis experiment in
+Section~\ref{sec:exp:static} surfaced as an empty violation, and was detected
+with approximation $A_1$, implying $n \le 1$, i.e.,~where some unmatched
+$\<push>$ operation precedes $\<pop>({\tt EMPTY})$. Similarly, the empty
+violation of Figure~\ref{fig:stacks}(b) is also a violation of the weaker
+length-$1$ history in Figure~\ref{fig:stacks}(c) satisfying $@Y_\mathrm{ev}$.
+Furthermore, we have found that the same bugs which manifest as empty
+violations often manifest as order violations as well. The ABA bug of
+Figure~\ref{fig:stacks}(a) is such a case: had the first thread executed
+another $\<push>(4)$ before $\<push>(1)$, then the final $\<pop>$ of Thread~2
+would have returned $4$, yielding the order violation $\<push>(4); \<push>(2);
+\<pop> => 4$.
+
