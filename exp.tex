@@ -25,20 +25,22 @@ linearizable.}, while others, such as Kirsch et al.'s
 $k$-FIFO~\cite{conf/pact/KirschLP13}, are meant to preserve weaker properties.
 Unless otherwise noted, we use these implementations without modification,
 except to annotate methods with a fixed set of possible preemption points,
-e.g.,~preceding shared-memory accesses.
+e.g.,~preceding shared-memory accesses. While space prohibits including the
+entirety of our study, the sample and analysis which we do include is
+representative.
 
 For our first two experiments (\S\ref{sec:exp:coverage},
-\S\ref{sec:exp:dynamic}), we have developed a tool for enumerating a (possibly
-large) number of alternate executions involving a limited number of object
-method invocations. We run each operation on a separate thread, and execute all
-thread schedules up to a given number $n \in \<Nats>$ of thread preemptions, at
-specified preemption points, similarly to Microsoft's Chess
-tool~\cite{conf/osdi/MusuvathiQBBNN08}. With $n=0$ preemptions, there is only
-one schedule to execute, though the number of schedules grows exponentially as
-$n$ increases. For instance, with our annotation of preemptions in Scal's
-Michael-Scott Queue, we execute $f(n)$ schedules of a program with $8$ method
-invocations at a rate of roughly one million schedules per minute, where $f$ is
-given by
+\S\ref{sec:exp:dynamic}) we have developed a tool for systematically
+enumerating a large number of alternate executions involving a limited number
+of object method invocations. We run each operation on a separate thread, and
+execute all thread schedules up to a given number $n \in \<Nats>$ of thread
+preemptions, at specified preemption points, similarly to Microsoft's Chess
+tool~\cite{conf/osdi/MusuvathiQBBNN08}. With $n\!=\!0$ preemptions, there is
+only one schedule to execute, though the number of schedules grows
+exponentially as $n$ increases. For instance, with our annotation of
+preemptions in Scal's Michael-Scott Queue, we execute $f(n)$ schedules of a
+program with $8$ method invocations at a rate of roughly one million schedules
+per minute, where $f$ is given by
 {\footnotesize
 \begin{align*}
   f(1) = 33, f(2) = 612, f(3) = 8343, f(4) = 95434, f(5) = 930141
@@ -50,9 +52,7 @@ CSeq~\cite{conf/ase/FischerIP13} to sequentialize a simple program which
 invokes a limited number of library methods, and then
 CBMC~\cite{conf/tacas/KroeningT14} (version 4.5) to perform bounded model
 checking up to a given loop-unroll bound. All measurements were made on similar
-MacBook Pro 2.XGHz Intel Core i5/i7 machines. While space prohibits including
-the entirety of our experiments, we do include a representative sample and
-analysis.
+MacBook Pro 2.XGHz Intel Core i5/i7 machines.
 
 \subsection{Coverage of Refinement Violations}
 \label{sec:exp:coverage}
@@ -102,7 +102,6 @@ point.
     numbers of those violations covered by $A_k$, for varying values of $k$.
   }
   \label{fig:data:coverage}
-%  \vspace{-3mm}
 \end{figure}
 
 \subsection{Operation Counting for Testing \& Runtime Monitoring}
@@ -143,36 +142,34 @@ runtime monitoring, where the number of operations grows without limit.
     with $20$ operations.
   }
   \label{fig:data:runtime}
- % \vspace{-3mm}
 \end{figure}
 
 \subsection{Operation Counting for Static Analysis}
 \label{sec:exp:static}
 
-TODO SAY THAT WE USE THE FORMULA IN Theorem~\ref{theorem:Parikh}
+Our approximation $A_k$ also leads to an effective static means of refinement
+checking, due to the simplicity of operation-counting. By using only simple
+increment and decrement operations on integer counters, and program
+assertions\footnote{We constructed program assertions automatically via
+Theorem~\ref{thm:formula}.} on those counters, we are able to leverage static
+verification tools capable of integer reasoning. We have found that the major
+obstacle in applying static tools is concurrency: even though the required
+counter reasoning is simple, reasoning precisely about thread interleavings is
+challenging, with or without our operation-counting instrumentation.
 
-Our approximation $A_k$ also leads to an effective static means of detecting
-refinement violations, due to the simplicity of an operation-counting based
-implementation. Essentially, by using only simple increment and decrement
-operations on integer counters, we are able to leverage static verification
-tools that are capable of integer reasoning. We have found that the major
-obstacle in leveraging such tools is concurrency: even though the required
-counter reasoning is simple, reasoning precisely about program concurrency is a
-formidable challenge, with or without our operation-counting instrumentation.
-
-Despite the difficultly of concurrency reasoning statically, we have
-successfully applied our approach using two different static-verification
-backends: one based on SMACK~\cite{conf/cav/RakamaricE14} and
-Corral~\cite{conf/cav/LalQL12}, and the other based on
+Despite the difficultly of precise static reasoning about thread interleavings,
+we have successfully applied our approach using two different
+static-verification backends: one based on SMACK~\cite{conf/cav/RakamaricE14}
+and Corral~\cite{conf/cav/LalQL12}, and the other based on
 CSeq~\cite{conf/ase/FischerIP13} and CBMC~\cite{conf/tacas/KroeningT14}. Both
 toolchains are based on sequentialization~\cite{journals/fmsd/LalR09} and
 SMT-based bounded model checking. Our results in Table~\ref{tab:exp:static}
-report only on the latter toolchain. Among $5$ data structure implementations,
-we manually injected $9$ realistic concurrency bugs. All bugs were uncovered as
-refinement violations with approximation $A_0$ or $A_1$, in round-robin
-executions of up to $4$ rounds, of a program with at most $4$ {\sf push} and
-$4$ {\sf pop} operations, and with loops unrolled up to $2$ times. Although the
-time complexity of concurrent exploration is high independently of our
+report on the latter. Among $5$ data structure implementations, we manually
+injected $9$ realistic concurrency bugs. All bugs were uncovered as refinement
+violations with approximation $A_0$ or $A_1$, in round-robin executions of up
+to $4$ rounds, of a program with at most $4$ {\sf push} and $4$ {\sf pop}
+operations, and with loops unrolled up to $2$ times. Although the time
+complexity of concurrent exploration is high independently of our
 operation-counting instrumentation, particularly as the number of rounds
 increases, one clearly observes that our approximation is effective in
 detecting violations statically.
@@ -180,6 +177,7 @@ detecting violations statically.
 \begin{table}[t]
   \footnotesize
   \centering
+  \setlength{\tabcolsep}{1.8mm}
   \begin{tabular}{llllllr}
   Library & Bug                  & $P$ & $k$ & $m$ & $n$ & Time \\
   \hline
@@ -207,7 +205,6 @@ detecting violations statically.
     exceeded.
   }
   \label{tab:exp:static}
- % \vspace{-3mm}
 \end{table}
 
 %% NOTE THE FOLLOWING IS GOOD TO KNOW EVEN IF IT DOESN'T APPEAR IN THE PAPER
