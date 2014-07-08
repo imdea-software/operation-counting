@@ -1,266 +1,3 @@
-<<<<<<< HEAD
-%!TEX root = draft.tex
-\section{Introduction}
-
-Efficient implementations of (shared-memory) concurrent objects such as
-semaphores, locks, atomic registers, and data structures (like sets, stacks,
-and queues) are essential to modern computing. Several libraries implementing
-operations for the manipulation of such objects are available (e.g., \cite{}).
-Clients (or users) of these libraries assume that the latter are \emph{conform}
-to \emph{reference implementations} where, typically operations (or methods) are
-\emph{atomic}, as it helps apprehending the library behaviors. However, in order
-to minimize synchronization overhead between concurrent object invocations,
-implementors of concurrent objects need to relax atomicity, allowing operations
-to be concurrently intertwined. Still, implementors must ensure that this
-relaxation is fully transparent to the client, that is, the interactions of the
-library with the client should indeed be conform to his expectations
-(corresponding to the reference implementation). This is a notoriously hard and
-error prone task. The necessary intricacy of these implementations is indeed a
-breeding ground for insidious and difficult-to-diagnose bugs. Accordingly,
-algorithmic methods for detecting conformance violation between implementations
-of concurrent objets is in high demand. Conformance between libraries is
-formally captured by the concept of \emph{observational refinement}: Given two
-libraries $L_1$ and $L_2$, each of them implementing the operations of some
-concurrent object, $L_1$ \emph{refines} $L_2$ if and only if for every
-(library-client) program $P$, every computation of $P$ invoking $L_1$ is also
-possible when $P$ invokes $L_2$ instead. The challenge we address in this paper is to provide an 
-efficient algorithmic approach for automatic observational refinement checking.
-
-Verifying observational refinement is an intrinsically hard problem, and is
-undecidable in general. The contribution of this work is in developing a
-tractable approach for detecting refinement violations, and is divided into two
-main parts.
-
-In the first part, outlined in Section~\ref{sec:intro:histories}, we establish
-a foundational characterization of observational refinement in terms of sets of
-so-called \emph{histories}; histories abstract concurrent executions into the
-happens-before (partial-order) relation between invoked object methods. We
-demonstrate that refinement between libraries is equivalent to a containment
-problem between sets of histories, and a violation to refinement corresponds to
-history-set inclusion problem. In fact, even checking whether the history of a
-single execution belongs to a given set is
-NP-hard~\cite{journals/siamcomp/GibbonsK97}.
-
-% As mentioned earlier, existing approaches for finding refinement violations
-% are based on finding linearizability bugs, and they do that basically by
-% enumerating all the (exponentially many) possible linearizations of
-% executions, which can only be applied for a limited number of operation
-% invocations. Moreover, from our result in \cite{}, observational refinement is
-% in general undecidable. (The proof there concerns linearizability, but uses a
-% specification that can be seen as an atomic reference implementation.) To
-% overcome these decidability and complexity obstacles, we adopt an approach
-% based on parameterized under-approximations.
-
-Motivated by the aforementioned hardness results, in the second part, outlined
-in Section~\ref{sec:intro:approx}, we develop a novel parameterized
-approximation for refinement checking, and demonstrate that our approach is
-feasible, leading to scalable and efficient algorithms for detecting refinement
-violations. The insight behind our approximation exploits fundamental
-properties of the histories arising from shared-memory concurrent executions:
-they are a special class of partial orders called interval orders. Such orders
-admit convenient representations leading to efficient automation, and reveal a
-useful measure for the parameter of our approximation. In practice we find that
-coarse approximations uncover refinement violations, and can be implemented
-much more efficiently than existing approaches.
-
-% We have implemented the reduction above using both a dynamic and static
-% analysis strategy. We used our implementation to show that our approach is
-% scalable and efficient in detecting refinement violations. Let us describe in
-% the sequel the contents of the paper and its contributions in more details.
-
-% In fact, we use as a concept of approximation the notion of partial-order
-% weakening, i.e., we approximate a history by relaxing some of its order
-% constraints. We show that if a history is not valid (i.e., it is not a history
-% of the reference library), then the same holds for any stronger history. Then,
-% we observe that histories of shared-memory libraries are special
-% partial-orders, called interval orders. These orders admit a canonical
-% representation and an associated notion of length that lead to a the
-% definition of natural parametrized approximation schema, which consists in
-% considering weaker histories of bounded length. Finally, we show that it is
-% possible to use counters to reason about bounded-length histories, and this
-% leads to a reduction of the bounded refinement checking to a reachability
-% problem. The reduction is based on constructing a simple monitor that tracks
-% bounded length histories of the implementation library and checks that they
-% satisfy an invariant characterizing the set of histories of the reference
-% library. In fact, using counter representations for histories is crucial in
-% this reduction as it allows representing symbolically sets of histories using
-% arithmetical constraints. We provide such symbolic representations for common
-% data structures and show that for a wide class of concurrent objects, these
-% representation can be computed systematically. Interestingly, we prove that
-% for stacks and queues, refinement checking can be checked precisely using our
-% approximation schema using small cut-off bounds less than 3.
-
-\subsection{Characterizing Observational Refinement}
-\label{sec:intro:histories}
-
-Naturally, automating the verification of observational refinement is quite
-challenging. The most immediate obstacle arises from the quantification over
-the infinitely many possible library-client programs. The first contribution of
-this paper is to provide a \emph{precise} characterization of the observational
-refinement problem between two libraries $L_1$ and $L_2$ as an inclusion
-problem between two sets of (happen-before) partial orders on their operations,
-defined independently from their execution contexts.
-
-More precisely, we associate to each execution a partial order on its
-operations, called \emph{history}, where an operation $o_1$ is considered to
-happen before an operation $o_2$ if $o_1$ returns (terminates) before $o_2$ is
-called (starts). We prove that a library $L_1$ refines another one $L_2$ if and
-only if the set $H(L_1)$ of histories (associated with the executions) of $L_1$
-is included in the set $H(L_2)$ of histories of $L_2$.
-
-\paragraph{History inclusion vs. linearizability}
-
-The characterization above of observational refinement is a fundamental result
-that offers a fresh view for reasoning about this problem. Indeed, the
-principal approach for tackling the problem of checking observational refinement
-in the literature is based on checking \emph{linearizability} \cite{}, i.e.,
-that every execution in $L_1$ can be reordered into an execution of $L_2$ while
-preserving the order between return and call actions. While linearizability
-implies observational refinement \cite{}, we show that the converse does not
-hold in general. In order to shed light on the subtle relation between these
-concepts, we investigate the links between history inclusion and
-linearizability. We prove that, interestingly, when $L_2$ is atomic (which is
-typically the case for reference implementations as mentioned above), history
-inclusion (and therefore observational refinement) between $L_1$ and $L_2$ is
-equivalent to linearizability.
-
-As we will see in the sequel, besides being a useful semantical means for
-reasoning about observational refinement, our characterization of this problem
-as a history inclusion problem leads to an efficient and powerful approach for
-detecting refinement violations.
-
-
-\subsection{Approximating Observational Refinement}
-\label{sec:intro:approx}
-
-\paragraph{Parameterized approximation schema}
-
-The approach we introduce in this paper is based on fundamental properties of
-library executions and their histories. The basic idea is to consider a notion
-of \emph{weakening pre-order} $\preceq$ on histories as a means for
-approximation: A history $h_1$ is \emph{weaker} than another history $h_2$,
-written $h_1 \preceq h_2$, if $h_1$ is obtained from $h_2$ by relaxing some of
-its order constraints. We prove that if $h$ is a history of a library $L$ then 
-every weaker history $h'\preceq h$ is also a history of $L$. This leads to the approximation principle, 
-which consists in considering for histories $h\in H(L_1)$ approximations $h' \preceq h$, such that checking 
-$h' \in H(L_2)$ is \emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in
-H(L_2)$, and therefore a refinement violation is found.
-
-So, the challenge we undertake is to provide an approximation schema based on
-defining a series of functions $A_k$, parameterized with $k \in \mathbb{N}$,
-such that for every $h$, we have (1) $A_k (h) \preceq h$, and (2) the test
-$A_k(h) \in H(L_2)$ is decidable in \emph{polynomial time} (w.r.t. size of $h$).
-Moreover, the schema should be \emph{complete} in the sense that there must be a
-$k$ such that $h \preceq A_k(h)$, which means that if a violation exists, it
-will be captured for a large enough parameter. Finally, and quite importantly,
-we seek for an approximation schema that is easy to implement, and which is
-able to catch refinement violations with small parameter values.
-
-\paragraph{Bounded interval-length histories}
-
-We provide such an approximation schema, exploiting a fundamental
-property of the executions of \emph{shared-memory} libraries: We show
-that histories of such executions are \emph{interval orders}. These orders
-admit \emph{canonical representations} where each element $o$ is
-mapped to an integer-bounded interval $I(o)$ such that for every two elements
-$o_1$ and $o_2$, $o_1$ is before $o_2$ if and only if $I(o_1)$ ends before
-$I(o_2)$ starts~\cite{phd/Greenough76}. Also, interval orders have a 
-notion of \emph{length} which corresponds to the maximal upper-bound of an
-interval in their canonical representation.
-
-This leads us to the definition of a parameterized approximation
-schema where the parameter $k$ corresponds to the notion of length
-mentioned above: For each $k \in \mathbb{N}$, the function $A_k$ maps each
-history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length at most $k$. 
-%In
-%this paper, we consider approximation functions that keep precise the last $k$
-%interval bounds, and abstract all the previous ones with equality.
-
-\paragraph{Reduction to reachability using counting representations}
-
-We show that interval-length bounding is a tractable approach for
-refinement checking, and that it can be implemented efficiently. A key idea for
-that is to use \emph{counting representations} for bounded interval-length
-histories: each interval is represented by a counter corresponding to the
-number of elements mapped to this interval in the canonical representation.
-%(Notice that there might be an unbounded number of elements mapped to a same
-%interval.) 
-Indeed, representing histories as vectors of integers opens the door
-to symbolic manipulation of sets of histories using arithmetical constraints.
-In fact, we introduce for that purpose a simple logic, called 
-Operation Counting Logic (OCL), that is suitable for reasoning about libraries
-implementing common concurrent objects, and for which checking if a given
-history satisfies a formula can be done in \emph{polynomial time}.
-
-Moreover, counting representations provide a simple way for implementing a
-monitor $P_k$ that tracks histories of interval-length at most $k$. In fact, we define
-a \emph{polynomial time} algorithm that, given an execution, builds a
-($k$-bounded interval-length) approximation history of it. Therefore, bounded
-interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
-\emph{reachability (or invariant) checking} problem in $P_k$ composed with
-$L_1$, provided that the set of histories $A_k(H(L_2))$ is effectively defined
-in OCL. We show that this is the case for reference implementations of the
-usual concurrent objects such as collection objects (like stacks or queues),
-semaphores, locks, etc, and that these OCL formulas can be constructed systematically
-for a wide class of objects.
-
-\paragraph{Demonstrating feasibility}
-
-The reduction of interval-bounded refinement checking to reachability checking
-can be exploited in several ways. We demonstrate in the paper that our approach
-is feasible both with a dynamic and a static state space exploration strategy.
-
-In the dynamic case, we show experimentally two remarkable facts: First, our
-approach is \emph{scalable}: its overhead is low and does not increase with the
-length of computations, whereas the overhead of the standard approach (used in
-existing tools such as Line-Up \cite{}) that is based on enumerating
-linearizations of executions explodes exponentially. Second, our approach is
-\emph{efficient} and well suited for catching refinement violations: most of
-these violations in practice are detected with small bounds, i.e., for $k$
-ranging from 0 to $2$, and only few (marginal) cases need greater bounds such
-as 3 or 4. On this issue, we were actually able to prove that for the common
-data structures of stacks and queues, refinement checking for order constraints
-can actually be reduced (without loss of completeness) to bounded refinement
-checking with small cut-off bounds, namely 3 and 2 respectively.
-
-In the static case, using the fact that sets of histories can be represented
-using arithmetical constraints, we can, for the first time check the existence
-of refinement violations using existing tools for reachability analysis of
-concurrent programs such as CSeq \cite{} (with backend CBMC \cite{}) and SMACK
-\cite{} (with backend Corral \cite{}) that are based on efficient symbolic
-encodings of sets of computations and the use of SAT/SMT solvers.
-
-\subsection{Summary of Contributions}
-
-To summarize, the papers presents the following contributions:
-\begin{itemize}
-
-  \item A characterization of observational refinement as a history inclusion
-  problem, and the proof that history inclusion is equivalent to
-  linearizability for atomic reference implementations.
-
-  \item The definition of general parameterized under-approximation schema for
-  detecting observational refinement violations based on a weakening pre-order
-  on histories, and the instantiation of this schema based on the fact that
-  histories of shared-memory libraries are interval-orders: The provided
-  approximation schema is based on considering weaker histories of bounded
-  interval-length.
-
-  \item An efficient implementation of this schema using counting
-  representations: Providing (1) a reduction of bounded refinement checking to
-  a reachability problem using arithmetics-based symbolic representations of
-  sets of interval-length bounded histories, as well as (2) symbolic
-  representations for sets of histories for common data structures (such as
-  stacks and queues), and a procedure for automatic generation of these
-  representations for a class of concurrent objects. Proving a cut-off bound
-  result for refinement checking of order constraints for stacks and queues.
-
-  \item Use of the reduction to reachability checking for defining dynamic and
-  static analysis algorithms for detecting refinement violations, and showing
-  the efficiency and the scalability of the approach in practice.
-
-\end{itemize}
-=======
 %!TEX root = draft.tex
 \section{Introduction}
 
@@ -391,15 +128,11 @@ library executions and their histories. The basic idea is to consider a notion
 of \emph{weakening pre-order} $\preceq$ on histories as a means for
 approximation: A history $h_1$ is \emph{weaker} than another history $h_2$,
 written $h_1 \preceq h_2$, if $h_1$ is obtained from $h_2$ by relaxing some of
-its order constraints. An important fact that makes this idea exploitable is
-that, for every library $L$ (in some formally well defined sense), the set of
-its histories $H(L)$ is \emph{downward closed} under $\preceq$, that is, if
-$H(L)$ contains a history $h$, than it contains also all weaker histories than
-$h$. Indeed, this fact leads to the principle of considering for histories $h
-\in H(L_1)$ approximations $h' \preceq h$, such that checking $h' \in H(L_2)$
-is \emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in
-H(L_2)$ since $H(L_2)$ is $\preceq$-downward closed, and therefore a refinement
-violation is found.
+its order constraints. We prove that if $h$ is a history of a library $L$ then 
+every weaker history $h'\preceq h$ is also a history of $L$. This leads to the approximation principle, 
+which consists in considering for histories $h\in H(L_1)$ approximations $h' \preceq h$, such that checking 
+$h' \in H(L_2)$ is \emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in
+H(L_2)$, and therefore a refinement violation is found.
 
 So, the challenge we undertake is to provide an approximation schema based on
 defining a series of functions $A_k$, parameterized with $k \in \mathbb{N}$,
@@ -413,41 +146,42 @@ able to catch refinement violations with small parameter values.
 
 \paragraph{Bounded interval-length histories}
 
-In the paper, we provide such an approximation schema, exploiting a fundamental
-property of the executions of \emph{shared-memory} libraries. In fact, we show
-that histories of such executions are not arbitrary orders, but particular
-orders called \emph{interval orders} \cite{}. The main property of these orders
-is that they admit a \emph{canonical representation} where each element $o$ is
+We provide such an approximation schema, exploiting a fundamental
+property of the executions of \emph{shared-memory} libraries: We show
+that histories of such executions are \emph{interval orders}. These orders
+admit \emph{canonical representations} where each element $o$ is
 mapped to an integer-bounded interval $I(o)$ such that for every two elements
 $o_1$ and $o_2$, $o_1$ is before $o_2$ if and only if $I(o_1)$ ends before
-$I(o_2)$ starts \cite{}. Also, based on this, interval orders have a (known)
+$I(o_2)$ starts~\cite{phd/Greenough76}. Also, interval orders have a 
 notion of \emph{length} which corresponds to the maximal upper-bound of an
-interval in their canonical representation \cite{}.
+interval in their canonical representation.
 
-This leads us to the definition of parameterized weakening-based approximation
-schema where the parameter $k$ corresponds naturally to the notion of length
+This leads us to the definition of a parameterized approximation
+schema where the parameter $k$ corresponds to the notion of length
 mentioned above: For each $k \in \mathbb{N}$, the function $A_k$ maps each
-history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length $k$. In
-this paper, we consider approximation functions that keep precise the last $k$
-interval bounds, and abstract all the previous ones with equality.
+history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length at most $k$. 
+%In
+%this paper, we consider approximation functions that keep precise the last $k$
+%interval bounds, and abstract all the previous ones with equality.
 
 \paragraph{Reduction to reachability using counting representations}
 
-We show in the paper that interval-length bounding is a tractable approach for
+We show that interval-length bounding is a tractable approach for
 refinement checking, and that it can be implemented efficiently. A key idea for
 that is to use \emph{counting representations} for bounded interval-length
 histories: each interval is represented by a counter corresponding to the
 number of elements mapped to this interval in the canonical representation.
-(Notice that there might be an unbounded number of elements mapped to a same
-interval.) Indeed, representing histories as vectors of integers opens the door
+%(Notice that there might be an unbounded number of elements mapped to a same
+%interval.) 
+Indeed, representing histories as vectors of integers opens the door
 to symbolic manipulation of sets of histories using arithmetical constraints.
-In fact, we introduce for that purpose a simple logic, called OCL (for
-Operation Counting Logic), that is suitable for reasoning about libraries
+In fact, we introduce for that purpose a simple logic, called 
+Operation Counting Logic (OCL), that is suitable for reasoning about libraries
 implementing common concurrent objects, and for which checking if a given
 history satisfies a formula can be done in \emph{polynomial time}.
 
 Moreover, counting representations provide a simple way for implementing a
-monitor $P_k$ that tracks histories of interval-length $k$. In fact, we define
+monitor $P_k$ that tracks histories of interval-length at most $k$. In fact, we define
 a \emph{polynomial time} algorithm that, given an execution, builds a
 ($k$-bounded interval-length) approximation history of it. Therefore, bounded
 interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
@@ -455,9 +189,8 @@ interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
 $L_1$, provided that the set of histories $A_k(H(L_2))$ is effectively defined
 in OCL. We show that this is the case for reference implementations of the
 usual concurrent objects such as collection objects (like stacks or queues),
-semaphores, locks, etc. In fact, we show that it is possible for a wide class
-of objects to construct systematically a formula characterizing precisely their
-sets of histories.
+semaphores, locks, etc, and that these OCL formulas can be constructed systematically
+for a wide class of objects.
 
 \paragraph{Demonstrating feasibility}
 
@@ -487,12 +220,13 @@ encodings of sets of computations and the use of SAT/SMT solvers.
 
 \subsection{Summary of Contributions}
 
-To summarize, the papers presents the following contributions:
+This work makes following contributions:
 \begin{itemize}
 
   \item A characterization of observational refinement as a history inclusion
-  problem, and the proof that history inclusion is equivalent to
-  linearizability for atomic reference implementations.
+  problem (\S\ref{sec:histories}), and 
+and the proof that history inclusion is
+  equivalent to linearizability for atomic reference implementations.
 
   \item The definition of general parameterized under-approximation schema for
   detecting observational refinement violations based on a weakening pre-order
@@ -515,4 +249,3 @@ To summarize, the papers presents the following contributions:
   the efficiency and the scalability of the approach in practice.
 
 \end{itemize}
->>>>>>> 8d7366f2db3408e43c2fa97e753dad5a8646e33f
