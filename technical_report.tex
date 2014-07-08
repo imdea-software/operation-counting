@@ -1,0 +1,119 @@
+\documentclass[preprint,nocopyrightspace]{sigplanconf}
+
+% \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage[numbers]{natbib}
+\usepackage{xspace}
+\usepackage{balance}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{breakurl}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{listings}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes,shadows,arrows}
+\usetikzlibrary{decorations.pathmorphing,snakes}
+\usepackage{tkz-graph}
+
+\def\ttat{\mtt{@}} % the at package clobbers this
+\usepackage{at}
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{wasysym} % causing problems with llncs's bold vectors
+\usepackage{stmaryrd}
+\usepackage{alltt}
+\usepackage{mathpartir}
+\usepackage[ligature,reserved,inference]{semantic}
+\usepackage[lined]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{pgf}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning,shapes,shadows}
+\usetikzlibrary{decorations}
+
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}} 
+\newcommand{\alert}[1]{\textcolor{red}{#1}} 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}
+\newtheorem{example}{Example}[section]
+\newtheorem{remark}{Remark}
+
+% \titlebanner{banner above paper title}        % These are ignored unless
+% \preprintfooter{\today}   % 'preprint' option specified.
+
+\title{Tractable Refinement Checking for Concurrent Objects}
+
+\authorinfo{}{}{}
+% \authorinfo{Ahmed Bouajjani \and Constantin Enea \\ \and Jad Hamza}%
+% {LIAFA, Université Paris 7}{\{abou,cenea,jhamza\}@liafa.univ-paris-diderot.fr}
+% \authorinfo{Michael Emmi}{IMDEA Software Institute}{michael.emmi@imdea.org}
+
+\input macros
+\input macros-programs
+
+\begin{document}
+
+  \maketitle
+
+  \begin{abstract}
+
+    Efficient implementations of concurrent objects such as semaphores, locks,
+    atomic registers, and data structures are essential to modern computing.
+    Programming them is however error prone: in attempting to minimize
+    synchronization overhead between concurrent object invocations, one risks
+    breaking conformance to reference implementations --- or in formal terms,
+    one risks violating \emph{observational refinement}. Testing this
+    refinement even within a single execution is intractable, and existing
+    approaches are limited to executions with very few object invocations.
+
+    In this work we develop a polynomial-time (per execution) approximation to
+    refinement checking which is parameterized by an accuracy $n \in \<Nats>$;
+    $n$ represents the degree to which refinement violations are visible. In
+    principle, more violations are detectable as $n$ increases, and in the
+    limit, all are detectable. Our insight for this approximation arises from
+    foundational properties on the partial orders characterizing the
+    happens-before relations between object invocations: they are
+    \emph{interval orders}, with a well defined measure of complexity,
+    i.e.,~their \emph{length}. Approximating the happens-before relation with a
+    possibly-weaker interval order of bounded length can be efficiently
+    implemented by maintaining a bounded number of integer counters. In
+    practice, we find that refinement violations can be detected with very
+    small values of $n$, and that our approach scales far beyond existing
+    refinement-checking approaches.
+
+  \end{abstract}
+ 
+  \input introduction
+  \input motivation
+  \input refinement
+  \input histories
+  \input linearizability
+  \input counting
+  \input containers
+  \input regular-specs
+  \input exp
+  \input related
+
+  \bibliographystyle{abbrvnat}
+  \bibliography{violin}
+  
+  \appendix
+
+  \input atomic-register
+  \input appendix-proofs
+
+\end{document}
