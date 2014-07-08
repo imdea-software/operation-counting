@@ -95,14 +95,14 @@ quotients.
 %    \vspace{-2mm}
 \end{figure}
 
-\begin{lemma}
+\begin{theorem}
   \label{lem:cutoff}  
 
   The families $@Y_\mathrm{rv}$, $@Y_\mathrm{ev}$, 
   $@Y_\mathrm{fv}$, and $@Y_\mathrm{lv}$, of operation-counting formulae have cutoffs $0$, $2$, $2$, and $3$,
   respectively.
 
-\end{lemma}
+\end{theorem}
 
 \begin{proof}%\let\qed\relax
 
@@ -188,20 +188,20 @@ such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
 \end{example}
 
 We say a history $\tup{O,f,<}$ uses \emph{unique values} when $f(o_1) = m_1(u)
-=> v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$. The following lemma
+=> v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$. The following theorem
 assumes the existence of the family $@Y_{\mathrm{ev}}'$ described before
 Example~\ref{ex:emptyv}; we omit the proof of $@Y_{\mathrm{ev}}'$'s existence
 due to lack of space.
 
-\begin{lemma}
+\begin{theorem}
   \label{lem:rep}
 
   If $h$ uses unique values, and $x \in \set{\mathrm{stack},
   \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x /| \lnot @Y_\mathrm{ev}'$.
 
-\end{lemma}
+\end{theorem}
 
-Lemmas~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation is
+Theorems~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation is
 guaranteed to discover any stack/queue violation in histories using unique
 values, modulo the empty violations of Example~\ref{ex:emptyv} for $n > 3$.
 
