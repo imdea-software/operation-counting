@@ -19,9 +19,11 @@ assigns {\tt Top = n} only if {\tt Top == t}.
 
 \begin{figure}[t]
   \scriptsize
-  \begin{minipage}[t]{45mm}
+  \begin{minipage}[t]{40mm}
     \begin{program}
-void push(int v) {
+struct node *Top;      
+      
+void push(int v):
   struct node *n,*t;
   n = malloc(sizeof( *n));
   n->data = v;
@@ -29,9 +31,11 @@ void push(int v) {
     struct node *t = Top;
     n->next = t;
   } while (! CAS (&Top, t, n))
-}
-
-int pop() {
+    \end{program}
+  \end{minipage}
+  \begin{minipage}[t]{40mm}
+    \begin{program}
+int pop():
   struct node *n,*t;
   do {
     *t = Top;
@@ -41,27 +45,29 @@ int pop() {
   int result = t->data;
   free(t);
   return result;
-}
     \end{program}
   \end{minipage}
-  \begin{minipage}[t]{35mm}
+  \begin{minipage}[t]{30mm}
     \begin{program}
-struct node {
+struct node:
   int data;
   struct node *next;
-} *Top;  
-
-void thread1() {
+    \end{program}
+  \end{minipage}
+  \begin{minipage}[t]{25mm}
+    \begin{program}
+void thread1():
   push(1);
   int x = pop();
-}
-
-void thread2() {
+    \end{program}
+  \end{minipage}
+  \begin{minipage}[t]{25mm}
+    \begin{program}
+void thread2():
   int y = pop();
   push(2);
   push(3);
   int z = pop();
-}
     \end{program}
   \end{minipage}
 
