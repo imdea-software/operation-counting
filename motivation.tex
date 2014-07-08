@@ -119,15 +119,15 @@ erroneously returns {\tt EMPTY}. Intuitively, this is a problem because the
 pushed than popped prior to Thread~2's final {\tt pop} operation.
 
 This bug exposes the fact that our {\tt CAS}-based implementation does not
-conform to programmers' expectations of an stack object whose operations
+conform to programmers' expectations of a stack object whose operations
 execute atomically, e.g.,~by holding a lock for the duration of each operation.
 In particular, the assignment {\tt z = EMPTY} should never have occurred.
 
 This idea of conformance is rigorously captured by the formal notion of
 \emph{observational refinement}. Essentially, an implementation $L_1$ of a
-concurrent object ``refines'' another implementation $L_2$ if every observable
-behavior of a program using $L_1$ is also observable using $L_2$. This property
-clearly does not hold between the {\tt CAS}-based implementation of
-Figure~\ref{fig:treiber} and an atomic lock-based implementation, since {\tt y
-= 1; x = 3; z = EMPTY} is observable using the {\tt CAS}-based implementation,
-yet not using the atomic one.
+concurrent object \emph{refines} another implementation $L_2$ if every
+observable behavior of a program using $L_1$ is also observable using $L_2$.
+This property clearly does not hold between the {\tt CAS}-based implementation
+of Figure~\ref{fig:treiber} and a correct atomic lock-based implementation,
+since {\tt y = 1; x = 3; z = EMPTY} is observable using the {\tt CAS}-based
+implementation, yet not using the atomic one.
