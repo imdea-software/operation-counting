@@ -6,13 +6,13 @@
 \newcommand{\ibar}{i}
 \newcommand{\nbar}{n}
 \newcommand{\xval}{a}
-\newcommand{\xvar}{x}
+\newcommand{\xvar}{{x_\xval}}
 \newcommand{\grwrite}[2]{w^{#1}_{#2}}
 \newcommand{\ind}[1]{{i_{#1}}}
 \newcommand{\jind}[1]{{j_{#1}}}
 \newcommand{\isub}{m}
-\newcommand{\wellformed}{\<wellFormed>_\xval}
-\newcommand{\theycover}{\<covered>_\xval}
+\newcommand{\wellformed}{\<wellFormed>_\xvar}
+\newcommand{\theycover}{\<covered>_\xvar}
 \newcommand{\dela}{u}
 \newcommand{\delb}{v}
 \newcommand{\delc}{z}
@@ -22,16 +22,16 @@
 {\small
 \begin{align*}
 \wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) =\ 
-  &\exists k'' \in [k].\ \exists \jind{0}<\ldots<\jind{k''} \in [k].\\
+  &\exists k'' \in [k].\ \exists \jind{0}<\ldots<\jind{k''}.\\
   &\exists \dela_\jind{0},\delb_\jind{0},\ldots,
-    \dela_\jind{k''},\delb_\jind{k''} \in [k].\\
+    \dela_\jind{k''},\delb_\jind{k''}.\\
  &\exists \delc_\ind{0},\deld_\ind{0},\ldots,\delc_\ind{k'},\deld_\ind{k'}
    \in [k].\\
 & \forall i,j \in [k].\ 
-  \#(\xval,i,j) \geq 
+  \#(\xvar,i,j) \geq 
   |\set{\isub : (\delc_\ind{\isub},\deld_\ind{\isub}) = (i,j)}| + \\
 &  \qquad\qquad|\set{\isub : 
-    \<SameVal>(\xval,x_\jind\isub) \land
+    \<SameVal>(\xvar,x_\jind\isub) \land
     (\dela_\jind{\isub},\delb_\jind{\isub}) = (i,j) }| \land\\
 & \forall \isub \in [k''].\ \jind{\isub} \in [\dela_\jind\isub,\delb_\jind\isub]
 \land\\
@@ -45,7 +45,7 @@
 \begin{align*}
 \theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) =\ 
   & 
-    \forall r,i,j.\ \<Read>(x) \land \<SameVal>(\xval,x) \land \#(r,i,j) > 0 
+    \forall r,i,j.\ \<Read>(x) \land \<SameVal>(\xvar,x) \land \#(r,i,j) > 0 
     \implies\\
   & \exists \isub \in [i-1,j].\ \<SameVal>(r,x_{\isub}) \lor\\
   & \exists \isub \in [1,k'].\ \ind{\isub} \in [i,j]
@@ -55,7 +55,7 @@
 \regform{k} =\ 
   &\exists x_0,\ldots,x_{k}.\ 
     \bigwedge_{i \in [k]} \<Write>(x_i) \land\\
-  &\forall \xval.\ \<Write>(\xval) \implies
+  &\forall \xvar.\ \<Write>(\xvar) \implies
   \exists k' \leq k.\ 
   \exists \ind{0}<\ldots<\ind{k'} \in [k].\\ 
   &\wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) \land\\
@@ -94,42 +94,36 @@ $\regform{k}$\footnote{\citet{journals/siamcomp/GibbonsK97} proves that this
 problem is NP-complete but using a different non-deterministic procedure for 
 showing membership to NP.}.
 
-Note that $H(\lreg)$ contains all histories where every completed $\<read>=>a$ 
-operation\footnote{Pending $\<read>$ operations can be ignored: a history $h$ 
-belongs to  iff the history $h'$ obtained from $h$ by deleting pending read 
-operations belongs to $H(\lreg)$} 
-can be mapped injectively to an overlapping $\<write>(a)=>\_$ operation. 
-Indeed, for any total ordering on the $\<write>$ operations of such a history 
-$h$ that doesn't contradict the ordering constraints in $h$, one can insert 
-every completed $\<read>=>a$ operation right after the $\<write>(a)=>\_$ 
-operation given by the injective mapping. We then obtain a sequential execution
-$e\in E(\lreg)$ with $h\preceq H(e)$. 
-% Therefore, a history $h$ may not belong to $H(\lreg)$ only if it contains 
-% completed $\<read>=>a$ operations with no overlapping $\<write>(a)=>\_$ 
-% operations. 
+% Note that $H(\lreg)$ contains all histories where every completed $\<read>=>a$ 
+% operation\footnote{Pending $\<read>$ operations can be ignored: a history $h$ 
+% belongs to  iff the history $h'$ obtained from $h$ by deleting pending read 
+% operations belongs to $H(\lreg)$} 
+% can be mapped injectively to an overlapping $\<write>(a)=>\_$ operation. 
+% Indeed, for any total ordering on the $\<write>$ operations of such a history 
+% $h$ that doesn't contradict the ordering constraints in $h$, one can insert 
+% every completed $\<read>=>a$ operation right after the $\<write>(a)=>\_$ 
+% operation given by the injective mapping. We then obtain a sequential execution
+% $e\in E(\lreg)$ with $h\preceq H(e)$. 
 
-Now, let $h$ be a history of $H(\lreg)$ 
-and $I:O->[\nbar]^2$ its canonical representation. 
-The procedure for deciding if a history $h$ belongs to $H(\lreg)$ works as 
-follows. First, for each $\ibar \in [\nbar]$, it guesses a $\<write>$ 
-operation $w_\ibar$ which is going to be the \emph{last write} linearized 
-during or before this interval.
+Let $h$ be a history of $H(\lreg)$ and $I:O->[\nbar]^2$ be its canonical 
+representation. The procedure for deciding if a history $h$ belongs to 
+$H(\lreg)$ works as follows. First, for each $\ibar \in [\nbar]$, it guesses a 
+value $x_\ibar$ which is going to be the last value written before the end 
+of interval $[0,\ibar]$.
 Then, for each value $\xval$, it guesses which intervals are going to contain
 linearization points of $\<write>(\xval)=>\_$ operations. Finally, it checks
 that every $\<read>=>\xval$ can either read from one of the \emph{last write}
 or from one of the $\<write>(\xval)=>\_$ operations just mentioned.
 
-Formally, the procedure is given by:
+More formally:
 \begin{enumerate}
   \item 
     for each $\ibar \in [\nbar]$, guess a value $x_\ibar$ corresponding to 
-    the last written value before the end of the interval $[\ibar,\ibar]$
+    the last written value before the end of the interval $[0,\ibar]$
   \item
-    then, for each value $\xval$, guess $\nbar' \leq \nbar$ 
-    $\<write>(\xval)=>\_$ operations  
-    $\grwrite{\xval}{\ind{0}},\ldots,\grwrite{\xval}{\ind{\nbar'}}$, 
-    which are going to be linearized respectively in the intervals 
-    $\ind{1},\ldots,\ind{\nbar}$
+    then, for each value $\xval$, guess $\nbar' \leq \nbar$ and
+    $\ind{0},\ldots,\ind{\nbar'}$ representing the intervals containing
+    linearization points of $\<write>(\xval)=>\_$ operations
   \item
     finally, check that for each completed $\<read>=>\xval$ operation $o$ with 
     $I(o)=[i,j]$, one of the following holds:
@@ -137,7 +131,7 @@ Formally, the procedure is given by:
     \item 
       one of the last written value $x_{i-1},\ldots,x_j$ is $\xval$
     \item 
-      there is a $\grwrite{\xval}{\ind{\isub}}$ with $\ind{\isub} \in [i,j]$
+      one of $\ind{\isub}$ is in $[i,j]$
   \end{itemize}
 \end{enumerate}
 
@@ -148,13 +142,14 @@ To simplify the formula, we use some notations such as the set comprehension
 and the quantification over bounded integers, which can easily be translated 
 to conjunctions and disjunctions. 
 Without loss of generality, we assume that our history always starts 
-with a $\<write>(0)=>\_$ operation (before all other operations).
+with a $\<write>(0)=>\_$ operation (before all other operations) to avoid
+edge cases.
 
 The predicate $\wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})$ is the 
 most difficult part of the formula. Informally, it simply states that there are 
-enough writes with the same value as $\xval$ in order to satisfy everything 
-which was guessed so far. When translating this idea into a formula, we get a 
-fairly long formula which, in english, goes as follows:
+enough writes in the history with the same value as $\xvar$ in order to satisfy 
+everything which was guessed so far. When translating this idea into a formula, 
+we get a fairly long formula which, in english, goes as follows:
 There exist $k''$ writes (filling the role of last written value for each 
 interval) such that:
 \begin{itemize}
@@ -166,48 +161,10 @@ interval) such that:
   (last line of the formula) if, for some interval $\ibar$, we didn't choose a 
   write (among the $k''$ writes) to fill the role of last written value, it 
   means we used the same write as a previous interval (namely, the one used for
-  the existentially quantified $\jind{\isub}$), and that there must not exist
+  the existentially quantified $x_\jind{\isub}$), and that there must not exist
   a write in between.
 \end{itemize}
 
-The predicate $\theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})$ is then a
-simple translation of the last item of the procedure.
-
-
-% 
-% We define the $\ocl$ formula $\regform{k}$ representing the atomic register up to some bound $k$. The atomic register, denoted by $\lreg$, is defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists of all sequential executions where every read returns the last written value (or the initial value $0$ if it is not preceded by a write). 
-% %Formally, $\ker E(L)$ is the set of all sequential executions with only completed operations such that the return value of any $\<read>$ invocation $o$ is the value $v$, where $\<write>(v)$ is the last $\<write>$ invocation before $o$, or $0$, if $o$ is not preceded by a $\<write>$ invocation.
-% Thus, a history $h$ belongs to $H(\lreg)$ iff it is weaker than the history of a sequential execution $e$ of $\lreg$, i.e.,  $h\preceq H(e)$.
-% 
-% In the following, we give a non-deterministic procedure for deciding if a history $h$ belongs to $H(\lreg)$, which is used to define $\regform{k}$\footnote{\citet{journals/siamcomp/GibbonsK97} proves that this problem is NP-complete but using a different non-deterministic procedure for showing membership to NP.}.
-% 
-% Note that $H(\lreg)$ contains all histories where every completed $\<read>=>a$ operation\footnote{Pending $\<read>$ operations can be ignored: a history $h$ belongs to  iff the history $h'$ obtained from $h$ by deleting pending read operations belongs to $H(\lreg)$} 
-% overlaps with a $\<write>(a)=>\_$ operation. Indeed, for any total ordering on the $\<write>$ operations of such a history $h$, that doesn't contradict the ordering constraints in $h$, one can insert every completed $\<read>=>a$ operation right after a $\<write>(a)=>\_$ operation in order to obtain a history of a sequential execution $e\in E(\lreg)$ with $h\preceq H(e)$. Therefore, a history $h$ may not belong to $H(\lreg)$ only if it contains completed $\<read>=>a$ operations with no overlapping $\<write>(a)=>\_$ operations. 
-% 
-% Now, let $h$ be a history of $H(\lreg)$ %and $I:O->[n]^2$ its canonical representation. 
-% and $o$ a completed $\<read>=>a$ operation with no overlapping $\<write>(a)=>\_$ operations. Then, one of the following must be true: 
-% \begin{itemize}
-% 	\item $a=0$ and there are no $\<write>$ operations, that finish before $o$ and write a different value, 
-% 	\item there exists a $\<write>(a)=>\_$ operation $o'$ finishing before $o$, such that no other $\<write>$ operation starts after $o'$ and finishes before $o$.
-% \end{itemize}
-% If we consider two $\<read>$ operations $o_1$ and $o_2$ in $h$, that have no overlapping writes (on the corresponding value), then the $\<write>$ operations $o_1'$ and $o_2'$ finishing before $o_1$, resp., $o_2$, may be the same. However, $o_1'$ and $o_2'$ must be the same when $o_1$ and $o_2$ have the same past in $h$. Indeed, the latter implies that the set of $\<write>$ operations occurring before $o_1$ and resp., $o_2$ in some sequential execution $e$ with $h\preceq H(e)$ is the same and consequently, $o_1$ and $o_2$ return a value written by the same $\<write>$ operation (the last $\<write>$ operation before $o_1$ and $o_2$ in $e$).
-% 
-% The procedure for deciding if a history $h$ belongs to $H(\lreg)$ works as follows. Roughly, for each past $p$ in $h$, it guesses a $\<write>$ operation $w_p$, that should write the value returned by all reads $o$ with $\<past>(o)=p$ and no overlapping writes, and then, it checks if this is indeed the case. Formally, the procedure works on the canonical representation $I:O->[n]^2$ of $h$, where a past in $h$ is represented by an index $i\in [n]$: 
-% %and if read operations have overlapping writes.
-% \begin{enumerate}
-% 	\item for each $i\in [n]$, guess a $\<write>$ operation $w_i$ such that: 
-% 	\begin{itemize}
-% %		\item $I(w_i)=[\_,i-1]$ or 
-% 		\item $w_i$ finishes before every $\<read>$ operation $o_r$ with $I(o_r)=[i,\_]$ and no other $\<write>$ operation starts after $w_i$ and finishes before such an $o_r$, i.e., $I(w_i)=[\_,i']$ and %$i'$ is the maximum value such that 
-% 		there exists no $\<write>$ operation $o$ with $I(o)\subseteq [i'+1,i-1]$ 
-% 	\end{itemize}
-% 	\item check that for each completed $\<read>=>a$ operation $o$ with $I(o)=[i,j]$, one of the following holds:
-% 	\begin{itemize}
-% 		\item $a=0$ and no $\<write>(b)$ operation with $b\neq 0$ finishes before $o$, i.e., there exists no $\<write>(b)$ operation $o'$ with $I(o')\subseteq [0,i-1]$,
-% 		\item $a$ is the value written by $w_{i-1}$,  
-% 		\item there exists a $\<write>(a)$ operation overlapping with $o$, i.e., there exists a $\<write>(a)$ operation $o'$ with $I(o')\cap [i,j]\neq\emptyset$.
-% 	\end{itemize}
-% \end{enumerate}
-% 
-% The formula $\regform{k}$ representing the atomic register up to $k$ is given in Figure~\ref{fig:register}. It is a mere translation of the above decision procedure in $\ocl$. The non-deterministic guessing is translated to a bounded number of existential quantifiers (since it describes histories of bounded interval length).
-% 
+The predicate $\theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})$ is a
+simple translation of the last item of the procedure, and ensured that all 
+read's have a write to read from.
