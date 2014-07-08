@@ -51,12 +51,12 @@ struct node {
   struct node *next;
 } *Top;  
 
-void thread1() {
+void Thread1() {
   push(1);
   int x = pop();
 }
 
-void thread2() {
+void Thread2() {
   int y = pop();
   push(2);
   push(3);
