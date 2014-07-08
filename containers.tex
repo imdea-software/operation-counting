@@ -2,7 +2,7 @@
 \section{Atomic Collections}
 \label{sec:containers}
 
-Collection-based data structures such as sets, queues, and stacks are among the
+Collection-based data structures such as queues, and stacks are among the
 most heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In
 this section we demonstrate that our approximation is effective in uncovering
 refinement violations to such atomic objects, in the sense that most violations
@@ -144,15 +144,18 @@ quotients.
 
   The families of operation-counting formulae,
   \begin{align*}
-    & @Y_\mathrm{set}   = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev}
-    \text{, } \\
+%    & @Y_\mathrm{set}   = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev}
+%    \text{, } \\
     & @Y_\mathrm{stack} = @Y_\mathrm{set} /| \lnot @Y_\mathrm{lv}
     \text{, and }
     @Y_\mathrm{queue} = @Y_\mathrm{set} /| \lnot @Y_\mathrm{fv}
   \end{align*}
-  have cutoffs $2$, $3$ and $2$, respectively.
+  have cutoffs $3$ and $2$, respectively.
 
 \end{corollary}
+
+Note that for every family $@Y$ defined in Figure~\ref{fig:spec:ds}, the size of the $i$th formula
+$@Y_i$ is linear in $i$, and its quantifier rank is at most 4.
 
 For simplicity we have defined $@Y_\mathrm{ev}$ to catch only empty violations
 in which the span of $\<pop>(\mathtt{EMPTY})$ operation is covered by the
@@ -193,13 +196,13 @@ due to lack of space.
 \begin{lemma}
   \label{lem:rep}
 
-  If $h$ uses unique values, and $x \in \set{ \mathrm{set}, \mathrm{stack},
+  If $h$ uses unique values, and $x \in \set{\mathrm{stack},
   \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x /| \lnot @Y_\mathrm{ev}'$.
 
 \end{lemma}
 
 It follows from Lemmas~\ref{lem:cutoff} and~\ref{lem:rep} that the $A_3$
-approximation is guaranteed to discover any stack/queue/set violation in
+approximation is guaranteed to discover any stack/queue violation in
 histories using unique values, modulo the empty violations of
 Example~\ref{ex:emptyv} with $n > 3$. Despite the theoretical possibility for
 empty violations which only surface for large $n$, our practical experience
