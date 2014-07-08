@@ -419,14 +419,15 @@ history incrementally, according to the increment/decrement and shift
 operations of Lemmas~\ref{lem:incr} and~\ref{lem:shift}. The variable $n$
 maintains the interval length of the input execution's history $H(e)$, while
 the variable $s$ maintains the infimum $s(o)$ of the interval of each operation
-$o$ in $H(e)$. The corresponding infimum in $A_k(H(e))$ when $o$ is invoked is
+$o$ in $H(e)$ (the value $s(o)$ can be discarded once the operation $o$ finishes). 
+The corresponding infimum in $A_k(H(e))$ when $o$ is invoked is
 given by $\min(n,k)$, as the interval bounds used in $A_k(H(e))$ may not exceed
 $k$. When $o$ completes, it is possible that some number of shift operations
 have translated its interval in $A_k(H(e))$. As the number of performed shift
 operations is equal to $\min(n-k,0)$, $o$'s infimum in $A_k(H(e))$ when
 completing is given by $s(o) - \min(n-k,0)$. It follows by
 Lemmas~\ref{lem:incr} and~\ref{lem:shift} that Algorithm~\ref{alg:counting}
-computes $A_k(H(e))$.
+computes $A_k(H(e))$. 
 
 \begin{theorem}
   \label{thm:counting:alg}
