@@ -17,7 +17,7 @@ allowing methods to interleave their internal actions; in one atomic step, the
 %Treiber~\cite{Treiber'86} stores its elements in the same singly-linked list
 %structure, 
 
-\begin{figure*}[t]
+\begin{figure}[t]
   \lstset{numbers=left, 
           numberstyle=\tiny\tt, 
           stepnumber=1, 
@@ -71,48 +71,39 @@ z = pop();
       \end{program}
     \end{minipage}
   \end{minipage}
-  \begin{minipage}[c]{130mm}
-    \input{figures/execution-horizontal.tikz}
-    \centering
-    \medskip
-    (a) An execution $e$ of the program; it depicts calls,
-    returns, and assignments, and time progresses from left to right.
-    
-    \bigskip
-    \begin{minipage}[c]{7cm}
-    \input{figures/history-partial-order.tikz}
-
-    \centering
-    \vspace{4mm}
-    (b) The history $h$ of the execution $e$.
-    \end{minipage}
-    \begin{minipage}[c]{4cm}
-    \centering
-    \input{figures/history-partial-order-weaker.tikz}
-
-    \centering
-    (c) A history weaker than $h$.
-    \end{minipage}
-
-     \bigskip
-     \centering
-    \input{figures/history-not-can-intervals.tikz}
-    
-    \smallskip
-    (d) The history $h$ as an interval order.
-    
-     \bigskip
-     \centering
-    \input{figures/history-intervals-second.tikz}
-    
-    \smallskip
-    (e) The canonical representation of $h$.
-    
-  \end{minipage}
   \caption{An implementation of Treiber's stack. The {\tt pop} operation
   returns the {\tt EMPTY} when the stack is empty.}
+  \label{fig:treiber}
+\end{figure}
+
+\begin{figure}[t]
+  \footnotesize
+  \centering
+  \input{figures/execution-horizontal.tikz} \\
+  \parbox{0.8\linewidth}{(a) An execution $e$ of the program; it depicts calls,
+  returns, and assignments, and time progresses from left to right.}
+
+  \bigskip
+  \begin{minipage}{43mm}
+    \input{figures/history-partial-order.tikz} \\
+    (b) The history $h$ of the execution $e$.
+  \end{minipage}
+  \begin{minipage}{40mm}
+    \input{figures/history-partial-order-weaker.tikz} \\
+    (c) A history weaker than $h$.
+  \end{minipage}
+
+  \bigskip
+  \input{figures/history-not-can-intervals.tikz} \\
+  (d) The history $h$ as an interval order.
+
+  \bigskip
+  \input{figures/history-intervals-second.tikz} \\
+  (e) The canonical representation of $h$.
+
+  \caption{An execution and its history.}
   \label{fig:stacks}
-\end{figure*}
+\end{figure}
 
 Unfortunately this nonblocking implementation suffers from a subtle concurrency
 bug, now commonly known as an ``ABA'' bug~\cite{tr/ibm/Michael04}. This bug
