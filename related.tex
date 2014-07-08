@@ -14,8 +14,8 @@ Section~\ref{sec:lin} expound further: we show that the two criteria coincide
 for atomic object specifications, and that in general, observational refinement
 can hold for non-linearizable objects.
 
-The theoretical limits of linearizability checking are well studied. Gibbons
-and Korach~\cite{journals/siamcomp/GibbonsK97} demonstrate NP-completeness for
+The theoretical limits of linearizability are well studied. Gibbons
+and Korach~\cite{journals/siamcomp/GibbonsK97} show NP-completeness for
 checking a single execution. Alur et al.~\cite{journals/iandc/AlurMP00} show
 EXPSPACE membership for checking finite-state implementations against atomic
 specifications, but only when the number of program threads is bounded.
@@ -29,8 +29,7 @@ restricted class of executions.
 Several semi-automated approaches for proving linearizability, and thus
 observational refinement, have relied on annotating method bodies with
 \emph{linearization points}~\cite{conf/cav/AmitRRSY07, conf/fm/LiuCLS09,
-conf/podc/OHearnRVYY10, conf/cav/Vafeiadis10, conf/icse/Zhang11a,
-conf/pldi/LiangF13, conf/cav/DragoiGH13}, to reduce the otherwise-exponential
+conf/podc/OHearnRVYY10, conf/cav/Vafeiadis10, conf/icse/Zhang11a}, to reduce the otherwise-exponential
 space of possible history linearizations to one single linearization. These
 methods often rely on programmer annotation, and do not admit conclusive
 evidence of a violation in the case of a failed proof.

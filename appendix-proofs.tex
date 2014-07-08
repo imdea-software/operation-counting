@@ -1,6 +1,19 @@
 %!TEX root = draft.tex
 \section{Proofs to Selected Results}\label{app:proofs}
 
+\subsection{Proof of Lemma~\ref{lem:kernel}}
+
+  By contradiction, suppose that $E_1 \neq E_2$ are minimal such that
+  $\overline{E}_1 = \overline{E}_2 = E(L)$. Let $E_1' = E_1 \setminus E_2$ and
+  $E_2' = E_2 \setminus E_1$ be the elements unique to $E_1$ and $E_2$. Each
+  element of $e_2' \in E_2'$ must be $~>$-derivable from some $e_1' \in E_1'$,
+  and visa versa, since $e_2' \in \overline{E}_1$ and $e_2'$ is not derivable
+  from $(E_1 \setminus E_1') = (E_2 \setminus E_2')$ --- otherwise $E_2$ would
+  not be minimal. It follows that $|E_1'| = |E_2'|$, again by minimality, and
+  that there must be a non-trivial cycle $e_1 ~> e_2 ~> .. ~> e_{2i} ~> e_1$ of
+  elements alternating between $E_1'$ and $E_2'$; however it is easily seen
+  that non-trivial $~>$-cycles do not exist.
+
 \subsection{Proof of Theorem~\ref{thm:formula}}
 
 Let $\Delta$ be the context-free language obtained from $\ker E(L)$ by replacing
