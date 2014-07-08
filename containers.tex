@@ -92,6 +92,7 @@ quotients.
     holds for $x={\tt pop}=>{\tt Empty}$.
   }
   \label{fig:spec:ds}
+    \vspace{-2mm}
 \end{figure}
 
 \begin{lemma}
@@ -103,14 +104,13 @@ quotients.
 
 \end{lemma}
 
-\begin{proof}
+\begin{proof}%\let\qed\relax
 
   We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$, the other
-  cutoffs can be proved in a similar way.
- 
+  cutoffs can be proved similarly.
   Since the formulae in $@Y_\mathrm{rv}$ constrain only the multiset of operation
   labels in a history, for each history $h=(O,<,f) |= @Y_\mathrm{rv}$ there
-  exists the history $h'=(O,\emptyset,f)$ such that $h' |= @Y_\mathrm{rv}$. The
+  exists the history $h'=(O,\emptyset,f)$ s.t. $h' |= @Y_\mathrm{rv}$. The
   fact that $A_0(h')=h'$ implies that $@Y_\mathrm{rv}$ has cutoff $0$.
  
   Next, let $h=(O,<,f) |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$, $@l_1'$, and
@@ -129,14 +129,14 @@ quotients.
     j_2 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_2}.
   \end{align*}
  
-  We define a weaker history $h'\preceq h$, which contains exactly the same set
-  of operations but it preserves only the ordering constraints $o_1<o_2$ such
-  that $I(o_1)\subseteq [0,j_1]$ and $I(o_2)\subseteq [j_1,\infty]$, or
-  $I(o_1)\subseteq [0,j_2]$ and $I(o_2)\subseteq [j_2,\infty]$. Clearly, the
+  We define a weaker history $h'\preceq h$, that contains exactly the same set
+  of operations as $h$ but it preserves only the ordering constraints $o_1<o_2$ s.t. 
+  $I(o_1)\subseteq [0,j_1]$ and $I(o_2)\subseteq [j_1,\infty]$, or
+  $I(o_1)\subseteq [0,j_2]$ and $I(o_2)\subseteq [j_2,\infty]$. The
   length of $h'$ is at most 2
   % (it can be 1 when there is no operation that starts after the last finishing
   % $@l_1$ operation and before the last $@l_3$ operation finishes),
-  and $h'|= @Y_{\mathrm{fv},2}$. Finally, since $A_2(h')=h'$, it follows that
+  and $h'|= @Y_{\mathrm{fv},2}$. Since $A_2(h')=h'$, 
   $@Y_\mathrm{rv}$ has cutoff $2$.
 \end{proof}
 
@@ -175,6 +175,7 @@ such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
     \caption{A family of empty violations, parameterized by $n \in 
       \protect\<Nats>$.}
     \label{fig:history:emptyv}
+    \vspace{-3mm}
   \end{figure}
   It follows that any such history would not be included in the histories
   $H(L_\mathrm{queue})$ of an atomic queue library. The empty-violation family
