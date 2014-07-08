@@ -216,7 +216,8 @@ $E(L)$, and is denoted by $\ker E(L)$. A library is called \emph{atomic} if its
 kernel contains only sequential executions. Atomic libraries are typically used
 as specifications for concurrent objects.
 
-\begin{example}\label{ex:atomic_stack}
+\begin{example}
+  \label{ex:atomic_stack}
 
   A library $L$ is called an \emph{atomic stack} iff the kernel $\ker E(L)$
   consists of all sequential executions with only completed operations such
@@ -230,7 +231,7 @@ as specifications for concurrent objects.
   	otherwise.
 
   \end{itemize}
-  The lock-based implementation mentioned in \S~\ref{sec:motivation} is an atomic
+  The lock-based implementation mentioned in \S\ref{sec:motivation} is an atomic
   stack.
 
 \end{example}
