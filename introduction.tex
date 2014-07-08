@@ -139,15 +139,11 @@ library executions and their histories. The basic idea is to consider a notion
 of \emph{weakening pre-order} $\preceq$ on histories as a means for
 approximation: A history $h_1$ is \emph{weaker} than another history $h_2$,
 written $h_1 \preceq h_2$, if $h_1$ is obtained from $h_2$ by relaxing some of
-its order constraints. An important fact that makes this idea exploitable is
-that, for every library $L$ (in some formally well defined sense), the set of
-its histories $H(L)$ is \emph{downward closed} under $\preceq$, that is, if
-$H(L)$ contains a history $h$, than it contains also all weaker histories than
-$h$. Indeed, this fact leads to the principle of considering for histories $h
-\in H(L_1)$ approximations $h' \preceq h$, such that checking $h' \in H(L_2)$
-is \emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in
-H(L_2)$ since $H(L_2)$ is $\preceq$-downward closed, and therefore a refinement
-violation is found.
+its order constraints. We prove that if $h$ is a history of a library $L$ then 
+every weaker history $h'\preceq h$ is also a history of $L$. This leads to the approximation principle, 
+which consists in considering for histories $h\in H(L_1)$ approximations $h' \preceq h$, such that checking 
+$h' \in H(L_2)$ is \emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in
+H(L_2)$, and therefore a refinement violation is found.
 
 So, the challenge we undertake is to provide an approximation schema based on
 defining a series of functions $A_k$, parameterized with $k \in \mathbb{N}$,
@@ -161,41 +157,42 @@ able to catch refinement violations with small parameter values.
 
 \paragraph{Bounded interval-length histories}
 
-In the paper, we provide such an approximation schema, exploiting a fundamental
-property of the executions of \emph{shared-memory} libraries. In fact, we show
-that histories of such executions are not arbitrary orders, but particular
-orders called \emph{interval orders} \cite{}. The main property of these orders
-is that they admit a \emph{canonical representation} where each element $o$ is
+We provide such an approximation schema, exploiting a fundamental
+property of the executions of \emph{shared-memory} libraries: We show
+that histories of such executions are \emph{interval orders}. These orders
+admit \emph{canonical representations} where each element $o$ is
 mapped to an integer-bounded interval $I(o)$ such that for every two elements
 $o_1$ and $o_2$, $o_1$ is before $o_2$ if and only if $I(o_1)$ ends before
-$I(o_2)$ starts \cite{}. Also, based on this, interval orders have a (known)
+$I(o_2)$ starts~\cite{phd/Greenough76}. Also, interval orders have a 
 notion of \emph{length} which corresponds to the maximal upper-bound of an
-interval in their canonical representation \cite{}.
+interval in their canonical representation.
 
-This leads us to the definition of parameterized weakening-based approximation
-schema where the parameter $k$ corresponds naturally to the notion of length
+This leads us to the definition of a parameterized approximation
+schema where the parameter $k$ corresponds to the notion of length
 mentioned above: For each $k \in \mathbb{N}$, the function $A_k$ maps each
-history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length $k$. In
-this paper, we consider approximation functions that keep precise the last $k$
-interval bounds, and abstract all the previous ones with equality.
+history $h$ to a ($\preceq$-)weaker history $h'$ of interval-length at most $k$. 
+%In
+%this paper, we consider approximation functions that keep precise the last $k$
+%interval bounds, and abstract all the previous ones with equality.
 
 \paragraph{Reduction to reachability using counting representations}
 
-We show in the paper that interval-length bounding is a tractable approach for
+We show that interval-length bounding is a tractable approach for
 refinement checking, and that it can be implemented efficiently. A key idea for
 that is to use \emph{counting representations} for bounded interval-length
 histories: each interval is represented by a counter corresponding to the
 number of elements mapped to this interval in the canonical representation.
-(Notice that there might be an unbounded number of elements mapped to a same
-interval.) Indeed, representing histories as vectors of integers opens the door
+%(Notice that there might be an unbounded number of elements mapped to a same
+%interval.) 
+Indeed, representing histories as vectors of integers opens the door
 to symbolic manipulation of sets of histories using arithmetical constraints.
-In fact, we introduce for that purpose a simple logic, called OCL (for
-Operation Counting Logic), that is suitable for reasoning about libraries
+In fact, we introduce for that purpose a simple logic, called 
+Operation Counting Logic (OCL), that is suitable for reasoning about libraries
 implementing common concurrent objects, and for which checking if a given
 history satisfies a formula can be done in \emph{polynomial time}.
 
 Moreover, counting representations provide a simple way for implementing a
-monitor $P_k$ that tracks histories of interval-length $k$. In fact, we define
+monitor $P_k$ that tracks histories of interval-length at most $k$. In fact, we define
 a \emph{polynomial time} algorithm that, given an execution, builds a
 ($k$-bounded interval-length) approximation history of it. Therefore, bounded
 interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
@@ -203,9 +200,8 @@ interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
 $L_1$, provided that the set of histories $A_k(H(L_2))$ is effectively defined
 in OCL. We show that this is the case for reference implementations of the
 usual concurrent objects such as collection objects (like stacks or queues),
-semaphores, locks, etc. In fact, we show that it is possible for a wide class
-of objects to construct systematically a formula characterizing precisely their
-sets of histories.
+semaphores, locks, etc, and that these OCL formulas can be constructed systematically
+for a wide class of objects.
 
 \paragraph{Demonstrating feasibility}
 
