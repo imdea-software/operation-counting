@@ -80,9 +80,10 @@ because the execution $e$ could be linearizable w.r.t. $L$ only if $E(L)$ were t
 contain one of the following executions:
 \[
 \begin{array}{c}
-  m(u)_1\ \<ret>(v)_1 \quad \quad\quad
-  m(u)_1\ m'(u)_2\ \<ret>(v)_1\ \<ret>(\_)_2  \quad \\[1mm]
-  m(u)_1\ \<ret>(v)_1\ m'(u)_2\ \<ret>(\_)_2 \text{.}
+  m(u)_1\ \<ret>(v)_1\ \text{,} \quad \quad\quad
+  m(u)_1\ m'(u)_2\ \<ret>(v)_1\ \<ret>(\_)_2\ \text{,}  \quad \\[1mm]
+  m(u)_1\ \<ret>(v)_1\ m'(u)_2\ \<ret>(\_)_2\ \text{,} \quad 
+  m'(u)_2\ \<ret>(\_)_2m(u)_1\ \<ret>(v)_1\ \text{.}
 \end{array}
 \]
 However, since $\ker E(L)=\set{e}$, none of these

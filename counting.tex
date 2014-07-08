@@ -2,7 +2,7 @@
 \section{Approximating History Inclusion}
 \label{sec:counting}
 
-By the equivalences of Section~\ref{sec:lin}, checking whether a given history
+By the equivalences of \S~\ref{sec:lin}, checking whether a given history
 $H(e)$ is included in a fixed set $H(L)$ of library histories is equivalent to
 checking whether $H(e)$ is linearizable with respect to $L$, for a fixed atomic
 library $L$. It follows that deciding $H(e) \in H(L)$ is NP-hard for an
@@ -56,7 +56,7 @@ $A_k(h) \in H(L_1) \setminus H(L_2)$.
 Our key challenge is to develop approximation functions $A_k$ for which history
 inclusion can be computed in polynomial time for fixed $k$, and for which
 observational refinement violations surface with small $k$. We demonstrate the
-latter in Sections~\ref{sec:containers}--\ref{sec:exp}.
+latter in \S~\ref{sec:containers}--\ref{sec:exp}.
 
 In this section we develop a schema of approximation functions for which the
 approximate history inclusion problem is polynomial-time computable. Our
@@ -83,7 +83,7 @@ of elements ordered before $o$.
 
 \begin{example}
 
-For the history $h$ in Figure~\ref{fig:stacks}(b), the $\<pop>=>3$ and $\<pop>=>1$
+In the history $h$ from Figure~\ref{fig:stacks}(b), the $\<pop>=>3$ and $\<pop>=>1$
 operations have the same past, namely the operation $\<push>(1)$, while the past of the $\<push>(3)$
 operation consists of the $\<push>(1)$, $\<pop>=>1$, and $\<push>(2)$ operations.
   
@@ -118,7 +118,7 @@ Our history-weakening approximation functions $A_k$ map histories to weaker
 histories whose corresponding interval orders have length at most $k$. While
 there are various ways to define such a function $A_k$, any such function
 enables the polynomial-time inclusion check $A_k(h) \in H(L)$ which we
-demonstrate in the following; Section~\ref{sec:counting:monitor} describes a
+demonstrate in the following; \S~\ref{sec:counting:monitor} describes a
 polynomial-time computable instantiation of $A_k$ which we have found useful in
 practice.
 

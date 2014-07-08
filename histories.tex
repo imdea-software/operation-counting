@@ -3,13 +3,13 @@
 \label{sec:histories}
 
 Though we seek to develop automated techniques to check observational
-refinement between libraries, the definition of Section~\ref{sec:refinement}
+refinement between libraries, the definition of \S~\ref{sec:refinement}
 does not suggest any practical means; it only suggests enumerating every
 possible execution of every possible program. In this section we introduce an
 equivalent notion based on concise abstractions of program executions called
 \emph{histories}. Besides being independent of programs, this equivalent notion
 helps expose the structure of the refinement problem, and suggests practical
-means of automation which we develop in Section~\ref{sec:counting}.
+means of automation which we develop in \S~\ref{sec:counting}.
 
 \subsection{Histories}
 
@@ -35,6 +35,7 @@ summary, and orders non-overlapping operations:
   \right.$
 
 \end{itemize}
+An operation of $h$ labeled by $@l\in \<Labels>$ is called an \emph{$@l$ operation}.
 The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L) }$.
 
 \begin{example}
@@ -43,9 +44,8 @@ The history $h$ of the execution $e$ in Figure~\ref{fig:stacks}(a) is pictured i
 The order relation is depicted by arrows (transitive orderings are omitted).
 Note that a history abstracts away the order between successive call, resp, return, actions. Therefore, an execution obtained from
 $e$ by reversing the order between the call action of the $\<pop>=>1$ operation (from the second thread) and the call action
-of the $\<pop>=>3$ operation (from the first thread) has the same history $h$. This holds also for an execution
-obtained from $e$ by reversing the order between the return action of the $\<push>(3)$ operation and
-the return action of the $\<pop>=>3$ operation.
+of the $\<pop>=>3$ operation (from the first thread) or the order between the return action of the $\<push>(3)$ operation and
+the return action of the $\<pop>=>3$ operation has the same history $h$. 
 
 \end{example}
 
