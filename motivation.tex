@@ -19,7 +19,7 @@ allowing methods to interleave their internal actions; in one atomic step, the
 
 \begin{figure}[t]
   \scriptsize
-  \begin{minipage}[t]{42mm}
+  \begin{minipage}[t]{45mm}
     \begin{program}
 void push(int v) {
   struct node *n,*t;
@@ -30,10 +30,7 @@ void push(int v) {
     n->next = t;
   } while (! CAS (&Top, t, n))
 }
-    \end{program}
-  \end{minipage}
-  \begin{minipage}[t]{42mm}
-    \begin{program}
+
 int pop() {
   struct node *n,*t;
   do {
@@ -47,23 +44,24 @@ int pop() {
 }
     \end{program}
   \end{minipage}
-  
-  {\normalsize\bf Program} \\[1mm]
-  \begin{minipage}[b]{17mm}
-    \textbf{Thread 1}
+  \begin{minipage}[t]{35mm}
     \begin{program}
-push(1);
-x = pop();
-    \end{program}
-    \vspace{6.3mm}
-  \end{minipage}
-  \begin{minipage}[b]{16mm}
-    \textbf{Thread 2}
-    \begin{program}
-y = pop();
-push(2);
-push(3);
-z = pop();
+struct node {
+  int data;
+  struct node *next;
+} *Top;  
+
+void thread1() {
+  push(1);
+  int x = pop();
+}
+
+void thread2() {
+  int y = pop();
+  push(2);
+  push(3);
+  int z = pop();
+}
     \end{program}
   \end{minipage}
 
