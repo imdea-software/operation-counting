@@ -54,8 +54,8 @@ parameter/return values.
 \begin{example}
   \label{ex:methods}
 
-  The method and value sets for the stack implementations in
-  Figure~\ref{fig:stacks} are $\<Methods> = \set{ \<push>, \<pop> }$ and
+  The method and value sets for the stack implementation in
+  Figure~\ref{fig:treiber} are $\<Methods> = \set{ \<push>, \<pop> }$ and
   $\<Vals> = \<Nats> \u \set{ {\tt EMPTY} }$.
 
 \end{example}
@@ -152,10 +152,10 @@ more of the above rules. The \emph{closure} of a set $E$ of executions under
 $~>$ is denoted $\overline{E}$.
 
 Note that even a library that implements \emph{atomic methods}, e.g.,~by
-guarding method bodies with a global-lock acquisition like the lock-based
-implementation in Figure~\ref{fig:stacks}, admits executions in which method
-calls and returns overlap. A library which accesses the client's thread
-identifiers can be modeled by taking thread identifiers as method parameters.
+guarding method bodies with a global-lock acquisition, admits executions in
+which method calls and returns overlap. A library which accesses the client's
+thread identifiers can be modeled by taking thread identifiers as method
+parameters.
 
 \begin{example}
   \label{ex:libraries}
