@@ -63,7 +63,7 @@ violations detected by a traditional linearizability checker\footnote{We
 implement a linearization-enumerating monitor, as in
 Line-Up~\cite{conf/pldi/BurckhardtDMT10}.\label{fn:lineup}} versus those caught
 by $A_k$. The linearizability checker serves as an exact measure due to the
-equivalence of Section~\ref{sec:lin}. While the approximation $A_k(H(e))$ of a
+equivalence of \S~\ref{sec:lin}. While the approximation $A_k(H(e))$ of a
 violation $H(e)$ may not itself be a violation, one hopes to encounter some
 execution $e'$ for which the violation $A_k(H(e'))$ \emph{covers} $H(e)$,
 i.e.,~for which $A_k(H(e')) \preceq H(e)$.
@@ -73,7 +73,7 @@ violations with small values of $k$. While $A_4$ suffices to cover all
 violations at nearly all data points --- besides the first point, where the
 sample size of $1023$ executions is small relative to the $8$ operations ---
 all values $k > 0$ capture a nontrivial and increasing number of violations.
-Note that our cutoff results of Section~\ref{sec:containers} are not undermined
+Note that our cutoff results of \S~\ref{sec:containers} are not undermined
 by the fact that $A_3$ and $A_4$ have missed violations; violations were missed
 due to not having encountered a diverse enough sample of executions. In fact,
 as the execution-sample size increases (the x-axis is ordered by number of
