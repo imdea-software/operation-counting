@@ -24,9 +24,19 @@ formally captured by the concept of \emph{observational refinement}: Given two
 libraries $L_1$ and $L_2$, each of them implementing the operations of some
 concurrent object, $L_1$ \emph{refines} $L_2$ if and only if for every
 (library-client) program $P$, every computation of $P$ invoking $L_1$ is also
-possible when $P$ invokes $L_2$ instead. The challenge we address in this paper
-is to provide an efficient algorithmic approach for automatic detection of
-refinement violations.
+possible when $P$ invokes $L_2$ instead. The challenge we address in this paper is to provide an 
+efficient algorithmic approach for automatic observational refinement checking.
+
+\paragraph{Overview}
+
+observational refinement is a complex problem, and it is even undecidable in general. The contribution of this paper is to propose a tractable approach for detecting refinement violation. Our work is composed of two parts: in a first part we investigate semantical issues and establish fundamental characterizations of observational refinement, and in a second part, we define a novel approach for refinement checking based on these characterizations, and we show that this approach is feasible, leading to scalable and efficient algorithms for detecting refinement violations.
+
+A key insight of our work is to reason about sets of so-called {\em histories}, where a history is an abstraction of an execution of a concurrent object library that corresponds to a notion of happen-before (partial-order) relation between the invoked methods along the execution. An essential contribution of our work is a precise characterization of observational refinement as an inclusion problem between sets of histories.
+
+Based on the characterization above, we develop a parametrized under-approximate schema for checking (non-)inclusion between sets of histories. This schema is based on  exploiting fundamental properties of histories of shared-memory libraries. 
+In fact, we use as a concept of approximation the notion of partial-order weakening, i.e., we approximate a history by relaxing some of its order constraints. We show that if a history is not valid (i.e., it is not a history of the reference library), then the same holds for any stronger history. Then, we observe that histories of shared-memory libraries are special partial-orders, called interval orders. These orders admit a canonical representation and an associated notion of length that lead to a the definition of natural parametrized approximation schema, which consists in considering weaker histories of bounded length. Finally, we show that it is possible to use counters to reason about bounded-length histories, and this leads to a reduction of the bounded refinement checking to a reachability problem. The reduction is based on constructing a simple monitor that tracks bounded length histories of the implementation library and checks that they satisfy an invariant characterizing the set of histories of the reference library. In fact, using counter representations for histories is crucial in this reduction as it allows representing symbolically sets of histories using arithmetical constraints. We provide such  symbolic representations for common data structures and show that for a wide class of concurrent objects, these representation can be computed systematically. Interestingly, we prove that for stacks and queues, refinement checking can be checked precisely using our approximation schema using small cut-off bounds less than 3.
+
+We have implemented the reduction above using both a dynamic and static analysis strategy. We used our implementation to show that our approach is scalable and efficient in detecting refinement violations. Let us describe in the sequel the contents of the paper and its contributions in more details. 
 
 \paragraph{Observational refinement vs history inclusion}
 
@@ -49,7 +59,7 @@ is included in the set $H(L_2)$ of histories of $L_2$.
 
 The characterization above of observational refinement is a fundamental result
 that offers a fresh view for reasoning about this problem. Indeed, the
-principal approach for tackling the problem of checking observation refinement
+principal approach for tackling the problem of checking observational refinement
 in the literature is based on checking \emph{linearizability} \cite{}, i.e.,
 that every execution in $L_1$ can be reordered into an execution of $L_2$ while
 preserving the order between return and call actions. While linearizability
@@ -182,30 +192,21 @@ concurrent programs such as CSeq \cite{} (with backend CBMC \cite{}) and SMACK
 \cite{} (with backend Corral \cite{}) that are based on efficient symbolic
 encodings of sets of computations and the use of SAT/SMT solvers.
 
-\paragraph{Summary}
-
-To summarize, the paper presents the following main contributions:
+\paragraph{Summary:}
+To summarize, the papers presents the following contributions:
 
 \begin{itemize}
+\item
+A characterization of observational refinement as a history inclusion problem, and the proof that history inclusion is equivalent to linearizability for atomic reference implementations.
 
-  \item A characterization of observational refinement as a history inclusion
-  problem.
+\item 
+The definition of general parameterized under-approximation schema for detecting observational refinement violations based on a weakening pre-order on histories, and 
+the instantiation of this schema based on the fact that histories of shared-memory libraries are interval-orders: The provided approximation schema is based on considering weaker histories of bounded interval-length.
 
-  \item The definition of general parameterized under-approximation schema for
-  detecting observational refinement violations based on a weakening pre-order
-  on histories.
+\item
+An efficient implementation of this schema using counting representations: Providing (1) a reduction of bounded refinement checking to a reachability problem  using arithmetics-based symbolic representations of sets of interval-length bounded histories, as well as (2) symbolic representations for sets of histories for common data structures (such as stacks and queues), and a procedure for automatic generation of these representations for a class of concurrent objects.  Proving a cut-off bound result for refinement checking of order constraints for stacks and queues.
 
-  \item An instantiation of this schema based on the fact that histories of
-  shared-memory libraries are interval-orders: The provided approximation
-  schema is based on considering weaker histories of bounded interval-length.
-
-  \item An efficient implementation of this schema using counting
-  representations, and its use for reducing bounded refinement checking to a
-  reachability problem, using symbolic representations of sets of
-  interval-length bounded histories.
-
-  \item Use of this reduction for defining dynamic and static analysis
-  algorithms for detecting refinement violations, and showing the efficiency
-  and the scalability of the approach in practice.
+\item 
+Use of the reduction to reachability checking for defining dynamic and static analysis algorithms for detecting refinement violations, and showing the efficiency and the scalability of the approach in practice.
 
 \end{itemize}
