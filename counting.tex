@@ -12,9 +12,9 @@ check whether each possible linearization of the partially-ordered history
 $H(e)$ is equivalent to some sequential execution of operations according to
 $L$, backtracking to try alternate linearizations on each failed attempt.
 Recent work implies that the more general problem of checking whether \emph{all
-histories} $H(L_1)$ of a given library $L_1$ are included in a fixed set
-$H(L_2)$ is undecidable, since it is equivalent to checking whether $L_1$ is
-linearizable with respect to $L_2$~\cite{conf/esop/BouajjaniEEH13}.
+histories} $H(L_1)$ of a given library $L_1$ are included in the set of histories $H(L_2)$
+of a fixed library $L_2$ is undecidable, since it is equivalent to checking whether $L_1$ is
+linearizable w.r.t. $L_2$~\cite{conf/esop/BouajjaniEEH13}.
 
 These complexity obstacles suggest investigating approximations to the history
 inclusion problems --- i.e.,~both $h \in H(L)$ and its more general variation

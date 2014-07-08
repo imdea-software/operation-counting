@@ -17,7 +17,7 @@ characterizations of concurrent data structures~\cite{conf/tacas/AbdullaHHJR13,
 conf/concur/HenzingerSV13} into a small set of constituent properties.
 
 A \emph{family} $@Y$ of operation-counting formulae is an indexed set $\set{
-@Y_i : i \in \<Nats> }$. We say a history $h$ \emph{satisfies} the $@Y$,
+@Y_i : i \in \<Nats> }$. We say a history $h$ \emph{satisfies} $@Y$,
 written $h |= @Y$, when $h |= @Y_i$ for $i = \len h$. We say that a family $@Y$
 has a \emph{cutoff} $n \in \<Nats>$ when for each history $h |= @Y$ there
 exists some $h' \preceq h$ such that $A_n(h')|= @Y$. Figure~\ref{fig:spec:ds}

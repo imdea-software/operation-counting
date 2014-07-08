@@ -33,6 +33,8 @@ for instance via the testing-based tools LineUp~\citep{conf/pldi/BurckhardtDMT10
 COLT~\citep{DBLP:conf/oopsla/ShachamBASVY11}, exponential
 explosion in the number of linearizations severely limits the number of
 executed operations for which exploration is possible (as we show in \S\ref{sec:exp:dynamic}). 
+COLT deals with the exponential explosion by checking a criterion stronger than linearizability, 
+where the linearization points are fixed to some particular statements in the implementation.
 
 Others have considered the theoretical limits in verifying linearizability.
 \citet{journals/siamcomp/GibbonsK97} showed that the linearizability of a
