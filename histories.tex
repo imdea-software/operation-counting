@@ -41,14 +41,14 @@ operation}. The histories admitted by $L$ are $H(L) = \set{ H(e) : e \in E(L)
 
 \begin{example}
 
-  Figure~\ref{fig:stacks}(b) depicts the history $h$ of the execution $e$ in
+  Figure~\ref{fig:stacks}(b) depicts the history of the execution in
   Figure~\ref{fig:stacks}(a). Arrows depict the order relation modulo
   transitivity. Operations $o_1$ and $o_2$ are ordered in $h$ if $o_1$'s return
-  precedes $o_2$'s call in $e$. For example, $\<push>(1)$ precedes $\<pop>=>3$.
+  precedes $o_2$'s call. For example, $\<push>(1)$ precedes $\<pop>=>3$.
   However, $\<pop>=>1$ is incomparable to $\<pop>=>3$ because $\<pop>=>1$'s
-  return comes after $\<pop>=>3$'s call in $e$, and $\<pop>=>3$'s return comes
-  after $\<pop>=>1$'s call. The order among operations' call actions is
-  irrelevant, as is the order among their return actions.
+  return comes after $\<pop>=>3$'s call, and $\<pop>=>3$'s return comes after
+  $\<pop>=>1$'s call. The order among operations' call actions is irrelevant,
+  as is the order among their return actions.
 
 \end{example}
 
@@ -86,9 +86,10 @@ time: the actions in an execution are linearly ordered.
 \begin{example}
   \label{ex:histories}
 
- Figure~\ref{fig:stacks}(d) pictures the history $h$ in Figure~\ref{fig:stacks}(b) as an interval order.
- Each operation is represented by an integer-bounded interval on the real number line such that
- $o_1<o_2$ iff the interval associated to $o_1$ finishes before the interval associated to $o_2$.
+  Figure~\ref{fig:stacks}(d) pictures the history in Figure~\ref{fig:stacks}(b)
+  as an interval order. Each operation is represented by an integer-bounded
+  interval on the real number line such that $o_1 < o_2$ iff the interval
+  associated to $o_1$ finishes before the interval associated to $o_2$.
   
 \end{example}
 

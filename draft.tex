@@ -80,19 +80,19 @@
     refinement even within a single execution is intractable, and existing
     approaches are limited to executions with very few object invocations.
 
-    In this work we develop a polynomial-time (per execution) approximation to
-    refinement checking which is parameterized by an accuracy $n \in \<Nats>$;
-    $n$ represents the degree to which refinement violations are visible. In
-    principle, more violations are detectable as $n$ increases, and in the
-    limit, all are detectable. Our insight for this approximation arises from
-    foundational properties on the partial orders characterizing the
+    We develop a polynomial-time (per execution) approximation to
+    refinement checking. The approximation is parameterized by an accuracy $k
+    \in \<Nats>$ representing the degree to which refinement violations are
+    visible. In principle, more violations are detectable as $k$ increases, and
+    in the limit, all are detectable. Our insight for this approximation arises
+    from foundational properties on the partial orders characterizing the
     happens-before relations between object invocations: they are
     \emph{interval orders}, with a well defined measure of complexity,
     i.e.,~their \emph{length}. Approximating the happens-before relation with a
     possibly-weaker interval order of bounded length can be efficiently
     implemented by maintaining a bounded number of integer counters. In
     practice, we find that refinement violations can be detected with very
-    small values of $n$, and that our approach scales far beyond existing
+    small values of $k$, and that our approach scales far beyond existing
     refinement-checking approaches.
 
   \end{abstract}
@@ -111,9 +111,9 @@
   \bibliographystyle{abbrvnat}
   \bibliography{violin-short}
   
-%  \appendix
-%
-%  \input atomic-register
-%  \input appendix-proofs
+  \appendix
+
+  \input atomic-register
+  \input appendix-proofs
 
 \end{document}

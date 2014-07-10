@@ -15,15 +15,14 @@ representing $L$ up to $k$.
 Our construction relies on Parikh's Theorem~\cite{journals/jacm/Parikh66}. We
 recall that the \emph{Parikh image} of $w \in @S^*$ is the multiset $\Pi(w) :
 @S -> \<Nats>$ mapping each symbol $a \in @S$ to its number of occurrences in
-$w$, and the \emph{Parikh image} of a language $M \subseteq @S^*$ is the set
-$\Pi(M) = \set{ \Pi(w) : w \in L }$ of its words' images. We show that if $\ker
+$w$, and the \emph{Parikh image} of a language $E \subseteq @S^*$ is the set
+$\Pi(E) = \set{ \Pi(w) : w \in L }$ of its words' images. We show that if $\ker
 E(L)$ is context free, then the language $E_k = \set{ e \in E(L) : \len H(e)
-\le k}$ of $L$'s executions with bounded-length histories has the same Parikh image 
-as a context-free language, and by Parikh's Theorem, $\Pi(E_k)$ can be
-represented as a Presburger formula, from which we derive $@Y_{L,k}$
-(the proof can be found in the accompanying technical report, \S\ref{app:proofs}).
+\le k}$ of $L$'s executions with bounded-length histories has the same Parikh
+image as a context-free language, and by Parikh's Theorem, $\Pi(E_k)$ can be
+represented as a Presburger formula, from which we derive $@Y_{L,k}$ (the proof
+can be found in the accompanying technical report, \S\ref{app:proofs}).
 
-    \vspace{-1mm}
 \begin{theorem}
   \label{thm:formula}
 
@@ -31,9 +30,11 @@ represented as a Presburger formula, from which we derive $@Y_{L,k}$
   methods and values such that $\ker E(L)$ is a context-free language, and let
   $k \in \<Nats>$. Then there exists an effectively-computable
   operation-counting formula $@Y_{L,k}$ representing $L$ up to $k$.
-    \vspace{-1mm}
+
 \end{theorem}
 
-This construction is useful in practice; with it we have derived formulae used
-in our static verification experiments of Section~\ref{sec:exp:static}.
-%In the worst case, the size of the formula $@Y_{L,k}$ is exponential in the size of
+This construction is useful in practice; with it we have derived the formulae
+used in our static verification experiments of Section~\ref{sec:exp:static}.
+
+% In the worst case, the size of the formula $@Y_{L,k}$ is exponential in the
+% size of

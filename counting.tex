@@ -61,16 +61,16 @@ latter in Section~\ref{sec:containers}--\ref{sec:exp}.
 In this section we develop a schema of approximation functions for which the
 approximate history inclusion problem is polynomial-time computable. Our
 development exploits structural aspects of the history inclusion problem; in
-particular, we exploit the fact that histories are \emph{interval orders}, with a natural measure of
-complexity, i.e.,~the interval order \emph{length}~\cite{phd/Greenough76}.
-Leveraging this notion of length, we abstract each history $h$ to a weaker
-history $A_k(h)$ whose length is bounded by $k$, and represent the set $H(L)$
-of histories by a formula $@Y_k$ over bounded interval length, against which
-$A_k(h)$ can be evaluated in polynomial time~(\S\ref{sec:counting:logic}).
-Finally, we exhibit a program monitoring scheme which can be used to decide our
-approximate observational refinement problem $\exists h.\ A_k(h) \in H(L_1)
-\setminus H(L_2)$, or as a general purpose runtime
-monitor~(\S\ref{sec:counting:monitor}).
+particular, we exploit the fact that histories are \emph{interval orders}, with
+a natural measure of complexity, i.e.,~the interval order
+\emph{length}~\cite{phd/Greenough76}. Leveraging this notion of length, we
+abstract each history $h$ to a weaker history $A_k(h)$ whose length is bounded
+by $k$, and represent the set $H(L)$ of histories by a formula $@Y_k$ over
+bounded interval length, against which $A_k(h)$ can be evaluated in polynomial
+time~(\S\ref{sec:counting:logic}). Finally, we exhibit a program monitoring
+scheme which can be used to decide our approximate observational refinement
+problem $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$, or as a
+general-purpose runtime-execution monitor~(\S\ref{sec:counting:monitor}).
 
 \subsection{Bounded-Interval-Length History Inclusion}
 \label{sec:counting:logic}
@@ -111,6 +111,8 @@ operation's pasts.
   number of its distinct pasts.
 
 \end{definition}
+
+\noindent
 We denote the length of the interval order $\tup{O,<}$ underlying a history
 $h = \tup{O,f,<}$ as $\len h$.
 
@@ -147,8 +149,8 @@ time by counting the distinct pasts among operations.
 
 \begin{example}
 
-  Figure~\ref{fig:stacks}(e) pictures the canonical representation of the history $h$ in
-  Figure~\ref{fig:stacks}(b). Note that the length of $h$ is 4.
+  Figure~\ref{fig:stacks}(e) pictures the canonical representation of the
+  history in Figure~\ref{fig:stacks}(b). Note that $\len H(e) = 4$.
 
 \end{example}
 
@@ -265,8 +267,7 @@ we define $A_k(h) = \tup{O,<',f}$ by
 where $I$ is the interval map of $h$. Intuitively, $A_k$ remembers only the the
 ordering between ``recent'' operations which have started after interval $n-k$.
 It follows by definition that $A_k(h) \preceq h$, since ordering constraints
-are only removed from $<$. Note that $A_k(h) = h$ for any history $h$ of length
-$n\leq k$.
+are only removed from $<$. Note that $A_k(h) = h$ if $\len h \le k$.
 
 \begin{lemma}
   \label{lemma:abstraction}
@@ -419,15 +420,14 @@ history incrementally, according to the increment/decrement and shift
 operations of Lemmas~\ref{lem:incr} and~\ref{lem:shift}. The variable $n$
 maintains the interval length of the input execution's history $H(e)$, while
 the variable $s$ maintains the infimum $s(o)$ of the interval of each operation
-$o$ in $H(e)$ (the value $s(o)$ can be discarded once the operation $o$ completes). 
-The corresponding infimum in $A_k(H(e))$ when $o$ is invoked is
-given by $\min(n,k)$, as the interval bounds used in $A_k(H(e))$ may not exceed
-$k$. When $o$ completes, it is possible that some number of shift operations
-have translated its interval in $A_k(H(e))$. As the number of performed shift
-operations is equal to $\min(n-k,0)$, $o$'s infimum in $A_k(H(e))$ when
-completing is given by $s(o) - \min(n-k,0)$. It follows by
-Lemmas~\ref{lem:incr} and~\ref{lem:shift} that Algorithm~\ref{alg:counting}
-computes $A_k(H(e))$. 
+$o$ in $H(e)$; $s(o)$ can be discarded once $o$ completes. The corresponding
+infimum in $A_k(H(e))$ when $o$ is invoked is given by $\min(n,k)$, as the
+interval bounds used in $A_k(H(e))$ may not exceed $k$. When $o$ completes, it
+is possible that some number of shift operations have translated its interval
+in $A_k(H(e))$. As the number of performed shift operations is equal to
+$\min(n-k,0)$, $o$'s infimum in $A_k(H(e))$ when completing is given by $s(o) -
+\min(n-k,0)$. It follows by Lemmas~\ref{lem:incr} and~\ref{lem:shift} that
+Algorithm~\ref{alg:counting} computes $A_k(H(e))$.
 
 \begin{theorem}
   \label{thm:counting:alg}
@@ -438,8 +438,8 @@ computes $A_k(H(e))$.
   constant in the number of operations when the size of integers is fixed, as
   in the case of modern computer architectures; otherwise, the space complexity
   is logarithmic in the number of operations, i.e.,~in execution length.} and
-  $O(|e|)$ time, where $\<width>(e)$ is the maximum number of overlapping operations
-  in $e$.
+  $O(|e|)$ time, where $\<width>(e)$ is the maximum number of overlapping
+  operations in $e$.
 
 \end{theorem}
 
@@ -457,7 +457,7 @@ overlapping operations is usally fixed and it doesn't influence the space comple
 \begin{proof}
   
   Follows from the fact that deciding $A_k(h) \in H(L)$ is equivalent to checking $A_k(h) |= @Y$, since $A_k(h)$
-  has length at most $k$, Theorem~\ref{thm:counting:alg}, and 
+  has length at most $k$, and Theorem~\ref{thm:counting:alg} and 
   Lemma~\ref{lemma:satisfaction}.
 \end{proof}
 
@@ -478,6 +478,6 @@ to $k$.
   \begin{align*}
     (P_k \x L_1) |= \Box @Y
   \end{align*}
-  where $@Y$ is interpreted over $P_k$'s counting representation $\pi$.
+  where $@Y$ is interpreted over $P_k$'s counting representation.
 
 \end{corollary}
