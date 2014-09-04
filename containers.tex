@@ -54,6 +54,7 @@ quotients.
 
 \begin{figure}[t]
   \footnotesize
+  \newcommand{\param}{k}
 %  \begin{align*}
 %    \<pending>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \quad\quad    \<completed>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') 
 %  \end{align*}
@@ -81,7 +82,16 @@ quotients.
 		 & /| \<before>(x_2,y_1) \\
     @Y_\mathrm{ev}  &= \exists x, y, z.\ \<isCPush>(x) /| \<isCPop>(y)  \\
                     &  /| \<SameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
-                    &  /| \<before>(y,z) /| \big( \<isCPop>(z) \vee \<noPPop>(y) \big)
+                    &  /| \<before>(y,z) /| \big( \<isCPop>(z) \vee \<noPPop>(y) \big) \\  
+    @Y_\mathrm{ev}^\param  &= 
+      \exists x_1,\dots,x_\param, y, z_1,\dots,z_{\param-1}.\\
+        &\<isCPush>(x_1) /| \dots \<isCPush>(x_\param) /| \<isCPop>(y) /|\\
+        &\<isPop>(z_1) /| \dots /| \<isPop>(z_{\param-1}) /|\\
+        &\<SameVal>(x_1,z_1) /| \dots /| \<SameVal>(x_{\param-1},z_{\param-1}) /|\\ 
+        &\<EmptyVal>(y) /| \<before>(x_1,y) /|\\
+        &\<before>(x_2,z_1) /| \dots /| \<before>(x_\param,z_{\param-1}) /|\\
+        &(\forall z_\param. (\<isPop>(z_\param) /| \<SameVal>(x_\param,z_\param))
+        \implies \<before>(y,z_\param))\\
   \end{align*}
   \caption{Four families of operation-counting formulae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
