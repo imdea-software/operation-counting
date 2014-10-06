@@ -3,18 +3,20 @@
 \label{sec:counting}
 
 By the equivalences of Section~\ref{sec:lin}, checking whether a given history
-$H(e)$ is included in a fixed set $H(L)$ of library histories is equivalent to
-checking whether $H(e)$ is linearizable with respect to $L$, for a fixed atomic
+$H(e)$ is included in a set $H(L)$ of library histories is equivalent to
+checking whether $H(e)$ is linearizable with respect to $L$, for a atomic
 library $L$. It follows that deciding $H(e) \in H(L)$ is NP-hard for an
-arbitrary, but fixed, library $L$~\cite{journals/siamcomp/GibbonsK97}.
+arbitrary library $L$, since it is NP-hard for the atomic register
+object~\cite{journals/siamcomp/GibbonsK97}.
 Generally speaking, the only known algorithms to decide $H(e) \in H(L)$ must
 check whether each possible linearization of the partially-ordered history
 $H(e)$ is equivalent to some sequential execution of operations according to
 $L$, backtracking to try alternate linearizations on each failed attempt.
 Recent work implies that the more general problem of checking whether \emph{all
-histories} $H(L_1)$ of a given library $L_1$ are included in the set of histories $H(L_2)$
-of a fixed library $L_2$ is undecidable, since it is equivalent to checking whether $L_1$ is
-linearizable w.r.t. $L_2$~\cite{conf/esop/BouajjaniEEH13}.
+histories} $H(L_1)$ of a given library $L_1$ are included in the set of
+histories $H(L_2)$ of a fixed library $L_2$ is undecidable, since it is
+equivalent to checking whether $L_1$ is linearizable w.r.t.~$L_2$ when $L_2$ is
+atomic~\cite{conf/esop/BouajjaniEEH13}.
 
 These complexity obstacles suggest investigating approximations to the history
 inclusion problems --- i.e.,~both $h \in H(L)$ and its more general variation
@@ -264,7 +266,7 @@ we define $A_k(h) = \tup{O,<',f}$ by
 \begin{align*}
   o_1 <' o_2 & \text{ if{f} } o_1 < o_2 \text{ and } n - k < \inf I(o_2)
 \end{align*}
-where $I$ is the interval map of $h$. Intuitively, $A_k$ remembers only the the
+where $I$ is the interval map of $h$. Intuitively, $A_k$ remembers only the
 ordering between ``recent'' operations which have started after interval $n-k$.
 It follows by definition that $A_k(h) \preceq h$, since ordering constraints
 are only removed from $<$. Note that $A_k(h) = h$ if $\len h \le k$.
@@ -433,18 +435,19 @@ Algorithm~\ref{alg:counting} computes $A_k(H(e))$.
   \label{thm:counting:alg}
 
   Algorithm~\ref{alg:counting} computes the history approximation
-  $\Pi(A_k(H(e)))$ of an execution $e$ in $O(|\<Labels>| \cdot \<width>(e))$
+  $\Pi(A_k(H(e)))$ of an execution $e$ in $O(|\<Labels>| \cdot k^2 + \<width>(e))$
   space\footnote{The space complexity of Algorithm~\ref{alg:counting} is
   constant in the number of operations when the size of integers is fixed, as
   in the case of modern computer architectures; otherwise, the space complexity
   is logarithmic in the number of operations, i.e.,~in execution length.} and
-  $O(|e|)$ time, where $\<width>(e)$ is the maximum number of overlapping
+  $O(|e|)$ time, where $\<width>(e)$ is the maximum number of concurrent
   operations in $e$.
 
 \end{theorem}
 
-Note that, in the worst case, $\<width>(e)=|e|$. However, in practice, the number of
-overlapping operations is usally fixed and it doesn't influence the space complexity.
+In the worst case $\<width>(e) = |e|$. In practice however one expects the
+number of threads, and thus concurrent operations, to be bounded, nullifying
+the effect of $|e|$ on asymptotic space complexity.
 
 \begin{corollary}
 

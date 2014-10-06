@@ -118,9 +118,9 @@ simply enumerating the linearizations of a given execution history without
 checking its inclusion. Despite our best-effort implementation, one observes
 the cost incurred by linearization: as the number of operations increases, the
 number of linearizations increases exponentially, and performance plummets.
-With only 20 operations, instrumentation overhead is nearly 100000\%. Our
+With only 20 operations, instrumentation overhead is nearly $1000$x. Our
 counting-based implementation of $A_2$ avoids this dramatic overhead: though
-not seriously optimized, we observe that runtime overhead stays within 30\%.
+not seriously optimized, we observe a $2.01$x geometric-mean runtime overhead.
 This scalability suggests that our approximation can be used not only for
 systematic concurrency testing with few method invocations, but also for
 runtime monitoring, where the number of operations grows without limit.
@@ -137,8 +137,8 @@ runtime monitoring, where the number of operations grows without limit.
     $i\!+\!j$, and each data point is sampled from up to $126600$ executions.
     Times do not include pre-calculation of sequential histories for
     linearization-based monitoring. While our $A_k$ monitor scales well,
-    usually maintaining under 30\% overhead, the linearization monitor scales
-    \textbf{exponentially}, running with nearly \textbf{100000\% overhead}
+    usually maintaining under 3x overhead, the linearization monitor scales
+    \textbf{exponentially}, running with nearly \textbf{1000x overhead}
     with $20$ operations.
   }
   \label{fig:data:runtime}

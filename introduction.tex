@@ -13,7 +13,7 @@ implementations. Conformance is formally captured by the concept of
 implementing the operations of some concurrent object, we say $L_1$
 \emph{refines} $L_2$ if and only if every computation of every program $P$
 using $L_1$ would also be possible were $P$ using $L_2$ instead. The challenge
-we address in this paper is to provide an tractable algorithmic approach for
+we address in this paper is to provide a tractable algorithmic approach for
 checking observational refinement.
 
 Verifying observational refinement is an intrinsically hard problem, and is
@@ -146,10 +146,9 @@ define a \emph{polynomial time} algorithm that, given an execution, builds a
 interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
 \emph{reachability (or invariant) checking} problem in $P_k$ composed with
 $L_1$, provided that the set of histories $A_k(H(L_2))$ is effectively defined
-in OCL. We show that this is the case for reference implementations of the
-usual concurrent objects such as collection objects (like stacks or queues),
-semaphores, locks, etc, and that these OCL formulas can be constructed
-systematically for a wide class of objects.
+in OCL. We show that this is the case for reference implementations of typical
+concurrent objects such as stacks and queues, and that these OCL formulas can
+be constructed systematically for a wide class of objects.
 
 \paragraph{Demonstrating feasibility}
 
