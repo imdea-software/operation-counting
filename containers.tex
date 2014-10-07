@@ -58,7 +58,7 @@ quotients.
     \pred{total}(x,i,j)
       & = \sum_{i\le i'\le j'\le j} \#(x,i',j')
     \\
-    \pred{before}(x,y)
+    \pred{before}_k(x,y)
       & = \bigvee_{0 \le i < k} \left(
         \begin{array}{l}
           \pred{total}(x,0,i) > 0 \ /| \\
@@ -74,15 +74,15 @@ quotients.
     \\
     @Y_\mathrm{fv}
       & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
-      & \quad /| \pred{before}(x_1,x_2) /| \pred{before}(y_2,y_1)
+      & \quad /| \pred{before}_k(x_1,x_2) /| \pred{before}_k(y_2,y_1)
     \\
     @Y_\mathrm{lv}
       & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
-      & \quad /| \pred{before}(x_1,x_2) /| \pred{before}(y_1,y_2) /| \pred{before}(x_2,y_1)
+      & \quad /| \pred{before}_k(x_1,x_2) /| \pred{before}_k(y_1,y_2) /| \pred{before}_k(x_2,y_1)
     \\
     @Y_\mathrm{ev}
       & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
-      & \quad /| \pred{before}(x,y) /| \pred{before}(y,z)
+      & \quad /| \pred{before}_k(x,y) /| \pred{before}_k(y,z)
   \end{align*}
   \caption{Four families of operation-counting formulae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
@@ -99,11 +99,11 @@ quotients.
   \begin{align*}
     @Y_\mathrm{lv}^n
       & = \exists x_1, .., x_n, y_1, .., y_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,y_i) \\
-      & \quad /| \pred{before}(y_1,x_n) /| \bigwedge_{i=2}^n \pred{before}(x_i,y_{i-1})
+      & \quad /| \pred{before}_k(y_1,x_n) /| \bigwedge_{i=2}^n \pred{before}_k(x_i,y_{i-1})
     \\
     @Y_\mathrm{ev}^n
       & = \exists x_1, .., x_n, y, z_1, .., z_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,z_i) /| \pred{EmptyVal}(y) \\
-      & \quad /| \pred{before}(x_1,y) /| \bigwedge_{i=2}^{n} \pred{before}(x_i,z_{i-1}) /| \pred{before}(y,z_n)
+      & \quad /| \pred{before}_k(x_1,y) /| \bigwedge_{i=2}^{n} \pred{before}_k(x_i,z_{i-1}) /| \pred{before}_k(y,z_n)
   \end{align*}
   \caption{Parameterized formulas.}
 \end{figure}
