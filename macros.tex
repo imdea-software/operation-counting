@@ -14,25 +14,6 @@
 \renewcommand{\u}{\cup}
 \newcommand{\U}{\bigcup}
 \newcommand{\x}{\times}
-\newcommand{\print}[1]{\<print> {#1}}
-\newcommand{\barrier}[1]{\<print> {#1}}
-\newcommand{\sync}[2]{\<sync> ({#1}, {#2})}
-\newcommand{\past}[1]{past({#1})}
-\newcommand{\future}[1]{\mathit{future}({#1})}
-\newcommand{\nbbarr}[1]{\mbox{\#}\<tick>({#1})}
-\newcommand{\nbbarrA}[2]{\mbox{\#}\<tick>({#1},{#2})}
-\newcommand{\counting}[2]{\mbox{\#}{#1}({#2})}
-\newcommand{\atLib}[1]{\overline{{#1}}}
-\newcommand{\rf}{\mathsf{rf}}
-\newcommand{\rdVal}{\mathsf{rdVal}}
-\newcommand{\ocl}{{\sf OCL}}
-\newcommand{\lab}{f_{\,\text I}}
-\newcommand{\closure}{{\mathit Cl}}
-\newcommand{\kernel}{{\mathit K}}
-\newcommand{\regform}[1]{\<register>[{#1}]}
-\newcommand{\queueform}[1]{\<fifo>[{#1}]}
-\newcommand{\lreg}{L_{\<reg>}}
-\newcommand{\lqueue}{L_{\<fifo>}}
 
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
@@ -132,35 +113,32 @@
     {\mbox{\normalfont\tiny\ensuremath{#1}}}}}
 
 \reservestyle{\semanticdomain}{\semanticdomainstyle} 
+
 \mathfn{min,max,log,dom,range}
-
-\metalangkeyword{true,false,assume}
-\metalangkeyword{ret,method,op}
-\metalangkeyword{empty}
-\metalangkeyword{name,value}
-\mathfn{past}
-\metalangkeyword{print,sync,read,write,assume,finished,time,barriers,read,write,w,r,reg,tick,newPast,counters,startTime,Shift,foreach,rem,add,isRead,DiffVal,EMPTY}
-\metalangkeyword{push,pop,enqueue,dequeue}
-\metalangkeyword{noWrites,isRead,isCompleted,sameVal,amongLastWr,isWrite,overlaps,readFrom,rf,intersects,Register,Reg,Read,Write,Rf,Completed,register,init,
-wellFormed,covered,IsWriteA,IsReadA,SameVal}
-
-\metalangkeyword{isPush,isPop,sameVal,emptyVal,Push,Pop,CompletedPop,PendingPush,SameVal,CPop,CPush,PPop,PPush,isCPop,isCPush,isPPop,isPPush,noPush,lessPush}
-\metalangkeyword{pending,completed,total,totalWrites,is,before,P,isP,noPPop,EmptyVal,width,lin}
-\metalangkeyword{removev,fifov,lifov,emptyv,fifo,queue}
-
 
 \semanticdomain{%
   Bools[\mathbb{B}],
   Nats[\mathbb{N}],
   Lab[\mathbb{A}],
-  Ints[\mathbb{Z}],
-  Cnts[\mathbb{C}],
+  Ints[\mathbb{Z}]
+}
+
+%%% LOCAL MACROS
+
+\semanticdomain{%
   Methods[\mathbb{M}],
   Vals[\mathbb{V}],
   Labels[\mathbb{L}],
-  Ops[\mathbb{O}],
+  Ops[\mathbb{O}]
 }
+
+\metalangkeyword{true,false}
+\metalangkeyword{ret,op}
+\mathfn{past,width}
+\metalangkeyword{push,pop}
+\metalangkeyword{read,write}
 
 \newcommand{\match}{\mathbin{\mapstochar\relbar\mapsfromchar}}
 \newcommand{\call}[2]{{\ensuremath{#1_{#2}}}}
 \newcommand{\ret}[1]{{\ensuremath{\mathsf{ret}_{#1}}}}
+\newcommand{\pred}[1]{\mathsf{#1}}

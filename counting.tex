@@ -137,8 +137,8 @@ representations minimize the interval bounds to the interval-order length.
   representation $I : O -> [n]^2$ mapping each $o \in O$ to the interval $I(o)
   = [i,j] \subseteq [0,n]$, with
   \begin{align*}
-    i = |\set{\past{o'} : o'<o}| \text{ and }
-    j = |\set{\past{o'} : \neg o<o'}| - 1 \text{.}
+    i = |\set{\<past>(o') : o'<o}| \text{ and }
+    j = |\set{\<past>(o') : \neg o<o'}| - 1 \text{.}
   \end{align*}
   such that $o_1 < o_2$ if{f} $\sup I(o_1) < \inf I(o_2)$.
 \end{lemma}

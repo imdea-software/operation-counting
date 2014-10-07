@@ -3,68 +3,53 @@
 \section{Atomic Registers}
 \label{sec:registers}
 
-\newcommand{\ibar}{i}
-\newcommand{\nbar}{n}
-\newcommand{\xval}{a}
-\newcommand{\xvar}{{x_\xval}}
-\newcommand{\grwrite}[2]{w^{#1}_{#2}}
-\newcommand{\ind}[1]{{i_{#1}}}
-\newcommand{\jind}[1]{{j_{#1}}}
-\newcommand{\isub}{m}
-\newcommand{\wellformed}{\<wellFormed>_\xvar}
-\newcommand{\theycover}{\<covered>_\xvar}
-\newcommand{\dela}{u}
-\newcommand{\delb}{v}
-\newcommand{\delc}{z}
-\newcommand{\deld}{t}
-
 \begin{figure*}[h]
 {\small
 \begin{align*}
-\wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) =\ 
-  &\exists k'' \in [k].\ \exists \jind{0}<\ldots<\jind{k''}.\\
-  &\exists \dela_\jind{0},\delb_\jind{0},\ldots,
-    \dela_\jind{k''},\delb_\jind{k''}.\\
- &\exists \delc_\ind{0},\deld_\ind{0},\ldots,\delc_\ind{k'},\deld_\ind{k'}
+\pred{wellFormed}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}}) =\ 
+  &\exists k'' \in [k].\ \exists {j_{0}}<\ldots<{j_{k''}}.\\
+  &\exists u_{j_{0}},v_{j_{0}},\ldots,
+    u_{j_{k''}},v_{j_{k''}}.\\
+ &\exists z_{i_{0}},t_{i_{0}},\ldots,z_{i_{k'}},t_{i_{k'}}
    \in [k].\\
 & \forall i,j \in [k].\ 
-  \#(\xvar,i,j) \geq 
-  |\set{\isub : (\delc_\ind{\isub},\deld_\ind{\isub}) = (i,j)}| + \\
-&  \qquad\qquad|\set{\isub : 
-    \<SameVal>(\xvar,x_\jind\isub) \land
-    (\dela_\jind{\isub},\delb_\jind{\isub}) = (i,j) }| \land\\
-& \forall \isub \in [k''].\ \jind{\isub} \in [\dela_\jind\isub,\delb_\jind\isub]
+  \#({x_a},i,j) \geq 
+  |\set{m : (z_{i_{m}},t_{i_{m}}) = (i,j)}| + \\
+&  \qquad\qquad|\set{m : 
+    \pred{SameVal}({x_a},x_{j_m}) \land
+    (u_{j_{m}},v_{j_{m}}) = (i,j) }| \land\\
+& \forall m \in [k''].\ {j_{m}} \in [u_{j_m},v_{j_m}]
 \land\\
-& \forall \isub \in [k'].\ 
-  \ind{\isub} \in [\delc_\ind{\isub},\deld_\ind{\isub}] \land\\
-& \forall \ibar \in [k].\ ((\forall \isub.\ \ibar != \jind\isub) \implies 
-\exists \isub .\ \<SameVal>(x_\jind\isub,\ibar) \land \jind\isub < \ibar \land 
-\<totalWrites>(\jind\isub+1,\ibar) = 0)
+& \forall m \in [k'].\ 
+  {i_{m}} \in [z_{i_{m}},t_{i_{m}}] \land\\
+& \forall i \in [k].\ ((\forall m.\ i != j_m) \implies 
+\exists m .\ \pred{SameVal}(x_{j_m},i) \land j_m < i \land 
+\pred{totalWrites}(j_{m+1},i) = 0)
 \end{align*}
 
 \begin{align*}
-\theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) =\ 
+\pred{covered}_{x_a}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}}) =\ 
   & 
-    \forall r,i,j.\ \<Read>(x) \land \<SameVal>(\xvar,x) \land \#(r,i,j) > 0 
+    \forall r,i,j.\ \pred{Read}(x) \land \pred{SameVal}({x_a},x) \land \#(r,i,j) > 0 
     \implies\\
-  & \exists \isub \in [i-1,j].\ \<SameVal>(r,x_{\isub}) \lor\\
-  & \exists \isub \in [1,k'].\ \ind{\isub} \in [i,j]
+  & \exists m \in [i-1,j].\ \pred{SameVal}(r,x_{m}) \lor\\
+  & \exists m \in [1,k'].\ {i_{m}} \in [i,j]
 \end{align*}
 
 \begin{align*}
-\regform{k} =\ 
+@Y_\mathsf{reg}^k =\ 
   &\exists x_0,\ldots,x_{k}.\ 
-    \bigwedge_{i \in [k]} \<Write>(x_i) \land\\
-  &\forall \xvar.\ \<Write>(\xvar) \implies
+    \bigwedge_{i \in [k]} \pred{Write}(x_i) \land\\
+  &\forall {x_a}.\ \pred{Write}({x_a}) \implies
   \exists k' \leq k.\ 
-  \exists \ind{0}<\ldots<\ind{k'} \in [k].\\ 
-  &\wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'}) \land\\
-  &\theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})
+  \exists {i_{0}}<\ldots<{i_{k'}} \in [k].\\ 
+  &\pred{wellFormed}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}}) \land\\
+  &\pred{covered}_{x_a}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}})
 \end{align*}
 }
-\caption{The formula ${\sf register}[k]$ representing $L_{\sf reg}$ up to $k$. 
+\caption{The formula $@Y_\mathsf{reg}^k$ representing $L_\mathsf{reg}$ up to $k$. 
 The names of the predicates over operation labels are capitalized while the 
-names of the sub-formulas of ${\sf register}[k]$ start with lower case. The 
+names of the sub-formulas of $@Y_\mathsf{reg}^k$ start with lower case. The 
 predicates are defined as follows: 
 (1) ${\sf Read}(x)$ holds for any $x={\sf read}=>\_$  
 (2) ${\sf Write}(x)$ holds for any $x={\sf write}(\_)=>\_$  
@@ -76,68 +61,69 @@ writes which start at or after $i$, and finish at or before $j$.
 \end{figure*}
 
 
-We define the $\ocl$ formula $\regform{k}$ representing the atomic register up 
-to some bound $k$. The atomic register, denoted by $\lreg$, is defined as 
-usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the kernel consists 
-of all sequential executions where every read returns the last written value 
-(or the initial value $0$ if it is not preceded by a write). 
-Formally, $\ker E(L)$ is the set of all sequential executions with only 
-completed operations such that the return value of any $\<read>$ invocation $o$ 
-is the value $v$, where $\<write>(v)$ is the last $\<write>$ invocation before 
-$o$, or $0$, if $o$ is not preceded by a $\<write>$ invocation.
-Thus, a history $h$ belongs to $H(\lreg)$ iff it is weaker than the history of 
-a sequential execution $e$ of $\lreg$, i.e.,  $h\preceq H(e)$.
+We define the OCL formula $@Y_\mathsf{reg}^k$ representing the atomic register
+up to some bound $k$. The atomic register, denoted by $L_\mathsf{reg}$, is
+defined as usual: the methods are $\<read>$ and $\<write>(\cdot)$, and the
+kernel consists of all sequential executions where every read returns the last
+written value (or the initial value $0$ if it is not preceded by a write).
+Formally, $\ker E(L_\mathsf{reg})$ is the set of all sequential executions with
+only completed operations such that the return value of any $\<read>$
+invocation $o$ is the value $v$, where $\<write>(v)$ is the last $\<write>$
+invocation before $o$, or $0$, if $o$ is not preceded by a $\<write>$
+invocation. Thus, a history $h$ belongs to $H(L_\mathsf{reg})$ iff it is weaker
+than the history of a sequential execution $e$ of $L_\mathsf{reg}$, i.e.,
+$h\preceq H(e)$.
 
 In the following, we give a non-deterministic procedure for deciding if a 
-history $h$ belongs to $H(\lreg)$, which is used to define 
-$\regform{k}$\footnote{\citet{journals/siamcomp/GibbonsK97} proves that this 
+history $h$ belongs to $H(L_\mathsf{reg})$, which is used to define 
+$@Y_\mathsf{reg}^k$\footnote{\citet{journals/siamcomp/GibbonsK97} proves that this 
 problem is NP-complete but using a different non-deterministic procedure for 
 showing membership to NP.}.
 
-% Note that $H(\lreg)$ contains all histories where every completed $\<read>=>a$ 
+% Note that $H(L_\mathsf{reg})$ contains all histories where every completed $\<read>=>a$ 
 % operation\footnote{Pending $\<read>$ operations can be ignored: a history $h$ 
 % belongs to  iff the history $h'$ obtained from $h$ by deleting pending read 
-% operations belongs to $H(\lreg)$} 
+% operations belongs to $H(L_\mathsf{reg})$} 
 % can be mapped injectively to an overlapping $\<write>(a)=>\_$ operation. 
 % Indeed, for any total ordering on the $\<write>$ operations of such a history 
 % $h$ that doesn't contradict the ordering constraints in $h$, one can insert 
 % every completed $\<read>=>a$ operation right after the $\<write>(a)=>\_$ 
 % operation given by the injective mapping. We then obtain a sequential execution
-% $e\in E(\lreg)$ with $h\preceq H(e)$. 
+% $e\in E(L_\mathsf{reg})$ with $h\preceq H(e)$. 
 
-Let $h$ be a history of $H(\lreg)$ and $I:O->[\nbar]^2$ be its canonical 
+Let $h$ be a history of $H(L_\mathsf{reg})$ and $I:O->[n]^2$ be its canonical 
 representation. The procedure for deciding if a history $h$ belongs to 
-$H(\lreg)$ works as follows. First, for each $\ibar \in [\nbar]$, it guesses a 
-value $x_\ibar$ which is going to be the last value written before the end 
-of interval $[0,\ibar]$.
-Then, for each value $\xval$, it guesses which intervals are going to contain
-linearization points of $\<write>(\xval)=>\_$ operations. Finally, it checks
-that every $\<read>=>\xval$ can either read from one of the \emph{last write}
-or from one of the $\<write>(\xval)=>\_$ operations just mentioned.
+$H(L_\mathsf{reg})$ works as follows. First, for each $i \in [n]$, it guesses a 
+value $x_i$ which is going to be the last value written before the end 
+of interval $[0,i]$.
+Then, for each value $a$, it guesses which intervals are going to contain
+linearization points of $\<write>(a)=>\_$ operations. Finally, it checks
+that every $\<read>=>a$ can either read from one of the \emph{last write}
+or from one of the $\<write>(a)=>\_$ operations just mentioned.
 
 More formally:
 \begin{enumerate}
   \item 
-    for each $\ibar \in [\nbar]$, guess a value $x_\ibar$ corresponding to 
-    the last written value before the end of the interval $[0,\ibar]$
+    for each $i \in [n]$, guess a value $x_i$ corresponding to 
+    the last written value before the end of the interval $[0,i]$
   \item
-    then, for each value $\xval$, guess $\nbar' \leq \nbar$ and
-    $\ind{0},\ldots,\ind{\nbar'}$ representing the intervals containing
-    linearization points of $\<write>(\xval)=>\_$ operations
+    then, for each value $a$, guess $n' \leq n$ and
+    ${i_{0}},\ldots,{i_{n'}}$ representing the intervals containing
+    linearization points of $\<write>(a)=>\_$ operations
   \item
-    finally, check that for each completed $\<read>=>\xval$ operation $o$ with 
+    finally, check that for each completed $\<read>=>a$ operation $o$ with 
     $I(o)=[i,j]$, one of the following holds:
   \begin{itemize}
     \item 
-      one of the last written value $x_{i-1},\ldots,x_j$ is $\xval$
+      one of the last written value $x_{i-1},\ldots,x_j$ is $a$
     \item 
-      one of $\ind{\isub}$ is in $[i,j]$
+      one of ${i_{m}}$ is in $[i,j]$
   \end{itemize}
 \end{enumerate}
 
-The formula $\regform{k}$ representing the atomic register up to $k$ is given 
+The formula $@Y_\mathsf{reg}^k$ representing the atomic register up to $k$ is given 
 in Figure~\ref{fig:register}. It is a translation of the above decision 
-procedure in $\ocl$. 
+procedure in OCL. 
 To simplify the formula, we use some notations such as the set comprehension 
 and the quantification over bounded integers, which can easily be translated 
 to conjunctions and disjunctions. 
@@ -145,9 +131,9 @@ Without loss of generality, we assume that our history always starts
 with a $\<write>(0)=>\_$ operation (before all other operations) to avoid
 edge cases.
 
-The predicate $\wellformed(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})$ is the 
+The predicate $\pred{wellFormed}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}})$ is the 
 most difficult part of the formula. Informally, it simply states that there are 
-enough writes in the history with the same value as $\xvar$ in order to satisfy 
+enough writes in the history with the same value as ${x_a}$ in order to satisfy 
 everything which was guessed so far. When translating this idea into a formula, 
 we get a fairly long formula which, in english, goes as follows:
 There exist $k''$ writes (filling the role of last written value for each 
@@ -158,13 +144,13 @@ interval) such that:
 \item
   the writes are well-placed
 \item
-  (last line of the formula) if, for some interval $\ibar$, we didn't choose a 
+  (last line of the formula) if, for some interval $i$, we didn't choose a 
   write (among the $k''$ writes) to fill the role of last written value, it 
   means we used the same write as a previous interval (namely, the one used for
-  the existentially quantified $x_\jind{\isub}$), and that there must not exist
+  the existentially quantified $x_{j_{m}}$), and that there must not exist
   a write in between.
 \end{itemize}
 
-The predicate $\theycover(x_0,\ldots,x_{k},\ind{0},\ldots,\ind{k'})$ is a
+The predicate $\pred{covered}_{x_a}(x_0,\ldots,x_{k},{i_{0}},\ldots,{i_{k'}})$ is a
 simple translation of the last item of the procedure, and ensured that all 
 read's have a write to read from.

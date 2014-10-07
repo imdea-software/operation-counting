@@ -54,54 +54,58 @@ quotients.
 
 \begin{figure}[t]
   \footnotesize
-  \newcommand{\param}{k}
-%  \begin{align*}
-%    \<pending>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<false>,i',j') \quad\quad    \<completed>(x,i,j) = \sum_{i\le i'\le j'\le j} \#(x,\<true>,i',j') 
-%  \end{align*}
   \begin{align*}
-    \<total>(x,i,j) &= \sum_{i\le i'\le j'\le j} \#(x,i',j') \\
-    \<total>(x)     &= \sum_{0\leq i\leq j\leq k}\<total>(x,i,j) \\
-    \<isP>(x)       &= \<P>(x)\land \<total>(x) > 0 \\
-                    & \text{ for all predicates } \<P>\in\set{\<CPush>,\<PPush>,\<CPop>,\<PPop>} \\
-    \<isPush>(x)     &= (\<PPush>(x)\vee \<CPush>(x))\land \<total>(x) > 0 \\
-%    \<isPAdd>(x)  = \<PAdd>(x)\land \<total>(x) > 0 
-    \<before>(x,y)  &= \bigvee_{0 \le i < k} \<total>(y,0,i) = 0 /| \<total>(x,i+1,k) = 0 \\
-    \<noPush>(x)     &= \forall y. \neg (\<isPush>(y) \land \<SameVal>(x,y)) \\
-    \<lessPush>(x)  &= \exists y.\ \<isPush>(y) \land \<SameVal>(x,y)\land \<total>(x) > \<total>(y) \\ 
-    \<noPPop>(x) &= \forall y.\ ( \neg \<isPPop>(y) \vee \<before>(x,y)) \\
-    @Y_\mathrm{rv}  &= \exists x.\ \<isCPop>(x)  /|  (\<noPush>(x) \vee \<lessPush>(x) ) \\
-    @Y_\mathrm{fv}  &= \exists x_1, x_2, y_1, y_2.\ \<isCPush>(x_1) /| \<isPush>(x_2) \\
-                    &  /|  \<CPop>(y_1) /| \<isCPop>(y_2) /| \<SameVal>(x_1,y_1) \\
-                    &  /| \<SameVal>(x_2,y_2) /| \<before>(x_1,x_2) \\
-                    & /| \Big(\big(\<total>(y_1) > 0 /| \<before>(y_2,y_1)\big) \\
-                    & \hspace{6mm} \vee \big(  \<total>(y_1) = 0 /| \<noPPop>(y_2) \big)\Big)\\
-%                    & \quad \quad /| \forall y_3.\ ( \neg \<isPPop>(y_3) \vee \<before>(y_2,y_3)) \big) \Big) \\
-   @Y_\mathrm{lv}   &= \exists x_1, x_2, y_1, y_2.\ \<isCPush>(x_1) /| \<isCPush>(x_2)  \\
-                    & /| \<isCPop>(y_1) /| \<isCPop>(y_2) /| \<SameVal>(x_1,y_1) \\
-                    & /| \<SameVal>(x_2,y_2) /| \<before>(x_1,x_2) /| \<before>(y_1,y_2) \\
-		 & /| \<before>(x_2,y_1) \\
-    @Y_\mathrm{ev}  &= \exists x, y, z.\ \<isCPush>(x) /| \<isCPop>(y)  \\
-                    &  /| \<SameVal>(x,z) /| \<EmptyVal>(y) /| \<before>(x,y)\\
-                    &  /| \<before>(y,z) /| \big( \<isCPop>(z) \vee \<noPPop>(y) \big) \\  
-    @Y_\mathrm{ev}^\param  &= 
-      \exists x_1,\dots,x_\param, y, z_1,\dots,z_{\param-1}.\\
-        &\<isCPush>(x_1) /| \dots \<isCPush>(x_\param) /| \<isCPop>(y) /|\\
-        &\<isPop>(z_1) /| \dots /| \<isPop>(z_{\param-1}) /|\\
-        &\<SameVal>(x_1,z_1) /| \dots /| \<SameVal>(x_{\param-1},z_{\param-1}) /|\\ 
-        &\<EmptyVal>(y) /| \<before>(x_1,y) /|\\
-        &\<before>(x_2,z_1) /| \dots /| \<before>(x_\param,z_{\param-1}) /|\\
-        &(\forall z_\param. (\<isPop>(z_\param) /| \<SameVal>(x_\param,z_\param))
-        \implies \<before>(y,z_\param))\\
+    \pred{total}(x,i,j)
+      & = \sum_{i\le i'\le j'\le j} \#(x,i',j')
+    \\
+    \pred{before}(x,y)
+      & = \bigvee_{0 \le i < k} \left(
+        \begin{array}{l}
+          \pred{total}(x,0,i) > 0 \ /| \\
+          \pred{total}(y,0,i) = 0 /| \pred{total}(x,i\!+\!1,k) = 0
+        \end{array} \right)
+    \\
+    \pred{match}(x,y)
+      & = \pred{Push}(x) /| \pred{Pop}(y) /| \pred{SameVal}(x,y)
+  \end{align*}
+  \begin{align*}
+    @Y_\mathrm{rv}
+      & = \exists x, y.\ \pred{match}(x,y) /| \pred{total}(x,0,k) < \pred{total}(y,0,k)
+    \\
+    @Y_\mathrm{fv}
+      & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
+      & \quad /| \pred{before}(x_1,x_2) /| \pred{before}(y_2,y_1)
+    \\
+    @Y_\mathrm{lv}
+      & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
+      & \quad /| \pred{before}(x_1,x_2) /| \pred{before}(y_1,y_2) /| \pred{before}(x_2,y_1)
+    \\
+    @Y_\mathrm{ev}
+      & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
+      & \quad /| \pred{before}(x,y) /| \pred{before}(y,z)
   \end{align*}
   \caption{Four families of operation-counting formulae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
-    \protect\<Nats>$. Predicates begin with capital letters, and macros begin
-    in lowercase. The predicate ${\tt CPush}(x)$ (resp., ${\tt PPush}(x)$) holds for labels of completed (resp., pending) ${\tt push}$
-    operations, i.e. $x={\tt push}(\_)$ (resp., $x={\tt push}(\_)=>\bot$). Analogously, for ${\tt CPop}(x)$ and ${\tt PPop}(x)$.
-    The predicate ${\tt SameVal}(x,y)$ holds for any pair $x={\tt push}(u)$ and $y={\tt pop}=>u$. Finally, ${\tt EmptyVal}(x)$
-    holds for $x={\tt pop}=>{\tt Empty}$.
+    \protect\<Nats>$. 
+    The predicates $\pred{Push}(x)$, $\pred{Pop}(x)$, $\pred{EmptyVal}(x)$ hold
+    when $x$ is the label of a push, pop, or empty-pop operation, respectively,
+    and $\pred{SameVal}(x,y)$ holds when $x$ and $y$ are labels with the
+    same value, either in the argument or return position.
   }
   \label{fig:spec:ds}
+\end{figure}
+
+\begin{figure}
+  \begin{align*}
+    @Y_\mathrm{lv}^n
+      & = \exists x_1, .., x_n, y_1, .., y_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,y_i) \\
+      & \quad /| \pred{before}(y_1,x_n) /| \bigwedge_{i=2}^n \pred{before}(x_i,y_{i-1})
+    \\
+    @Y_\mathrm{ev}^n
+      & = \exists x_1, .., x_n, y, z_1, .., z_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,z_i) /| \pred{EmptyVal}(y) \\
+      & \quad /| \pred{before}(x_1,y) /| \bigwedge_{i=2}^{n} \pred{before}(x_i,z_{i-1}) /| \pred{before}(y,z_n)
+  \end{align*}
+  \caption{Parameterized formulas.}
 \end{figure}
 
 \begin{theorem}
