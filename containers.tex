@@ -2,26 +2,36 @@
 \section{Atomic Collections}
 \label{sec:containers}
 
-Collection-based data structures such as queues, and stacks are among the
-most heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In
-this section we demonstrate that our approximation is effective in uncovering
-refinement violations to such atomic objects, in the sense that most violations
-can be uncovered with coarse approximations, i.e.,~$k\le 3$, depending on the
-data structure. To obtain these results we exhibit families $@Y$ of operation
-counting formulae characterizing these structures with cutoff/small-model
-properties: for any history $h$ violating $@Y$ there exists $h' \preceq h$
-violating $@Y$ with $\len h' \le k$. While this $h'$ may not correspond
-directly to $A_k(h)$, we can deduce there exists some $h'$ whose
-$k$-approximation $A_k(h')$ violates $@Y$. Our results build off of previous
-characterizations of concurrent data structures~\cite{conf/tacas/AbdullaHHJR13,
-conf/concur/HenzingerSV13} into a small set of constituent properties.
+Collection-based data structures such as stacks and queues are among the most
+heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In this
+section we demonstrate that our approximation is effective in uncovering
+refinement violations for such atomic objects, in the sense that most
+violations can be uncovered with coarse approximations, i.e.,~$k\le 3$,
+depending on the data structure. To obtain these results we exhibit families
+$@Y$ of operation counting formul\ae characterizing these structures with
+``cutoff'' (or ``small-model'') properties: for any history $h$ violating $@Y$
+there exists $h' \preceq h$ violating $@Y$ with $\len h' \le k$. While this
+$h'$ may not correspond directly to $A_k(h)$, we can deduce there exists some
+$h'$ whose $k$-approximation $A_k(h')$ does violate $@Y$. Our results build off
+of previous characterizations of concurrent data
+structures~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13} into a
+small set of constituent properties. For ease of presentation, in the following
+we consider only completed histories, i.e.,~in which no operation is pending.
+This restriction comes without loss of generality for library implementations
+which ensure that each operation can complete when uninterrupted by
+others~\cite{conf/concur/HenzingerSV13}. In any case, our formul\ae can be
+extended to handle pending operations as well.
 
-A \emph{family} $@Y$ of operation-counting formulae is an indexed set $\set{
+
+\subsection{Small-Model Formulas for Stacks and Queues}
+\label{sec:containers:small}
+
+A \emph{family} $@Y$ of operation-counting formul\ae is an indexed set $\set{
 @Y_i : i \in \<Nats> }$. We say a history $h$ \emph{satisfies} $@Y$,
 written $h |= @Y$, when $h |= @Y_i$ for $i = \len h$. We say that a family $@Y$
 has a \emph{cutoff} $n \in \<Nats>$ when for each history $h |= @Y$ there
 exists some $h' \preceq h$ such that $A_n(h')|= @Y$. Figure~\ref{fig:spec:ds}
-defines four families of operation-counting formulae:
+defines four families of operation-counting formul\ae:
 \begin{itemize}
 
   \item $@Y_\mathrm{rv}$ characterizes \emph{remove violations} in which a
@@ -38,7 +48,7 @@ defines four families of operation-counting formulae:
 
   \item $@Y_\mathrm{lv}$ characterizes \emph{LIFO violations} in which some
   pair of {\sf pop}s occur in the \emph{same} order as their corresponding {\sf
-  push}es.
+  push}es, and the second push occurs before the first pop.
 
 \end{itemize}
 As in previous work~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13},
@@ -50,7 +60,8 @@ practice, collection-based data structures are data independent, and the second
 condition can always be met by tagging each value with a unique identifier.
 However, in order to achieve bounded counting representations, we may only
 distinguish between these values up to equivalence relations with finite
-quotients.
+quotients. Formally, we say a history $\tup{O,f,<}$ uses \emph{unique values}
+when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
 
 \begin{figure}[t]
   \footnotesize
@@ -84,78 +95,78 @@ quotients.
       & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
       & \quad /| \pred{before}_k(x,y) /| \pred{before}_k(y,z)
   \end{align*}
-  \caption{Four families of operation-counting formulae characterizing atomic
+  \caption{Four families of operation-counting formul\ae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
     \protect\<Nats>$. 
     The predicates $\pred{Push}(x)$, $\pred{Pop}(x)$, $\pred{EmptyVal}(x)$ hold
     when $x$ is the label of a push, pop, or empty-pop operation, respectively,
     and $\pred{SameVal}(x,y)$ holds when $x$ and $y$ are labels with the
-    same value, either in the argument or return position.
+    same value, either in the argument or return position. All formul\ae are
+    of size polynomial in $k$, and have quantifier rank $1$.
   }
   \label{fig:spec:ds}
 \end{figure}
 
-\begin{figure}
-  \begin{align*}
-    @Y_\mathrm{lv}^n
-      & = \exists x_1, .., x_n, y_1, .., y_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,y_i) \\
-      & \quad /| \pred{before}_k(y_1,x_n) /| \bigwedge_{i=2}^n \pred{before}_k(x_i,y_{i-1})
-    \\
-    @Y_\mathrm{ev}^n
-      & = \exists x_1, .., x_n, y, z_1, .., z_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,z_i) /| \pred{EmptyVal}(y) \\
-      & \quad /| \pred{before}_k(x_1,y) /| \bigwedge_{i=2}^{n} \pred{before}_k(x_i,z_{i-1}) /| \pred{before}_k(y,z_n)
-  \end{align*}
-  \caption{Parameterized formulas.}
-\end{figure}
+% \begin{figure}
+%   \begin{align*}
+%     @Y_\mathrm{lv}^n
+%       & = \exists x_1, .., x_n, y_1, .., y_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,y_i) \\
+%       & \quad /| \pred{before}_k(y_1,x_n) /| \bigwedge_{i=2}^n \pred{before}_k(x_i,y_{i-1})
+%     \\
+%     @Y_\mathrm{ev}^n
+%       & = \exists x_1, .., x_n, y, z_1, .., z_n.\ \bigwedge_{i=1}^n \pred{match}(x_i,z_i) /| \pred{EmptyVal}(y) \\
+%       & \quad /| \pred{before}_k(x_1,y) /| \bigwedge_{i=2}^{n} \pred{before}_k(x_i,z_{i-1}) /| \pred{before}_k(y,z_n)
+%   \end{align*}
+%   \caption{Parameterized formulas.}
+% \end{figure}
 
 \begin{theorem}
-  \label{lem:cutoff}  
+  \label{lem:cutoff}
 
-  The families $@Y_\mathrm{rv}$, $@Y_\mathrm{ev}$, 
-  $@Y_\mathrm{fv}$, and $@Y_\mathrm{lv}$, of operation-counting formulae have cutoffs $0$, $2$, $2$, and $3$,
-  respectively.
+  The families $@Y_\mathrm{rv}$, $@Y_\mathrm{ev}$, $@Y_\mathrm{fv}$, and
+  $@Y_\mathrm{lv}$, of operation-counting formul\ae have cutoffs $0$, $2$, $2$,
+  and $3$, respectively.
 
 \end{theorem}
 
-\begin{proof}%\let\qed\relax
+\begin{proof}
 
-  We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$, the other
-  cutoffs can be proved similarly.
-  Since the formulae in $@Y_\mathrm{rv}$ constrain only the multiset of operation
-  labels in a history, for each history $h=(O,<,f) |= @Y_\mathrm{rv}$ there
-  exists the history $h'=(O,\emptyset,f)$ s.t. $h' |= @Y_\mathrm{rv}$. The
-  fact that $A_0(h')=h'$ implies that $@Y_\mathrm{rv}$ has cutoff $0$.
+  We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$. The other
+  cutoffs are proved similarly. Since the formul\ae in $@Y_\mathrm{rv}$
+  constrain only the multiset of operation labels in a history, for each
+  history $h = \tup{O,<,f} |= @Y_\mathrm{rv}$ there exists the history $h' =
+  \tup{O,\emptyset,f}$ such that $h' |= @Y_\mathrm{rv}$. The fact that $A_0(h')
+  = h'$ implies that $@Y_\mathrm{rv}$ has cutoff $0$.
  
-  Next, let $h=(O,<,f) |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$, $@l_1'$, and
-  $@l_2'$ be the instances of the variables $x_1$, $x_2$, $y_1$, and $y_2$,
-  respectively. Let $@Y_{\mathrm{fv},k}$ denote the formula parametrized by $k$ in the family $@Y_\mathrm{fv}$.
-  By definition $h |=  @Y_{\mathrm{fv},k}$, where $k=\len h$.
-  We consider only the case when $total(y_1)>0$ holds (the other
-  case is similar). Besides the constraints on operation labels, the formula $@Y_{\mathrm{fv},k}$ 
-  states that all $@l_1$ operations end before an $@l_1'$
-  operation starts and all $@l_2$ operations end before an $@l_2'$ operation
-  starts. Let $I:O->[n]^2$ be the canonical representation of $h$. Also, let
-  $j_1$ (resp., $j_2$) be the maximum upper bound of an interval associated to
-  an $@l_1$ (resp., $@l_3$) operation, i.e.,
+  Next, let $h = \tup{O,<,f} |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$,
+  $@l_1'$, and $@l_2'$ be the instances of the variables $x_1$, $x_2$, $y_1$,
+  and $y_2$, respectively. Let $@Y_{\mathrm{fv},k}$ denote the formula
+  parametrized by $k$ in the family $@Y_\mathrm{fv}$. By definition $h |=
+  @Y_{\mathrm{fv},k}$, where $k = \len h$. We consider only the case when
+  $\pred{total}(y_1)>0$ holds (the other case is similar). Besides the constraints on
+  operation labels, the formula $@Y_{\mathrm{fv},k}$ states that all $@l_1$
+  operations end before an $@l_1'$ operation starts and all $@l_2$ operations
+  end before an $@l_2'$ operation starts. Let $I:O->[n]^2$ be the canonical
+  representation of $h$. Also, let $j_1$ (resp., $j_2$) be the maximum upper
+  bound of an interval associated to an $@l_1$ (resp., $@l_3$) operation, i.e.,
   \begin{align*}
-    j_1 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_1},\\
+    j_1 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_1}, \\
     j_2 = \max\set{j:\exists o\in O.\ I(o) = [i,j] /| f(o)=@l_2}.
   \end{align*}
- 
   We define a weaker history $h'\preceq h$, that contains exactly the same set
-  of operations as $h$ but it preserves only the ordering constraints $o_1<o_2$ s.t. 
-  $I(o_1)\subseteq [0,j_1]$ and $I(o_2)\subseteq [j_1,\infty]$, or
-  $I(o_1)\subseteq [0,j_2]$ and $I(o_2)\subseteq [j_2,\infty]$. The
-  length of $h'$ is at most 2
+  of operations as $h$ but it preserves only the ordering constraints $o_1<o_2$
+  s.t. $I(o_1)\subseteq [0,j_1]$ and $I(o_2)\subseteq [j_1,\infty]$, or
+  $I(o_1)\subseteq [0,j_2]$ and $I(o_2)\subseteq [j_2,\infty]$. The length of
+  $h'$ is at most 2
   % (it can be 1 when there is no operation that starts after the last finishing
   % $@l_1$ operation and before the last $@l_3$ operation finishes),
-  and $h'|= @Y_{\mathrm{fv},2}$. Since $A_2(h')=h'$, 
-  $@Y_\mathrm{rv}$ has cutoff $2$.
+  and $h'|= @Y_{\mathrm{fv},2}$. Since $A_2(h') = h'$, $@Y_\mathrm{rv}$ has
+  cutoff $2$.
 \end{proof}
 
 \begin{corollary}
 
-  The families of operation-counting formulae,
+  The families of operation-counting formul\ae,
   \begin{align*}
     & @Y_\mathrm{stack} = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev} /| \lnot @Y_\mathrm{lv}
     \text{, and } \\
@@ -165,15 +176,17 @@ quotients.
 
 \end{corollary}
 
-Note that for every family $@Y$ defined in Figure~\ref{fig:spec:ds}, the size of the $k$th formula
-$@Y_k$ is linear in $k$, and its quantifier rank is at most 4.
-
-For simplicity we have defined $@Y_\mathrm{ev}$ to catch only empty violations
-in which the span of $\<pop>(\mathtt{EMPTY})$ operation is covered by the
-presence of a single element. While it is theoretically possible to define the
-family $@Y_\mathrm{ev}'$ for which $@Y_{\mathrm{ev},k}'$ catches all empty
-violations in histories up to length $k$, the following example implies that
-such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
+While $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$ are complete, in the sense that
+they characterize every possible remove and FIFO violation, the
+$@Y_\mathrm{lv}$ and $@Y_\mathrm{ev}$ families are incomplete:
+Example~\ref{ex:emptyv} demonstrates this for $@Y_\mathrm{ev}$ by exhibiting a
+parameterized history $h(n)$ for $n \ge 1$ such that $h(n) \not\in
+H(L_\mathrm{queue})$, yet $h(n) |= \lnot @Y_\mathrm{ev}$ for all $n > 1$. While
+it is theoretically possible to define a family $@Y_{\mathrm{ev},k}'$ which
+catches all empty violations in histories with interval length at most $k$ ---
+a fact that we demonstrate in Section~\ref{sec:containers:complete} --- we do
+not currently know whether it is possible to construct a formula which catches
+all empty violations in histories with arbitrarily-large interval length.
 
 \begin{example}
   \label{ex:emptyv}
@@ -197,24 +210,6 @@ such a $@Y_\mathrm{ev}'$ would not have a cutoff property.
 
 \end{example}
 
-We say a history $\tup{O,f,<}$ uses \emph{unique values} when $f(o_1) = m_1(u)
-=> v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$. The following theorem
-assumes the existence of the family $@Y_{\mathrm{ev}}'$ described before
-Example~\ref{ex:emptyv}; we omit the proof of $@Y_{\mathrm{ev}}'$'s existence
-due to lack of space.
-
-\begin{theorem}
-  \label{lem:rep}
-
-  If $h$ uses unique values, and $x \in \set{\mathrm{stack},
-  \mathrm{queue}}$, then $h \in H(L_x)$ if{f} $h |= @Y_x /| \lnot @Y_\mathrm{ev}'$.
-
-\end{theorem}
-
-Theorems~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation is
-guaranteed to discover any stack/queue violation in histories using unique
-values, modulo the empty violations of Example~\ref{ex:emptyv} for $n > 3$.
-
 Despite the theoretical possibility for empty violations which only surface for
 large $n$, our practical experience suggests small $n$ tends to suffice. The
 bug $\text{B}_5$ of our static analysis experiment in
@@ -230,3 +225,95 @@ another $\<push>(4)$ before $\<push>(1)$, then the final $\<pop>$ of Thread~2
 would have returned $4$, yielding the order violation $\<push>(4); \<push>(2);
 \<pop> => 4$.
 
+
+\subsection{Completeness for Bounded Interval Length}
+\label{sec:containers:complete}
+
+While Section~\ref{sec:containers:small} demonstrates complete families
+$@Y_\mathrm{queue}$ and $@Y_\mathrm{stack}$ of operation counting formul\ae for
+the $L_\mathrm{queue}$ and $L_\mathrm{stack}$ objects for histories of interval
+length up to $2$ and $3$, respectively, this section exhibits complete
+formul\ae for histories of any bounded interval length $k \in \<Nats>$.
+
+For the rest of this section, we fix an interval length $k \in \<Nats>$ and
+demonstrate that a bounded enumeration of histories suffices to characterize
+every possible violation.
+
+Formally, given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2}
+\in O^2$ is a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) =
+\<pop> => v$ for some $v \in \<Vals>$. We say that two distinct elements
+$\tup{o_1,o_2}$ and $\tup{o_3,o_4}$ are \emph{redundant in $h$} when their
+operations have the same pasts and futures,
+\begin{align*}
+  \<past>(o_1) = \<past>(o_3) & & \<future>(o_1) = \<future>(o_3) \\
+  \<past>(o_2) = \<past>(o_4) & & \<future>(o_2) = \<future>(o_4)
+\end{align*}
+(and thus will share the same canonical intervals). We say the element
+$\tup{o_1,o_2}$ is \emph{redundant with $h$} when there exists an element of
+$h$ with which it is redundant. We say that $h' = \tup{O \u O', <', f'}$
+\emph{extends $h$ with $O'$} when $o_1 < o_2$ iff $o_1 <' o_2$ for all $o_1,
+o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
+
+\begin{lemma}
+
+  Let $x \in \set{\mathrm{stack}, \mathrm{queue}}$.
+  If $h'$ extends $h$ with $\set{o_1,o_2}$ and $\tup{o_1,o_2}$ is
+  redundant in $h$, then $h \in H(L_x)$ iff $h' \in H(L_x)$.
+
+\end{lemma}
+
+% \begin{proof}
+%   TODO FILL IT IN
+% \end{proof}
+
+Let $\mathbb{I}_k = \set{ [i,j] : i,j \in \<Nats>,\ 0 \le i \le j \le k }$ be
+the finite set of integral intervals up to $k \in \<Nats>$, and suppose a fixed
+order $\ll$ over the finite set $\mathbb{I}_k^2$. We define the function $h^1$
+which maps any subset $\set{ \tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}}
+} \subseteq \mathbb{I}_k^2$ to the history $\tup{O,<,f}$ where
+\begin{align*}
+  O
+    & = \set{ \tup{i,1}, \tup{i,2} : 1 \le i \le n } \\
+  \tup{i_1,j_1} < \tup{i_2,j_2}
+    & \text{ iff } I_{i_1,j_1} < I_{i_2,j_2} \\
+  f(\tup{i,j}) 
+    & = \left\{
+    \begin{array}{ll}
+      \<push>(i) & \text{ if } j = 1 \\
+      \<pop> => i & \text{ if } j = 2
+    \end{array}
+  \right.
+\end{align*}
+such that $\tup{I_{1,1}, I_{1,2}} \ll \tup{I_{2,1}, I_{2,2}} \ll .. \ll
+\tup{I_{n,1}, I_{n,2}}$. Then we define the finite set $H^1_k = \set{ h^1(X) :
+X \subseteq \mathbb{I}_k^2}$. Notice that the histories of $H^1_k$ do not
+contain redundant elements. Finally, we define the finite subset $H^1_{x,k} =
+H^1_k @\ H(L_x)$ of histories which are not admitted by $L_x$, for $x \in
+\set{\mathrm{stack}, \mathrm{queue}}$, and enumerate them to write the formula
+characterizing length $k$ violations to $L_x$:
+\begin{align*}
+  @Y_{x,k} = \bigvee_{h \in H^1{x,k}} @Y_h
+\end{align*}
+where $@Y_h$ characterizes the history $h = \tup{O,<,f}$ with operations
+$\set{ o_1, .., o_n }$ and elements $E$, and its extensions:
+\begin{align*}
+  @Y_h = \exists x_1, .., x_n.
+  \!\!\! \bigwedge_{o_i < o_j} \!\!\! \pred{before}_k(x_i,x_j)
+  \land \!\!\!\!\!\! \bigwedge_{\langle o_i,o_j \rangle \in E} \!\!\!\!\!\! \pred{match}(x_i,x_j)
+\end{align*}
+Note that $@Y_{x,k}$ is polynomial in size for fixed $k \in \<Nats>$, and
+has quantifier rank $1$.
+
+\begin{theorem}
+  Let $x \in \set{stack, queue}$.
+  If $\len h \le k$ and $h$ uses unique values,
+  then $h \in H(L_x)$ iff $h |= \lnot @Y_{x,k}$,
+\end{theorem}
+
+% \begin{proof}
+%   TODO FILL THIS IN
+% \end{proof}
+
+% Theorems~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation
+% is guaranteed to discover any stack/queue violation in histories using unique
+% values, modulo the empty violations of Example~\ref{ex:emptyv} for $n > 3$.

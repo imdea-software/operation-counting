@@ -14,6 +14,8 @@
 \renewcommand{\u}{\cup}
 \newcommand{\U}{\bigcup}
 \newcommand{\x}{\times}
+\let\oldae=\ae
+\renewcommand{\ae}{\oldae\xspace}
 
 \newcommand{\set}[1]{{\{ #1 \}}}
 \newcommand{\mset}[1]{{\{\!\{ #1 \}\!\}}}
@@ -134,7 +136,7 @@
 
 \metalangkeyword{true,false}
 \metalangkeyword{ret,op}
-\mathfn{past,width}
+\mathfn{past,future,width}
 \metalangkeyword{push,pop}
 \metalangkeyword{read,write}
 
