@@ -84,27 +84,24 @@ approach for detecting refinement violations.
 
 \paragraph{Parameterized approximation schema}
 
-The approach we introduce in this paper is based on fundamental properties of
-library executions and their histories. The basic idea is to consider a notion
-of \emph{weakening pre-order} $\preceq$ on histories as a means for
-approximation: A history $h_1$ is \emph{weaker} than another history $h_2$,
-written $h_1 \preceq h_2$, if $h_1$ is obtained from $h_2$ by relaxing some of
-its order constraints. We prove that if $h$ is a history of a library $L$ then
-every weaker history $h'\preceq h$ is also a history of $L$. This leads to the
-approximation principle, which consists in considering for histories $h\in
-H(L_1)$ approximations $h' \preceq h$, such that checking $h' \in H(L_2)$ is
-\emph{tractable}. If $h' \not\in H(L_2)$, then we also have $h \not\in H(L_2)$,
-and therefore a refinement violation is found.
+The approach we puruse in this paper is based on fundamental properties of
+library executions and their histories. We consider a \emph{weakening preorder}
+$\preceq$ on histories as a means for approximation: a history $h_1$ is
+\emph{weaker} than another history $h_2$, written $h_1 \preceq h_2$, if $h_1$
+is obtained from $h_2$ by relaxing order constraints. We show that if a library
+$L$ admits a history $h$, then $L$ also admits every weaker history $h' \preceq
+h$. This leads to an approximation principle, which considers approximations
+$h' \preceq h$ of histories $h\in H(L_1)$, such that checking $h' \in H(L_2)$
+is \emph{tractable}. If $h' \not\in H(L_2)$ then $h \not\in H(L_2)$, thus a
+violation is found.
 
-So, the challenge we undertake is to provide an approximation schema based on
-defining a series of functions $A_k$, parameterized with $k \in \mathbb{N}$,
-such that for every $h$, we have (1) $A_k (h) \preceq h$, and (2) the test
-$A_k(h) \in H(L_2)$ is decidable in \emph{polynomial time} (w.r.t. size of
-$h$). Moreover, the schema should be \emph{complete} in the sense that there
-must be a $k$ such that $h \preceq A_k(h)$, which means that if a violation
-exists, it will be captured for a large enough parameter. Finally, and quite
-importantly, we seek for an approximation schema that is easy to implement, and
-which is able to catch refinement violations with small parameter values.
+The challenge is to design a parameterized approximation $A_k$, for $k \in
+\mathbb{N}$, such that (1)~$A_k (h) \preceq h$, and (2)~$A_k(h) \in H(L_2)$ is
+decidable in \emph{polynomial time} in the size of $h$. The approximation
+should also be \emph{complete}, in the sense that $h \preceq A_k(h)$ for some
+$k \in \<Nats>$, so that any violation can be captured with a large enough
+parameter value. Finally, the approximation should also be easy to implement,
+and able to catch refinement violations with small parameter values.
 
 \paragraph{Bounded interval-length histories}
 
