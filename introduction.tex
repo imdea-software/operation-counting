@@ -2,7 +2,7 @@
 \section{Introduction}
 
 Efficient implementations of concurrent objects such as semaphores, locks,
-atomic registers, and data structures such as stacks and queues, are essential
+and atomic collections such as stacks and queues are essential
 to modern computing. Programming them is however error prone. In order to
 minimize synchronization overhead between concurrent object invocations,
 implementors avoid blocking operations such as lock acquisition, allowing
@@ -17,9 +17,9 @@ we address in this paper is to provide a tractable algorithmic approach for
 checking observational refinement.
 
 Verifying observational refinement is an intrinsically hard problem, and is
-undecidable in general. The contribution of this work is in developing a
-tractable approach for detecting refinement violations, and is divided into two
-main parts.
+undecidable in general~\cite{conf/esop/BouajjaniEEH13}. The contribution of
+this work is in developing a tractable approach for detecting refinement
+violations, and is divided into two main parts.
 
 In the first part, outlined in Section~\ref{sec:intro:histories}, we establish
 a foundational characterization of observational refinement in terms of sets of
@@ -27,8 +27,8 @@ so-called \emph{histories}; histories abstract concurrent executions into the
 happens-before (partial-order) relation between invoked object methods. We
 demonstrate that refinement between libraries is equivalent to a containment
 problem between sets of histories, and a violation to refinement corresponds to
-history-set inclusion problem. In fact, even checking whether the history of a
-single execution belongs to a given set is
+history-set-inclusion problem. In fact, even checking whether the history of a
+single execution belongs to a given library's history set is
 NP-hard~\cite{journals/siamcomp/GibbonsK97}.
 
 Motivated by the aforementioned hardness results, in the second part, outlined
@@ -48,38 +48,36 @@ much more efficiently than existing approaches.
 
 Naturally, automating the verification of observational refinement is quite
 challenging. The most immediate obstacle arises from the quantification over
-the infinitely many possible library-client programs: a library $L_1$ refines
+the infinitely-many possible library-client programs: a library $L_1$ refines
 another library $L_2$ if every observation of every client program using $L_1$
 is also admitted using $L_2$. Our first contribution is to provide a
 \emph{precise} characterization of refinement as a set-inclusion problem,
 defined independently from their execution contexts, between the partial orders
 of operations admitted by each library. More precisely, we associate to each
-execution $e$ a partial order $H(e)$ on its object method invocations called a
+execution $e$ a partial order $H(e)$ on its object-method invocations, called a
 \emph{history}. An operation $o_1$ is considered to happen before an operation
 $o_2$ in $H(e)$ if $o_1$ completes before $o_2$ is invoked in $e$. We prove
-that a library $L_1$ refines another library $L_2$ if and only if the set
-$H(L_1)$ of $L_1$'s histories (i.e.,~associated with $L_1$'s executions) is
-included in the set $H(L_2)$ of $L_2$'s histories.
+that a library $L_1$ refines another $L_2$ if and only if the set $H(L_1)$ of
+$L_1$'s histories (i.e.,~associated with $L_1$'s executions) is contained in
+$H(L_2)$.
 
 This characterization is a fundamental result that offers a fresh view for
-reasoning about the refinement problem. Indeed, the principal approach for
+reasoning about the refinement problem. Thus far, the principal approach for
 tackling the problem of checking observational refinement in the literature is
 based on checking \emph{linearizability}~\cite{journals/toplas/HerlihyW90},
-which requires that every execution in $L_1$ can be reordered into an execution
+which requires that every execution of $L_1$ can be reordered into an execution
 of $L_2$ while preserving the order between return and call actions. While
 linearizability implies observational
 refinement~\cite{journals/tcs/FilipovicORY10}, we show that the converse does
-not hold in general. In order to shed light on the subtle relationship between
-these concepts, we investigate the links between history inclusion and
-linearizability. We prove that, interestingly, when $L_2$ is atomic, which is
-typically the case for reference implementations as mentioned above, history
-inclusion, and therefore observational refinement, between $L_1$ and $L_2$ is
-equivalent to linearizability.
+not generally hold. To shed light on the subtle relationship between these
+concepts, we investigate the link between history inclusion and
+linearizability. We prove that when $L_2$ is atomic, which is typically the
+case for reference implementations, history inclusion between $L_1$ and $L_2$,
+and therefore observational refinement, is equivalent to linearizability.
 
-As we will see in the sequel, besides being a useful semantical means for
-reasoning about observational refinement, this characterization of the
-refinement leads to an efficient and powerful approach for detecting refinement
-violations.
+As reveled in the sequel, besides being a useful semantical means for reasoning
+about observational refinement, our characterization leads to an efficient
+approach for detecting refinement violations.
 
 \subsection{Approximating Observational Refinement}
 \label{sec:intro:approx}
