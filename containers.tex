@@ -83,6 +83,10 @@ when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
     @Y_\mathrm{rv}
       & = \exists x, y.\ \pred{match}(x,y) /| \pred{total}(x,0,k) < \pred{total}(y,0,k)
     \\
+    @Y_\mathrm{ev}
+      & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
+      & \quad /| \pred{before}_k(x,y) /| \pred{before}_k(y,z)
+    \\
     @Y_\mathrm{fv}
       & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
       & \quad /| \pred{before}_k(x_1,x_2) /| \pred{before}_k(y_2,y_1)
@@ -90,10 +94,6 @@ when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
     @Y_\mathrm{lv}
       & = \exists x_1, x_2, y_1, y_2.\ \pred{match}(x_1,y_1) /| \pred{match}(x_2,y_2) \\
       & \quad /| \pred{before}_k(x_1,x_2) /| \pred{before}_k(y_1,y_2) /| \pred{before}_k(x_2,y_1)
-    \\
-    @Y_\mathrm{ev}
-      & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
-      & \quad /| \pred{before}_k(x,y) /| \pred{before}_k(y,z)
   \end{align*}
   \caption{Four families of operation-counting formul\ae characterizing atomic
     data structure violations, parameterized by the interval length $k \in
@@ -131,13 +131,11 @@ when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
 
 \begin{proof}
 
-  We consider only the case of $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$. The other
-  cutoffs are proved similarly. Since the formul\ae in $@Y_\mathrm{rv}$
-  constrain only the multiset of operation labels in a history, for each
-  history $h = \tup{O,<,f} |= @Y_\mathrm{rv}$ there exists the history $h' =
-  \tup{O,\emptyset,f}$ such that $h' |= @Y_\mathrm{rv}$. The fact that $A_0(h')
-  = h'$ implies that $@Y_\mathrm{rv}$ has cutoff $0$.
- 
+  Here we prove the theorem for $@Y_\mathrm{rv}$ and $@Y_\mathrm{fv}$; the
+  others follow similarly. Since $@Y_\mathrm{rv}$ does not discriminate
+  between intervals, $h = \tup{O,<,f} |= @Y_\mathrm{rv}$ if{f} $A_0(h) =
+  \tup{O,@0,f} |= @Y_\mathrm{rv}$. Thus $@Y_\mathrm{rv}$ has cutoff $0$.
+
   Next, let $h = \tup{O,<,f} |= @Y_\mathrm{fv}$ and let $@l_1$, $@l_2$,
   $@l_1'$, and $@l_2'$ be the instances of the variables $x_1$, $x_2$, $y_1$,
   and $y_2$, respectively. Let $@Y_{\mathrm{fv},k}$ denote the formula
@@ -239,11 +237,11 @@ For the rest of this section, we fix an interval length $k \in \<Nats>$ and
 demonstrate that a bounded enumeration of histories suffices to characterize
 every possible violation.
 
-Formally, given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2}
-\in O^2$ is a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) =
-\<pop> => v$ for some $v \in \<Vals>$. We say that two distinct elements
-$\tup{o_1,o_2}$ and $\tup{o_3,o_4}$ are \emph{redundant in $h$} when their
-operations have the same pasts and futures,
+Given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2} \in O^2$ is
+a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) = \<pop> => v$
+for some $v \in \<Vals>$. We say that two distinct elements $\tup{o_1,o_2}$ and
+$\tup{o_3,o_4}$ are \emph{redundant in $h$} when their operations have the same
+pasts and futures,
 \begin{align*}
   \<past>(o_1) = \<past>(o_3) & & \<future>(o_1) = \<future>(o_3) \\
   \<past>(o_2) = \<past>(o_4) & & \<future>(o_2) = \<future>(o_4)
@@ -251,14 +249,14 @@ operations have the same pasts and futures,
 (and thus will share the same canonical intervals). We say the element
 $\tup{o_1,o_2}$ is \emph{redundant with $h$} when there exists an element of
 $h$ with which it is redundant. We say that $h' = \tup{O \u O', <', f'}$
-\emph{extends $h$ with $O'$} when $o_1 < o_2$ iff $o_1 <' o_2$ for all $o_1,
-o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
+\emph{extends $h = \tup{O,<,f}$ with $O'$} when $o_1 < o_2$ if{f} $o_1 <' o_2$
+for all $o_1, o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
 
 \begin{lemma}
 
   Let $x \in \set{\mathrm{stack}, \mathrm{queue}}$.
   If $h'$ extends $h$ with $\set{o_1,o_2}$ and $\tup{o_1,o_2}$ is
-  redundant in $h$, then $h \in H(L_x)$ iff $h' \in H(L_x)$.
+  redundant in $h$, then $h \in H(L_x)$ if{f} $h' \in H(L_x)$.
 
 \end{lemma}
 
@@ -275,7 +273,7 @@ which maps any subset $\set{ \tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}}
   O
     & = \set{ \tup{i,1}, \tup{i,2} : 1 \le i \le n } \\
   \tup{i_1,j_1} < \tup{i_2,j_2}
-    & \text{ iff } I_{i_1,j_1} < I_{i_2,j_2} \\
+    & \text{ if{f} } I_{i_1,j_1} < I_{i_2,j_2} \\
   f(\tup{i,j}) 
     & = \left\{
     \begin{array}{ll}
@@ -307,7 +305,7 @@ has quantifier rank $1$.
 \begin{theorem}
   Let $x \in \set{stack, queue}$.
   If $\len h \le k$ and $h$ uses unique values,
-  then $h \in H(L_x)$ iff $h |= \lnot @Y_{x,k}$,
+  then $h \in H(L_x)$ if{f} $h |= \lnot @Y_{x,k}$,
 \end{theorem}
 
 % \begin{proof}
