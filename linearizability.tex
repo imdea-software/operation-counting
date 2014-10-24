@@ -23,17 +23,17 @@ such that:
 \end{quote}
 For example, the second and the third executions in Example~\ref{ex:libraries}
 are weaker than the first (with sequential calls to $\<push>$ and $\<pop>$). An
-execution $e_1$ is \emph{linearizable} w.r.t. a library $L_2$\footnote{The
+execution $e_1$ is \emph{linearizable} w.r.t.~a library $L_2$\footnote{The
 original definition of \citet{journals/toplas/HerlihyW90} assumes that $L_2$ is
 a set of sequential executions. Here we consider a slight extension adapted to
 concurrent executions, faithful to the original intention, where $\ker L_2$ may
-be a set of sequential executions.} if{f} there exists $e_2 \in L_2$, with only
+be a set of sequential executions.} if{f} there exists $e_2 \in E(L_2)$, with only
 completed operations, such that $e_1 \sqsubseteq e_2$. A library $L_1$
 is \emph{linearizable} w.r.t. $L_2$, written $L_1 \sqsubseteq L_2$, if{f}
-each execution $e_1 \in L_1$ is linearizable w.r.t. $L_2$.
+each execution $e_1 \in E(L_1)$ is linearizable w.r.t. $L_2$.
 
 Since linearizability compares executions of $L_1$, which may contain pending
-operations, with executions of $L_2$, where every operation is completed,
+operations, with executions of $L_2$, in which every operation is completed,
 observational refinement need not imply linearizability when $L_2$ contains
 non-terminating methods, i.e.,~where the calls to these methods are pending in
 all executions.
@@ -68,9 +68,18 @@ the order relations $\sqsubseteq$ and $\preceq$.
 \begin{lemma}
   \label{lemma:exec_hist}
 
-  $e_1\sqsubseteq e_2$ if{f} $H(e_1) \preceq H(e_2)$.
+  $e_1\sqsubseteq e_2$ if{f} $H(e_1) \preceq H(e_2)$, if $e_2$ is sequential.
 
 \end{lemma}
+
+\begin{proof}
+  By definition $e_1 \sqsubseteq e_2$ means that there exists $e_1'$ such that
+  $e_2$ is a permutation of $e_1'$ preserving the order between return and call
+  actions, thus $e_2 ~> e_1'$, and thus $H(e_1') \preceq H(e_2)$. Furthermore,
+  since $e_1'$ is obtained from $e_1$ by appending returns and deleting calls,
+  $H(e_1) \preceq H(e_1')$. By transitivity, $H(e_1) \preceq H(e_2)$. The other
+  direction is equally straightforward.
+\end{proof}
 
 \begin{theorem}
 
