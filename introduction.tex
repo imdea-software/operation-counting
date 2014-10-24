@@ -13,7 +13,7 @@ implementations. Conformance is formally captured by the concept of
 implementing the operations of some concurrent object, we say $L_1$
 \emph{refines} $L_2$ if and only if every computation of every program $P$
 using $L_1$ would also be possible were $P$ using $L_2$ instead. The challenge
-we address in this paper is to provide a tractable algorithmic approach for
+we address in this work is to provide a tractable algorithmic approach for
 checking observational refinement.
 
 Verifying observational refinement is an intrinsically hard problem, and is
@@ -82,43 +82,38 @@ approach for detecting refinement violations.
 \subsection{Approximating Observational Refinement}
 \label{sec:intro:approx}
 
-\paragraph{Parameterized approximation schema}
-
-The approach we puruse in this paper is based on fundamental properties of
-library executions and their histories. We consider a \emph{weakening preorder}
+The approach we pursue in this work exploits fundamental properties of library
+executions and their histories. We consider a \emph{weakening preorder}
 $\preceq$ on histories as a means for approximation: a history $h_1$ is
 \emph{weaker} than another history $h_2$, written $h_1 \preceq h_2$, if $h_1$
 is obtained from $h_2$ by relaxing order constraints. We show that if a library
 $L$ admits a history $h$, then $L$ also admits every weaker history $h' \preceq
 h$. This leads to an approximation principle, which considers approximations
-$h' \preceq h$ of histories $h\in H(L_1)$, such that checking $h' \in H(L_2)$
-is \emph{tractable}. If $h' \not\in H(L_2)$ then $h \not\in H(L_2)$, thus a
-violation is found.
+$A(h) \preceq h$ of histories $h\in H(L_1)$, such that checking $A(h) \in
+H(L_2)$ is \emph{tractable}. If $A(h) \not\in H(L_2)$ then $h \not\in H(L_2)$,
+thus a violation is found.
 
 The challenge is to design a parameterized approximation $A_k$, for $k \in
 \mathbb{N}$, such that (1)~$A_k (h) \preceq h$, and (2)~$A_k(h) \in H(L_2)$ is
 decidable in \emph{polynomial time} in the size of $h$. The approximation
-should also be \emph{complete}, in the sense that $h \preceq A_k(h)$ for some
-$k \in \<Nats>$, so that any violation can be captured with a large enough
-parameter value. Finally, the approximation should also be easy to implement,
-and able to catch refinement violations with small parameter values.
+should also be \emph{complete}, in the sense that for any history $h$, there
+exists $k \in \<Nats>$ such that $h \preceq A_k(h)$; this ensures that any
+violation can be captured with a large enough parameter value. Finally, the
+approximation should also be easy to implement, and able to catch refinement
+violations with small parameter values.
 
 \paragraph{Bounded interval-length histories}
 
-We provide such an approximation schema, exploiting a fundamental property of
-the executions of \emph{shared-memory} libraries: We show that histories of
-such executions are \emph{interval orders}. These orders admit \emph{canonical
-representations} where each element $o$ is mapped to an integer-bounded
-interval $I(o)$ such that for every two elements $o_1$ and $o_2$, $o_1$ is
-before $o_2$ if and only if $I(o_1)$ ends before $I(o_2)$
-starts~\cite{phd/Greenough76}. Also, interval orders have a notion of
-\emph{length} which corresponds to the maximal upper-bound of an interval in
-their canonical representation.
-
-This leads us to the definition of a parameterized approximation schema where
-the parameter $k$ corresponds to the notion of length mentioned above: For each
-$k \in \mathbb{N}$, the function $A_k$ maps each history $h$ to a
-($\preceq$-)weaker history $h'$ of interval-length at most $k$.
+Our approximation scheme exploits a fundamental property of shared-memory
+library executions: their histories are \emph{interval orders}, a special case
+of partial orders which admit \emph{canonical representations} in which each
+operation $o$ is mapped to a positive-integer-bounded interval $I(o)$. An
+operation $o_1$ happens before another operation $o_2$ if and only if $I(o_1)$
+ends before $I(o_2)$ begins~\cite{phd/Greenough76}. Interval orders are
+equipped with a natural notion of \emph{length}, which corresponds to the
+smallest integer constant for which an interval mapping $I$ exists. Our
+approximation $A_k$ maps each history $h$ to a $\preceq$-weaker history
+$A_k(h)$ of interval length at most $k$.
 
 \paragraph{Reduction to reachability using counting representations}
 
@@ -147,7 +142,7 @@ be constructed systematically for a wide class of objects.
 
 \paragraph{Demonstrating feasibility}
 
-We demonstrate in the paper that our approach is feasible both with a dynamic
+We demonstrate in the work that our approach is feasible both with a dynamic
 and a static state space exploration strategy.
 
 In the dynamic case, we show experimentally two remarkable facts. First, our
@@ -181,16 +176,17 @@ This work makes following contributions:
   linearizability for atomic reference implementations (\S\ref{sec:lin}).
 
   \item An under-approximation for detecting observational refinement
-  violations based on a weakening pre-order on histories, exploiting the fact
-  that histories are interval orders (\S\ref{sec:counting}).
+  violations based on a weakening preorder on histories, exploiting the fact
+  that library histories are interval orders (\S\ref{sec:counting}).
 
-  \item An efficient implementation of this approximation using counting
-  representations. Specifically, a reduction to a reachability problem
+  \item An efficient implementation of our approximation using counters.
+  Specifically, we reduce refinement checking to safety-property checking
   (\S\ref{sec:counting:monitor}) using arithmetic-based symbolic
-  representations of sets of interval-length bounded histories
-  (\S\ref{sec:counting:logic}), cut-off bounds for representations
-  collection-based data structures (\S\ref{sec:containers}), and a procedure
-  for automatic generation of these representations (\S\ref{sec:regular}).
+  representations of bounded-interval-length history sets
+  (\S\ref{sec:counting:logic}), we demonstrate cut-off bounds for
+  atomic-collection objects (\S\ref{sec:containers}), and we develop a
+  procedure for the automatic generation of counting representations
+  (\S\ref{sec:regular}).
 
   \item Experimental demonstration of the efficiency and scalability of our
   approach both in dynamic and static analysis settings (\S\ref{sec:exp}).

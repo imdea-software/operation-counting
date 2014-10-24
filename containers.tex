@@ -81,7 +81,7 @@ when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
   \end{align*}
   \begin{align*}
     @Y_\mathrm{rv}
-      & = \exists x, y.\ \pred{match}(x,y) /| \pred{total}(x,0,k) < \pred{total}(y,0,k)
+      & = \exists x, y.\ \pred{match}(x,y) /| \pred{before}_k(y,x)
     \\
     @Y_\mathrm{ev}
       & = \exists x, y, z.\ \pred{match}(x,z) /| \pred{EmptyVal}(y) \\
@@ -166,9 +166,9 @@ when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
 
   The families of operation-counting formul\ae,
   \begin{align*}
-    & @Y_\mathrm{stack} = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev} /| \lnot @Y_\mathrm{lv}
+    & @Y_\mathrm{stack} = @Y_\mathrm{rv} |/ @Y_\mathrm{ev} |/ @Y_\mathrm{lv}
     \text{, and } \\
-    & @Y_\mathrm{queue} = \lnot @Y_\mathrm{rv} /| \lnot @Y_\mathrm{ev} /| \lnot @Y_\mathrm{fv}
+    & @Y_\mathrm{queue} = @Y_\mathrm{rv} |/ @Y_\mathrm{ev} |/ @Y_\mathrm{fv}
   \end{align*}
   have cutoffs $3$ and $2$, respectively.
 
@@ -179,12 +179,14 @@ they characterize every possible remove and FIFO violation, the
 $@Y_\mathrm{lv}$ and $@Y_\mathrm{ev}$ families are incomplete:
 Example~\ref{ex:emptyv} demonstrates this for $@Y_\mathrm{ev}$ by exhibiting a
 parameterized history $h(n)$ for $n \ge 1$ such that $h(n) \not\in
-H(L_\mathrm{queue})$, yet $h(n) |= \lnot @Y_\mathrm{ev}$ for all $n > 1$. While
-it is theoretically possible to define a family $@Y_{\mathrm{ev},k}'$ which
-catches all empty violations in histories with interval length at most $k$ ---
-a fact that we demonstrate in Section~\ref{sec:containers:complete} --- we do
-not currently know whether it is possible to construct a formula which catches
-all empty violations in histories with arbitrarily-large interval length.
+H(L_\mathrm{queue})$,\footnote{$L_\mathrm{queue}$ denotes an atomic FIFO queue
+library with $\<push>$ and $\<pop>$ methods.} yet $h(n) |= \lnot
+@Y_\mathrm{ev}$ for all $n > 1$. While it is theoretically possible to define a
+family $@Y_{\mathrm{ev},k}'$ which catches all empty violations in histories
+with interval length at most $k$ --- a fact that we demonstrate in
+Section~\ref{sec:containers:complete} --- we do not currently know whether it
+is possible to construct a formula which catches all empty violations in
+histories with arbitrarily-large interval length.
 
 \begin{example}
   \label{ex:emptyv}
@@ -241,7 +243,7 @@ Given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2} \in O^2$ is
 a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) = \<pop> => v$
 for some $v \in \<Vals>$. We say that two distinct elements $\tup{o_1,o_2}$ and
 $\tup{o_3,o_4}$ are \emph{redundant in $h$} when their operations have the same
-pasts and futures,\footnote{Similarly the definition of $\<past>$ from
+pasts and futures,\footnote{Similarly to the definition of $\<past>$ from
 Section~\ref{sec:counting:logic}, we define the \emph{future} of an operation
 $o$ in an history $\tup{O,<,f}$ by $\<future>(o) = \set{o' \in O : o < o'}$.}
 \begin{align*}
@@ -307,7 +309,7 @@ has quantifier rank $1$.
 \begin{theorem}
   Let $x \in \set{stack, queue}$.
   If $\len h \le k$ and $h$ uses unique values,
-  then $h \in H(L_x)$ if{f} $h |= \lnot @Y_{x,k}$,
+  then $h \in H(L_x)$ if{f} $h |= \lnot @Y_{x,k}$.
 \end{theorem}
 
 % \begin{proof}

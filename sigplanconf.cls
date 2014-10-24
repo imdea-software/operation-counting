@@ -1086,8 +1086,8 @@
   \if \@andp{\@emptyargp{#2}}{\@emptyargp{#3}}%
     \noindent \@setauthor{40pc}{#1}{\@false}\par
   \else\if \@emptyargp{#3}%
-    \noindent \@setauthor{17pc}{#1}{\@false}\hspace{3pc}%
-              \@setauthor{17pc}{#2}{\@false}\par
+    \noindent \@setauthor{20pc}{#1}{\@false}\hspace{3pc}%
+              \@setauthor{10pc}{#2}{\@false}\par
   \else
     \noindent \@setauthor{12.5pc}{#1}{\@false}\hspace{2pc}%
               \@setauthor{12.5pc}{#2}{\@false}\hspace{2pc}%
