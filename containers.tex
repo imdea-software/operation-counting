@@ -241,7 +241,9 @@ Given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2} \in O^2$ is
 a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) = \<pop> => v$
 for some $v \in \<Vals>$. We say that two distinct elements $\tup{o_1,o_2}$ and
 $\tup{o_3,o_4}$ are \emph{redundant in $h$} when their operations have the same
-pasts and futures,
+pasts and futures,\footnote{Similarly the definition of $\<past>$ from
+Section~\ref{sec:counting:logic}, we define the \emph{future} of an operation
+$o$ in an history $\tup{O,<,f}$ by $\<future>(o) = \set{o' \in O : o < o'}$.}
 \begin{align*}
   \<past>(o_1) = \<past>(o_3) & & \<future>(o_1) = \<future>(o_3) \\
   \<past>(o_2) = \<past>(o_4) & & \<future>(o_2) = \<future>(o_4)
