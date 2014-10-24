@@ -72,13 +72,13 @@
   \begin{abstract}
 
     Efficient implementations of concurrent objects such as semaphores, locks,
-    atomic registers, and data structures are essential to modern computing.
-    Programming them is however error prone: in attempting to minimize
-    synchronization overhead between concurrent object invocations, one risks
-    breaking conformance to reference implementations --- or in formal terms,
-    one risks violating \emph{observational refinement}. Testing this
-    refinement even within a single execution is intractable, and existing
-    approaches are limited to executions with very few object invocations.
+    and atomic collections are essential to modern computing. Yet programming
+    such objects is error prone: in minimizing the synchronization overhead
+    between concurrent object invocations, one risks the conformance to
+    reference implementations --- or in formal terms, one risks violating
+    \emph{observational refinement}. Testing this refinement even within a
+    single execution is intractable, limiting existing approaches to executions
+    with very few object invocations.
 
     We develop a polynomial-time (per execution) approximation to
     refinement checking. The approximation is parameterized by an accuracy $k
