@@ -23,20 +23,20 @@
   \node[nnode] (t13) [right of=t12,label=below:13] {};
   \node[nnode] (t14) [right of=t13] {};
 
-  \node[lnode] (x1)  [above=12mm of t0] {};
-  \node[lnode] (x2)  [above=12mm of t1] {}; 
-  \node[lnode] (x3)  [above=12mm of t2] {}; 
-  \node[lnode] (x6)  [above=12mm of t10] {};
+  \node[lnode] (x1)  [above=8mm of t0] {};
+  \node[lnode] (x2)  [above=8mm of t1] {}; 
+  \node[lnode] (x3)  [above=8mm of t2] {}; 
+  \node[lnode] (x6)  [above=8mm of t10] {};
 
-  \node[lnode] (y1)  [above=5mm of t3] {}; 
-  \node[lnode] (y2)  [above=5mm of t4] {}; 
-  \node[lnode] (y4)  [above=5mm of t6] {}; 
-  \node[lnode] (y5)  [above=5mm of t7] {}; 
-  \node[lnode] (y6)  [above=5mm of t8] {}; 
-  \node[lnode] (y7)  [above=5mm of t9] {};
+  \node[lnode] (y1)  [above=2mm of t3] {}; 
+  \node[lnode] (y2)  [above=2mm of t4] {}; 
+  \node[lnode] (y4)  [above=2mm of t6] {}; 
+  \node[lnode] (y5)  [above=2mm of t7] {}; 
+  \node[lnode] (y6)  [above=2mm of t8] {}; 
+  \node[lnode] (y7)  [above=2mm of t9] {};
 
-  \node[lnode] (y8)  [above=5mm of t12] {};
-  \node[lnode] (y9)  [above=5mm of t13] {}; 
+  \node[lnode] (y8)  [above=2mm of t12] {};
+  \node[lnode] (y9)  [above=2mm of t13] {}; 
 
   \draw[->,>=stealth'] (t0) -- (t14);
   \draw[dotted] (x1) -- (t0);

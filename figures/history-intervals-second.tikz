@@ -14,14 +14,14 @@
   \node[nnode] (t4) [right of=t3,label=below:4] {};
   \node[nnode] (t5) [right of=t4] {};
 
-  \node[lnode] (x1)  [above=12mm of t0] {};
-  \node[lnode] (x2)  [above=12mm of t1] {};
-  \node[lnode] (x3)  [above=12mm of t3] {};
+  \node[lnode] (x1)  [above=8mm of t0] {};
+  \node[lnode] (x2)  [above=8mm of t1] {};
+  \node[lnode] (x3)  [above=8mm of t3] {};
 
-  \node[lnode] (y1)  [above=4mm of t1] {}; 
-  \node[lnode] (y2)  [above=4mm of t2] {}; 
-  \node[lnode] (y3)  [above=4mm of t3] {};
-  \node[lnode] (y4)  [above=4mm of t4] {};
+  \node[lnode] (y1)  [above=2mm of t1] {}; 
+  \node[lnode] (y2)  [above=2mm of t2] {}; 
+  \node[lnode] (y3)  [above=2mm of t3] {};
+  \node[lnode] (y4)  [above=2mm of t4] {};
 
   \draw[->,>=stealth'] (t0) -- (t14);
   \draw[dotted] (x1) -- (t0);
