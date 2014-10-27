@@ -300,7 +300,7 @@ f(o') = \_(\_) => v\neq \bot\}$ relating all completed operations to $o$. As the
 following lemma shows, the $\oplus$ operator allows us to manipulate our
 $k$-approximations $A_k(H(e))$ directly, without having to maintain the precise
 history $H(e)$ of an execution $e$. Note that besides maintaining $A_k(H(e)$,
-this formulation requires us to compute $A_{k-1}(H(e))$ occasionally as well.
+this formulation requires us to compute $A_{k-1}(H(e))$ periodically as well.
 
 \begin{lemma}
   \label{lem:step}
@@ -470,7 +470,7 @@ the effect of $|e|$ on asymptotic space complexity.
 
 As an online monitor program $P_k$ for history approximation,
 Algorithm~\ref{alg:counting} effectively reduces the approximate refinement
-checking problem between $L_1$ and $L_2$ to a reachability problem on the
+checking problem between $L_1$ and $L_2$ to a safety verification problem on the
 composition $P_k \x L_1$: as $P_k$ tracks the counting representation $\pi =
 \Pi(A_k(H(e)))$ of the current execution $e$'s approximation, we must only
 verify whether $\pi$ satisfies the operation-counting formula $@Y$ for $L_2$ up
