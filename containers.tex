@@ -52,16 +52,16 @@ defines four families of operation-counting formul\ae:
 
 \end{itemize}
 As in previous work~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13},
-our arguments for the completeness of these properties relies on \emph{data
+our arguments for the (partial) completeness of these properties rely on \emph{data
 independence}~\cite{conf/popl/Wolper86}, i.e.,~that library executions are
-closed under consistent renaming $\<Vals> -> \<Vals>$ of method call and
-return values, and assume that each value is {\sf push}ed at most once. In
-practice, collection-based data structures are data independent, and the second
-condition can always be met by tagging each value with a unique identifier.
-However, in order to achieve bounded counting representations, we may only
-distinguish between these values up to equivalence relations with finite
-quotients. Formally, we say a history $\tup{O,f,<}$ uses \emph{unique values}
-when $f(o_1) = m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
+closed under consistent renaming $\<Vals> -> \<Vals>$ of method call/return
+values, and assume that each value is {\sf push}ed at most once. In practice,
+collection-based data structures are data independent, and the second condition
+can always be met by tagging each value with a unique identifier. However, in
+order to achieve bounded counting representations, we may only distinguish
+between these values up to equivalence relations with finite quotients.
+Formally, we say a history $\tup{O,f,<}$ uses \emph{unique values} when $f(o_1)
+= m_1(u) => v_1$ and $f(o_2) = m_2(u) => v_2$ implies $o_1 = o_2$.
 
 \begin{figure}[t]
   \footnotesize
@@ -266,15 +266,12 @@ for all $o_1, o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
 
 \end{lemma}
 
-% \begin{proof}
-%   TODO FILL IT IN
-% \end{proof}
-
-Let $\mathbb{I}_k = \set{ [i,j] : i,j \in \<Nats>,\ 0 \le i \le j \le k }$ be
-the finite set of integral intervals up to $k \in \<Nats>$, and suppose a fixed
-order $\ll$ over the finite set $\mathbb{I}_k^2$. We define the function $H^1$
-which maps any subset $\set{ \tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}}
-} \subseteq \mathbb{I}_k^2$ to the history $\tup{O,<,f}$ where
+To enumerate the non-redundant $k$-length histories, let $\mathbb{I}_k = \set{
+[i,j] : i,j \in \<Nats>,\ 0 \le i \le j \le k }$ be the set of integral
+intervals up to $k \in \<Nats>$, and fix an arbitrary total order $\ll$ over
+$\mathbb{I}_k^2$. We define the function $H^1$ mapping any subset $\set{
+\tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}} } \subseteq \mathbb{I}_k^2$
+to the history $\tup{O,<,f}$ where
 \begin{align*}
   O
     & = \set{ \tup{i,1}, \tup{i,2} : 1 \le i \le n } \\
@@ -313,10 +310,6 @@ has quantifier rank $1$.
   If $\len h \le k$ and $h$ uses unique values,
   then $h \in H(L_x)$ if{f} $h |= \lnot @Y_{x,k}$.
 \end{theorem}
-
-% \begin{proof}
-%   TODO FILL THIS IN
-% \end{proof}
 
 % Theorems~\ref{lem:cutoff} and~\ref{lem:rep} imply that the $A_3$ approximation
 % is guaranteed to discover any stack/queue violation in histories using unique
