@@ -29,18 +29,18 @@ demonstrate that refinement between libraries is equivalent to a
 history-set-containment problem, and each violation is captured by a negative
 instance of history-set-membership.
 
-Since refinement-violation detection for even a single execution is NP-hard for
-arbitrary objects~\cite{journals/siamcomp/GibbonsK97}, the second part,
-outlined in Section~\ref{sec:intro:approx}, develops a novel approximation for
-refinement checking. We demonstrate that our approach is feasible, leading to
-scalable and efficient algorithms for detecting refinement violations. The
-insight behind our approximation exploits fundamental properties of the
-histories arising from shared-memory concurrent executions: they are a special
-class of partial orders called interval orders. Such orders admit convenient
-representations leading to efficient automation, and reveal a useful parameter
-for refining our approximation. In practice we find that even coarse
-approximations uncover refinement violations, and can be implemented much more
-efficiently than existing approaches.
+Since refinement-violation detection for even a single execution is
+NP-hard~\cite{journals/siamcomp/GibbonsK97}, the second part, outlined in
+Section~\ref{sec:intro:approx}, develops a novel approximation for refinement
+checking. We demonstrate that our approach is feasible, leading to scalable
+refinement-violation-detection algorithms. The insight behind our approximation
+exploits fundamental properties of the histories arising from shared-memory
+concurrent executions: they are a special class of partial orders called
+interval orders. Such orders admit convenient representations leading to
+efficient automation, and reveal a useful parameter for refining our
+approximation. In practice we find that even coarse approximations uncover
+refinement violations, and can be implemented much more efficiently than
+existing approaches.
 
 
 \subsection{Characterizing Observational Refinement}
@@ -51,7 +51,7 @@ most immediate obstacle arises from the quantification over the infinitely-many
 possible library-client programs: a library $L_1$ refines another library $L_2$
 if every observation of every client program using $L_1$ is also admitted using
 $L_2$. Our first contribution is to provide a \emph{precise} characterization
-of refinement as a set-containment problem, defined independently from their
+of refinement as a set-containment problem, defined independently from libraries'
 execution contexts, between the partial orders of operations admitted by each
 library. More precisely, we associate to each execution $e$ a partial order
 $H(e)$ on its object-method invocations, called a \emph{history}. An operation
@@ -87,92 +87,76 @@ $\preceq$ on histories as a means for approximation: a history $h_1$ is
 essentially if $h_1$ is obtained from $h_2$ by relaxing order constraints. We
 show that if a library $L$ admits a history $h$, then $L$ also admits every
 weaker history $h' \preceq h$. Our approximation principle considers
-approximations $A(h) \preceq h$ of histories $h\in H(L_1)$, such that checking
+weakenings $A(h) \preceq h$ of histories $h\in H(L_1)$, such that checking
 $A(h) \in H(L_2)$ is \emph{tractable}. If $A(h) \not\in H(L_2)$ then $h \not\in
 H(L_2)$, and thus a violation is found.
 
 The challenge is to design a parameterized approximation $A_k$, for $k \in
-\mathbb{N}$, such that (1)~$A_k (h) \preceq h$, and (2)~$A_k(h) \in H(L_2)$ is
-decidable in \emph{polynomial time} in the size of $h$. The approximation
-should also be \emph{complete}, in the sense that for any history $h$, there
-exists $k \in \<Nats>$ such that $h \preceq A_k(h)$; this ensures that any
-violation can be captured with a large enough parameter value. Finally, the
-approximation should also be easy to implement, and able to catch refinement
-violations with small parameter values.
+\mathbb{N}$, such that $A_k(h) \in H(L_2)$ is decidable in \emph{polynomial
+time} in the size of $h$. The approximation should also be \emph{complete}, in
+the sense that for any history $h$, there exists $k \in \<Nats>$ such that $h
+\preceq A_k(h)$, ensuring that any violation can be captured with a large
+enough parameter value. Finally, the approximation should be easy to implement,
+and catch violations with small parameter values.
 
-\paragraph{Bounded interval-length histories}
+% \paragraph{Parameterized Approximation by Bounded Interval Length}
 
 Our approximation scheme exploits a fundamental property of shared-memory
 library executions: their histories are \emph{interval orders}, a special case
 of partial orders which admit \emph{canonical representations} in which each
 operation $o$ is mapped to a positive-integer-bounded interval $I(o)$. An
-operation $o_1$ happens before another operation $o_2$ if and only if $I(o_1)$
-ends before $I(o_2)$ begins~\cite{phd/Greenough76}. Interval orders are
-equipped with a natural notion of \emph{length}, which corresponds to the
-smallest integer constant for which an interval mapping $I$ exists. Our
-approximation $A_k$ maps each history $h$ to a $\preceq$-weaker history
-$A_k(h)$ of interval length at most $k$.
+operation $o_1$ happens before another operation $o_2$ if and only if the
+interval $I(o_1)$ ends before $I(o_2)$ begins~\cite{phd/Greenough76}. Interval
+orders are equipped with a natural notion of \emph{length}, which corresponds
+to the smallest integer constant for which an interval mapping exists. Our
+approximation $A_k$ maps each history $h$ to a weaker history $A_k(h)$ of
+interval length at most $k$.
 
-\paragraph{Reduction to safety verification using counters}
+Bounded-interval-length orders admit a convenient representation of histories
+using counting: each interval is represented by a counter whose value reflects
+the number of operations spanning that interval. Such a representation
+conveniently opens the door to symbolic manipulation of history sets using
+arithmetic constraints, which we describe using a simple \emph{operation
+counting logic (OCL)}. We demonstrate that this logic has a polynomial-time
+satisfiability problem, and is suitable for reasoning about commonly-used
+concurrent object libraries including atomic collections like stacks and
+queues. We also demonstrate that OCL formul\ae can be systematically
+constructed for a broad class of concurrent objects.
 
-We show that interval-length bounding is a tractable approach for refinement
-checking, and that it can be implemented efficiently. A key idea for that is to
-use \emph{counting representations} for bounded interval-length histories: each
-interval is represented by a counter corresponding to the number of elements
-mapped to this interval in the canonical representation. Indeed, representing
-histories as vectors of integers opens the door to symbolic manipulation of
-sets of histories using arithmetical constraints. In fact, we introduce for
-that purpose a simple ``operation counting'' logic (OCL), that is
-suitable for reasoning about libraries implementing common concurrent objects,
-and for which checking if a given history satisfies a formula can be done in
-\emph{polynomial time}.
+Moreover, counting-based representations can be efficiently monitored in
+polynomial-time and space using simple counter increments and decrements at the
+precise moments when operations begin and end. By maintaining a
+$k$-interval-length approximation $A_k(H(e))$ of an execution $e$, we
+effectively reduce our approximate refinement-checking problem to a
+\emph{safety verification} problem by periodically checking whether $A_k(H(e))
+|= @Y$, where $@Y$ is an OCL formula characterizing the $k$-interval-length
+histories of $H(L_2)$.
 
-Moreover, counting representations provide a simple way for implementing a
-monitor $P_k$ that tracks histories of interval-length at most $k$. In fact, we
-define a \emph{polynomial time} algorithm that, given an execution, builds a
-($k$-bounded interval-length) approximation history of it. Therefore, bounded
-interval-length refinement checking between $L_1$ and $L_2$ can be reduced to a
-\emph{safety verification} problem in $P_k$ composed with
-$L_1$, provided that the set of histories $A_k(H(L_2))$ is effectively defined
-in OCL. We show that this is the case for reference implementations of typical
-concurrent objects such as stacks and queues, and that these OCL formulas can
-be constructed systematically for a wide class of objects.
-
-\paragraph{Demonstrating feasibility}
-
-
-We demonstrate in the work that our approach is feasible both with a dynamic
-and a static state space exploration strategy.
-
-In the dynamic case, we show experimentally two remarkable facts. First, our
-approach is \emph{scalable}: its overhead is low and does not increase with the
-length of computations, whereas the overhead of the standard approach (used in
-existing tools such as Line-Up~\cite{conf/pldi/BurckhardtDMT10}) that is based
-on enumerating linearizations of executions explodes exponentially. Second, our
-approach is \emph{efficient} and well suited for catching refinement
-violations: most of these violations in practice are detected with small
-bounds, i.e.,~for $k$ ranging from 0 to $2$, and relatively few (marginal)
-cases need greater bounds such as 3 or 4. On this issue, we were actually able
-to prove that for stacks and queues, refinement checking for order constraints
-can actually be reduced (without loss of completeness) to bounded refinement
-checking with small cut-off bounds, namely 3 and 2 respectively.
-
-In the static case, using the fact that sets of histories can be represented
-using arithmetical constraints, we can, for the first time, check the existence
-of refinement violations using existing tools for reachability analysis of
-concurrent programs such as CSeq~\cite{conf/ase/FischerIP13} (with backend
+Empirically, we demonstrate that our approach is effective in both
+dynamic-checking and static-checking contexts. Used in the dynamic setting, we
+maintain relatively-low runtime overhead which does not increase in the length
+of executions. Our approach scales far beyond the existing approaches based on
+linearizability, in which enumerating linearizations explodes exponentially in
+the length of executions. Furthermore, our approximation $A_k$ is well-suited
+for catching refinement violations with small parameter values: violations are
+most often detected with $k \le 2$, and almost always with $k \le 4$. In fact,
+we even prove that many violations to atomic collection objects including
+stacks and queues can always be caught with $k \le 3$. In the static-checking
+context, our counting-based representation allows us to leverage off-the-shelf
+SAT/SMT-based symbolic program exploration tools including
+CSeq~\cite{conf/ase/FischerIP13} (with backend
 CBMC~\cite{conf/tacas/KroeningT14}) and SMACK~\cite{conf/cav/RakamaricE14}
-(with backend Corral~\cite{conf/cav/LalQL12}) that are based on efficient
-symbolic encodings of sets of computations and the use of SMT solvers.
+(with backend Corral~\cite{conf/cav/LalQL12}) to discover refinement violations.
 
 \subsection{Summary of Contributions}
 
 This work makes following contributions:
 \begin{itemize}
 
-  \item A characterization of observational refinement as a history inclusion
-  problem (\S\ref{sec:histories}), and an proof of equivalence with
-  linearizability for atomic reference implementations (\S\ref{sec:lin}).
+  \item A characterization of observational refinement as a
+  history-set-containment problem (\S\ref{sec:histories}), and an proof of
+  equivalence with linearizability for atomic reference implementations
+  (\S\ref{sec:lin}).
 
   \item An under-approximation for detecting observational refinement
   violations based on a weakening preorder on histories, exploiting the fact
@@ -180,14 +164,13 @@ This work makes following contributions:
 
   \item An efficient implementation of our approximation using counters.
   Specifically, we reduce refinement checking to safety-property checking
-  (\S\ref{sec:counting:monitor}) using arithmetic-based symbolic
-  representations of bounded-interval-length history sets
-  (\S\ref{sec:counting:logic}), we demonstrate cut-off bounds for
-  atomic-collection objects (\S\ref{sec:containers}), and we develop a
-  procedure for the automatic generation of counting representations
-  (\S\ref{sec:regular}).
+  (\S\ref{sec:counting:monitor}) using symbolic-arithmetic representations of
+  bounded-interval-length history sets (\S\ref{sec:counting:logic}),
+  demonstrate cut-off bounds for atomic-collection objects
+  (\S\ref{sec:containers}), and develop an automatic construction of counting
+  representations (\S\ref{sec:regular}).
 
-  \item Experimental demonstration of the efficiency and scalability of our
-  approach both in dynamic and static analysis settings (\S\ref{sec:exp}).
+  \item Experimental validation of our approximation-based approach in both
+  dynamic-checking and static-checking settings (\S\ref{sec:exp}).
 
 \end{itemize}
