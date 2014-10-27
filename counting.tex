@@ -216,7 +216,6 @@ where $I$ is the canonical representation of $\tup{O,<}$.
   \end{align*}
   \caption{The syntax of Operation Counting Logic.}
   \label{fig:logic}
-%  \vspace{-2mm}
 \end{figure}
 
 We allow predicates $P$ of arbitrary arity over operation labels, so long as
@@ -234,23 +233,27 @@ formula $@Y$ is the maximum number of nested quantifiers in $@Y$. An operation
 counting formula $@Y$ \emph{represents a library $L$ up to $k$} when $h \in
 H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
 
-\begin{lemma}\label{lemma:satisfaction}
+\begin{lemma}
+  \label{lemma:satisfaction}
 
   Checking if a history $h$ satisfies an operation counting formula
   $@Y$ of fixed quantifier rank is decidable in polynomial time.
 
 \end{lemma}
 
-\begin{proof}\let\qed\relax
-
-  This follows from the facts that: (1) the canonical representation of $h$ is polynomial-time computable (see Lemma~\ref{lem:representation}),
-  (2) functions and predicates are polynomial-time computable, and (3) quantifiers are only instantiated over labels occurring in $h$.
-  The latter implies that quantifiers can be replaced by a disjunction over the
+\begin{proof}
+  \let\q\qed
+  \let\qed\relax
+  This follows from the facts that: (1)~the canonical representation of $h$ is
+  polynomial-time computable (see Lemma~\ref{lem:representation}),
+  (2)~functions and predicates are polynomial-time computable, and
+  (3)~quantifiers are only instantiated over labels occurring in $h$. The
+  latter implies that quantifiers can be replaced by a disjunction over the
   labels occurring in $h = \tup{O,f,<}$:
   \begin{align*}
     h |= \exists x.\ F
     \quad \text{if{f}} \quad
-    h |= \bigvee_{o \in O} F[x <- f(o)].
+    h |= \bigvee_{o \in O} F[x <- f(o)]. \q
   \end{align*}
 \end{proof}
 
