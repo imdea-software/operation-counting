@@ -215,9 +215,10 @@ large $n$, our practical experience suggests small $n$ tends to suffice. The
 bug $\text{B}_5$ of our static analysis experiment in
 Section~\ref{sec:exp:static} surfaced as an empty violation, and was detected
 with approximation $A_1$, implying $n \le 1$, i.e.,~where some unmatched
-$\<push>$ operation precedes $\<pop>({\tt EMPTY})$. Similarly, the empty
-violation of Figure~\ref{fig:stacks}(b) is also a violation of the weaker
-length-$1$ history in Figure~\ref{fig:stacks}(c) satisfying $@Y_\mathrm{ev}$.
+$\<push>$ operation precedes $\<pop>({\tt EMPTY})$. Similarly, although the
+history of Figure~\ref{fig:stacks}(b) satisfies the empty-violation formula
+$@Y_\mathrm{ev}$, so does the weaker length-$1$ history of
+Figure~\ref{fig:stacks}(c).
 Furthermore, we have found that the same bugs which manifest as empty
 violations often manifest as order violations as well. The ABA bug of
 Figure~\ref{fig:stacks}(a) is such a case: had the first thread executed
