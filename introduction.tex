@@ -26,7 +26,7 @@ foundational characterization of observational refinement in terms of sets of
 so-called \emph{histories}. Histories abstract concurrent executions into the
 happens-before (partial-order) relation between object-method invocations. We
 demonstrate that refinement between libraries is equivalent to a
-history-set-containment problem, and each violation is captured by a negative
+history-set-inclusion problem, and each violation is captured by a negative
 instance of history-set-membership.
 
 Since refinement-violation detection for even a single execution is
@@ -51,14 +51,14 @@ most immediate obstacle arises from the quantification over the infinitely-many
 possible library-client programs: a library $L_1$ refines another library $L_2$
 if every observation of every client program using $L_1$ is also admitted using
 $L_2$. Our first contribution is to provide a \emph{precise} characterization
-of refinement as a set-containment problem, defined independently from libraries'
+of refinement as a set-inclusion problem, defined independently from libraries'
 execution contexts, between the partial orders of operations admitted by each
 library. More precisely, we associate to each execution $e$ a partial order
 $H(e)$ on its object-method invocations, called a \emph{history}. An operation
 $o_1$ is considered to happen before an operation $o_2$ in $H(e)$ if $o_1$
 completes before $o_2$ is invoked in $e$. We prove that a library $L_1$ refines
 another $L_2$ if and only if the set $H(L_1)$ of $L_1$'s histories
-(i.e.,~associated with $L_1$'s executions) is contained in $H(L_2)$.
+(i.e.,~associated with $L_1$'s executions) is included in $H(L_2)$.
 
 This characterization is a fundamental result that offers a fresh view for
 reasoning about refinement. Thus far, the principal approach for checking
@@ -69,9 +69,9 @@ of $L_2$ while preserving the return-call order between operations. While
 linearizability implies observational
 refinement~\cite{journals/tcs/FilipovicORY10}, we demonstrate that the converse
 does not generally hold. To shed light on the subtle relationship between these
-concepts, we investigate the link between history containment and
+concepts, we investigate the link between history inclusion and
 linearizability. We prove that when $L_2$ is atomic, which is typically the
-case for reference implementations, history containment between $L_1$ and
+case for reference implementations, history inclusion between $L_1$ and
 $L_2$, and therefore observational refinement, is equivalent to linearizability.
 
 
@@ -154,7 +154,7 @@ This work makes following contributions:
 \begin{itemize}
 
   \item A characterization of observational refinement as a
-  history-set-containment problem (\S\ref{sec:histories}), and an proof of
+  history-set-inclusion problem (\S\ref{sec:histories}), and an proof of
   equivalence with linearizability for atomic reference implementations
   (\S\ref{sec:lin}).
 
