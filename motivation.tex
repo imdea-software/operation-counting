@@ -19,7 +19,7 @@ assigns {\tt Top = n} only if {\tt Top == t}.
 
 \begin{figure}[t]
   \scriptsize
-  \begin{minipage}[t]{40mm}
+  \begin{minipage}[t]{41mm}
     \begin{program}
 struct node *Top;      
       
@@ -30,7 +30,7 @@ void push(int v):
   do {
     struct node *t = Top;
     n->next = t;
-  } while (! CAS (&Top, t, n))
+  } while (! CAS (&Top, t, n));
     \end{program}
   \end{minipage}
   \begin{minipage}[t]{40mm}
@@ -49,9 +49,10 @@ int pop():
   \end{minipage}
   \begin{minipage}[t]{30mm}
     \begin{program}
-struct node:
+struct node {
   int data;
   struct node *next;
+}
     \end{program}
   \end{minipage}
   \begin{minipage}[t]{25mm}
