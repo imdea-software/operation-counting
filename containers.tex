@@ -271,7 +271,7 @@ for all $o_1, o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
 
 Let $\mathbb{I}_k = \set{ [i,j] : i,j \in \<Nats>,\ 0 \le i \le j \le k }$ be
 the finite set of integral intervals up to $k \in \<Nats>$, and suppose a fixed
-order $\ll$ over the finite set $\mathbb{I}_k^2$. We define the function $h^1$
+order $\ll$ over the finite set $\mathbb{I}_k^2$. We define the function $H^1$
 which maps any subset $\set{ \tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}}
 } \subseteq \mathbb{I}_k^2$ to the history $\tup{O,<,f}$ where
 \begin{align*}
@@ -288,7 +288,7 @@ which maps any subset $\set{ \tup{I_{1,1}, I_{1,2}}, .., \tup{I_{n,1}, I_{n,2}}
   \right.
 \end{align*}
 such that $\tup{I_{1,1}, I_{1,2}} \ll \tup{I_{2,1}, I_{2,2}} \ll .. \ll
-\tup{I_{n,1}, I_{n,2}}$. Then we define the finite set $H^1_k = \set{ h^1(X) :
+\tup{I_{n,1}, I_{n,2}}$. Then we define the finite set $H^1_k = \set{ H^1(X) :
 X \subseteq \mathbb{I}_k^2}$. Notice that the histories of $H^1_k$ do not
 contain redundant elements. Finally, we define the finite subset $H^1_{x,k} =
 H^1_k @\ H(L_x)$ of histories which are not admitted by $L_x$, for $x \in
@@ -298,11 +298,11 @@ characterizing length $k$ violations to $L_x$:
   @Y_{x,k} = \bigvee \set{ @Y_h : h \in H^1_{x,k} }
 \end{align*}
 where $@Y_h$ characterizes the history $h = \tup{O,<,f}$ with operations
-$\set{ o_1, .., o_n }$ and elements $E$, and its extensions:
+$\set{ o_1, .., o_n }$ and elements $@c$, and its extensions:
 \begin{align*}
   @Y_h = \exists x_1, .., x_n.
   \!\!\! \bigwedge_{o_i < o_j} \!\!\! \pred{before}_k(x_i,x_j)
-  \land \!\!\!\!\!\! \bigwedge_{\langle o_i,o_j \rangle \in E} \!\!\!\!\!\! \pred{match}(x_i,x_j)
+  \land \!\!\!\!\!\! \bigwedge_{\langle o_i,o_j \rangle \in @c} \!\!\!\!\!\! \pred{match}(x_i,x_j)
 \end{align*}
 Note that $@Y_{x,k}$ is polynomial in size for fixed $k \in \<Nats>$, and
 has quantifier rank $1$.

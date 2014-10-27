@@ -27,7 +27,8 @@ execution $e_1$ is \emph{linearizable} w.r.t.~a library $L_2$\footnote{The
 original definition of \citet{journals/toplas/HerlihyW90} assumes that $L_2$ is
 a set of sequential executions. Here we consider a slight extension adapted to
 concurrent executions, faithful to the original intention, where $\ker L_2$ may
-be a set of sequential executions.} if{f} there exists $e_2 \in E(L_2)$, with only
+be a set of sequential executions.} if{f} there exists a sequential execution
+$e_2 \in E(L_2)$, with only
 completed operations, such that $e_1 \sqsubseteq e_2$. A library $L_1$
 is \emph{linearizable} w.r.t. $L_2$, written $L_1 \sqsubseteq L_2$, if{f}
 each execution $e_1 \in E(L_1)$ is linearizable w.r.t. $L_2$.
