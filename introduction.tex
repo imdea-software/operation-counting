@@ -25,9 +25,9 @@ The first part, outlined in Section~\ref{sec:intro:histories}, establishes a
 foundational characterization of observational refinement in terms of sets of
 so-called \emph{histories}. Histories abstract concurrent executions into the
 happens-before (partial-order) relation between object-method invocations. We
-demonstrate that refinement between libraries is equivalent to a
-history-set-inclusion problem, and each violation is captured by a negative
-instance of history-set-membership.
+show that refinement between libraries is equivalent to a history-set inclusion
+problem, and consequently each violation is captured by a negative instance of
+history-set membership.
 
 Since refinement-violation detection for even a single execution is
 NP-hard~\cite{journals/siamcomp/GibbonsK97}, the second part, outlined in
@@ -70,7 +70,7 @@ linearizability implies observational
 refinement~\cite{journals/tcs/FilipovicORY10}, we demonstrate that the converse
 does not generally hold. To shed light on the subtle relationship between these
 concepts, we investigate the link between history inclusion and
-linearizability. We prove that when $L_2$ is atomic, which is typically the
+linearizability. We prove that when $L_2$ is atomic, which is often the
 case for reference implementations, history inclusion between $L_1$ and
 $L_2$, and therefore observational refinement, is equivalent to linearizability.
 
@@ -118,7 +118,7 @@ the number of operations spanning that interval. Such a representation
 conveniently opens the door to symbolic manipulation of history sets using
 arithmetic constraints, which we describe using a simple \emph{operation
 counting logic (OCL)}. We demonstrate that this logic has a polynomial-time
-satisfiability problem, and is suitable for reasoning about commonly-used
+model-checking problem, and is suitable for reasoning about commonly-used
 concurrent object libraries including atomic collections like stacks and
 queues. We also demonstrate that OCL formul\ae can be systematically
 constructed for a broad class of concurrent objects.
@@ -150,11 +150,11 @@ CBMC~\cite{conf/tacas/KroeningT14}) and SMACK~\cite{conf/cav/RakamaricE14}
 
 \subsection{Summary of Contributions}
 
-This work makes following contributions:
+This work makes the following contributions:
 \begin{itemize}
 
   \item A characterization of observational refinement as a
-  history-set-inclusion problem (\S\ref{sec:histories}), and an proof of
+  history-set-inclusion problem (\S\ref{sec:histories}), and a proof of
   equivalence with linearizability for atomic reference implementations
   (\S\ref{sec:lin}).
 
@@ -164,7 +164,7 @@ This work makes following contributions:
 
   \item An efficient implementation of our approximation using counters.
   Specifically, we reduce refinement checking to safety-property checking
-  (\S\ref{sec:counting:monitor}) using symbolic-arithmetic representations of
+  (\S\ref{sec:counting:monitor}) using symbolic arithmetic representations of
   bounded-interval-length history sets (\S\ref{sec:counting:logic}),
   demonstrate cut-off bounds for atomic-collection objects
   (\S\ref{sec:containers}), and develop an automatic construction of counting

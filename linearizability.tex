@@ -22,7 +22,7 @@ such that:
 
 \end{quote}
 For example, the second and the third executions in Example~\ref{ex:libraries}
-are weaker than the first (with sequential calls to $\<push>$ and $\<pop>$). An
+are $\sqsubseteq$-smaller than the first (with sequential calls to $\<push>$ and $\<pop>$). An
 execution $e_1$ is \emph{linearizable} w.r.t.~a library $L_2$\footnote{The
 original definition of \citet{journals/toplas/HerlihyW90} assumes that $L_2$ is
 a set of sequential executions. Here we consider a slight extension adapted to
@@ -69,7 +69,7 @@ the order relations $\sqsubseteq$ and $\preceq$.
 \begin{lemma}
   \label{lemma:exec_hist}
 
-  $e_1\sqsubseteq e_2$ if{f} $H(e_1) \preceq H(e_2)$, if $e_2$ is sequential.
+  $e_1\sqsubseteq e_2$ if{f} $H(e_1) \preceq H(e_2)$.
 
 \end{lemma}
 

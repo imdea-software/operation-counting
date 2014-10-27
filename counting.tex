@@ -67,8 +67,8 @@ particular, we exploit the fact that histories are \emph{interval orders}, with
 a natural measure of complexity, i.e.,~the interval order
 \emph{length}~\cite{phd/Greenough76}. Leveraging this notion of length, we
 abstract each history $h$ to a weaker history $A_k(h)$ whose length is bounded
-by $k$, and represent the set $H(L)$ of histories by a formula $@Y_k$ over
-bounded interval length, against which $A_k(h)$ can be evaluated in polynomial
+by $k$, and represent the set $H(L)$ of histories, restricted to interval
+length $k$, by a formula against which $A_k(h)$ can be evaluated in polynomial
 time~(\S\ref{sec:counting:logic}). Finally, we exhibit a program monitoring
 scheme which can be used to decide our approximate observational refinement
 problem $\exists h.\ A_k(h) \in H(L_1) \setminus H(L_2)$, or as a
@@ -228,8 +228,8 @@ formul\ae is defined by:
   \quad \text{if{f}} \quad
   \exists o \in O.\ h |= F[x <- f(o)].
 \end{align*}
-where $h = \tup{O,f,<}$. The \emph{quantifier rank} of an operation counting
-formula $@Y$ is the maximum number of nested quantifiers in $@Y$. An operation
+where $h = \tup{O,f,<}$. The \emph{quantifier count} of an operation counting
+formula $@Y$ is the number of quantified variables in $@Y$. An operation
 counting formula $@Y$ \emph{represents a library $L$ up to $k$} when $h \in
 H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
 
@@ -237,7 +237,7 @@ H(L)$ if{f} $h |= @Y$ for every history $h$ of length at most $k$.
   \label{lemma:satisfaction}
 
   Checking if a history $h$ satisfies an operation counting formula
-  $@Y$ of fixed quantifier rank is decidable in polynomial time.
+  $@Y$ of fixed quantifier count is decidable in polynomial time.
 
 \end{lemma}
 
@@ -456,7 +456,7 @@ the effect of $|e|$ on asymptotic space complexity.
 
   The approximate inclusion problem $A_k(h) \in H(L)$ is decidable in
   polynomial time, for fixed $k$, given an operation counting formula
-  $@Y$ for $L$ up to $k$, of fixed quantifier rank.
+  $@Y$ for $L$ up to $k$, of fixed quantifier count.
 
 \end{corollary}
 

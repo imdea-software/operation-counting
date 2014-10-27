@@ -73,7 +73,7 @@ of \emph{call actions} and \emph{return actions}; each call action $m(v)_o$
 combines a method $m \in \<Methods>$ and value $v \in \<Vals>$ with an
 \emph{operation identifier} $o \in \<Ops>$. Operation identifiers are used to
 pair call and return actions. We denote the operation identifier of a
-call/return action $c$ by $\<op>(c)$. Call and return actions $c \in C$ and $r
+call/return action $a$ by $\<op>(a)$. Call and return actions $c \in C$ and $r
 \in R$ are \emph{matching}, written $c \match r$, when $\<op>(c) = \<op>(r)$. A
 word $e \in @S^*$ over alphabet $@S$, such that $(C \u R) \subseteq @S$, is
 \emph{well formed} when:
@@ -192,7 +192,7 @@ set $E$ of sequential executions, i.e.,~$E(L) = \overline{E}$. When such a set
 $E$ exists, it is unique, and we call it \emph{the kernel of $L$}, denoted by
 $\ker L$. Note that $\ker L$ contains only completed operations since $e_1
 \cdot e_2 ~> e_1 \cdot c \cdot e_2$, for any unmatched call $c$. Atomic
-libraries are typically considered as specifications for concurrent objects.
+libraries are often considered as specifications for concurrent objects.
 
 \begin{example}
   \label{ex:atomic_stack}
