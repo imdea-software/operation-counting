@@ -138,7 +138,7 @@ representations minimize the interval bounds to the interval-order length.
   = [i,j] \subseteq [0,n]$, with
   \begin{align*}
     i = |\set{\<past>(o') : o'<o}| \text{ and }
-    j = |\set{\<past>(o') : \neg o<o'}| - 1 \text{.}
+    j = |\set{\<past>(o') : \neg o<o'}| - 1
   \end{align*}
   such that $o_1 < o_2$ if{f} $\sup I(o_1) < \inf I(o_2)$.
 \end{lemma}
@@ -423,7 +423,7 @@ The following lemma establishes the intended effect of $\overleftarrow{\pi}$.
 Algorithm~\ref{alg:counting} computes the counting representation of a given
 history incrementally, according to the increment/decrement and shift
 operations of Lemmas~\ref{lem:incr} and~\ref{lem:shift}. The variable $n$
-maintains the interval length of the input execution's history $H(e)$, while
+maintains the interval length of the execution history $H(e)$, while
 the variable $s$ maintains the infimum $s(o)$ of the interval of each operation
 $o$ in $H(e)$; $s(o)$ can be discarded once $o$ completes. The corresponding
 infimum in $A_k(H(e))$ when $o$ is invoked is given by $\min(n,k)$, as the

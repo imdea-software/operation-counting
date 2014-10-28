@@ -2,18 +2,20 @@
 \section{Atomic Collections}
 \label{sec:containers}
 
-Collection-based data structures such as stacks and queues are among the most
-heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. In this
-section we demonstrate that our approximation is effective in uncovering
-refinement violations for such atomic objects, in the sense that most
-violations can be uncovered with coarse approximations, i.e.,~$k\le 3$,
-depending on the data structure. To obtain these results we exhibit families
-$@Y$ of operation counting formul\ae characterizing these structures with
-``cutoff'' (or ``small-model'') properties: for any history $h$ violating $@Y$
-there exists $h' \preceq h$ violating $@Y$ with $\len h' \le k$. While this
-$h'$ may not correspond directly to $A_k(h)$, we can deduce there exists some
-$h'$ whose $k$-approximation $A_k(h')$ does violate $@Y$. Our results build off
-of previous characterizations of concurrent data
+Atomic collection objects including stacks and queues are among the most
+heavily investigated concurrent objects~\cite{chapter/cds/MoirS07}. We
+demonstrate that our approximation is effective in uncovering refinement
+violations for these objects, in the sense that most violations can be
+uncovered with coarse approximations, i.e.,~$k\le 3$, depending on the data
+structure. We achieve this by exhibiting families of operation
+counting formul\ae characterizing these structures with ``cutoff'' (or
+``small-model'') properties: informally, if $n \in \<Nats>$ is a cutoff for
+$@Y$, then for any history $h$ violating $@Y$, there exists a weaker history
+$h' \preceq h$ violating $@Y$ with $\len h' \le n$. While this $h'$ may not
+correspond directly to $A_k(h)$, for $k \le n$, we can deduce there exists
+some $h'$ whose $k$-approximation $A_k(h')$ violates $@Y$.
+
+Our results build off of previous characterizations of concurrent data
 structures~\cite{conf/tacas/AbdullaHHJR13, conf/concur/HenzingerSV13} into a
 small set of constituent properties. For ease of presentation, in the following
 we consider only completed histories, i.e.,~in which no operation is pending.
@@ -244,7 +246,7 @@ every possible violation.
 Given a history $h = \tup{O,<,f}$, an \emph{element} $\tup{o_1,o_2} \in O^2$ is
 a pair of operations such that $f(o_1) = \<push>(v)$ and $f(o_2) = \<pop> => v$
 for some $v \in \<Vals>$. We say that two distinct elements $\tup{o_1,o_2}$ and
-$\tup{o_3,o_4}$ are \emph{redundant in $h$} when their operations have the same
+$\tup{o_3,o_4}$ are \emph{redundant with $h$} when their operations have the same
 pasts and futures,\footnote{Similarly to the definition of $\<past>$ from
 Section~\ref{sec:counting:logic}, we define the \emph{future} of an operation
 $o$ in an history $\tup{O,<,f}$ by $\<future>(o) = \set{o' \in O : o < o'}$.}
@@ -262,7 +264,7 @@ for all $o_1, o_2 \in O$, and $f(o) = f'(o)$ for all $o \in O$.
 
   Let $x \in \set{\mathrm{stack}, \mathrm{queue}}$.
   If $h'$ extends $h$ with $\set{o_1,o_2}$ and $\tup{o_1,o_2}$ is
-  redundant in $h$, then $h \in H(L_x)$ if{f} $h' \in H(L_x)$.
+  redundant with $h$, then $h \in H(L_x)$ if{f} $h' \in H(L_x)$.
 
 \end{lemma}
 
@@ -302,8 +304,8 @@ $\set{ o_1, .., o_n }$ and elements $@c$, and its extensions:
   \!\!\! \bigwedge_{o_i < o_j} \!\!\! \pred{before}_k(x_i,x_j)
   \land \!\!\!\!\!\! \bigwedge_{\langle o_i,o_j \rangle \in @c} \!\!\!\!\!\! \pred{match}(x_i,x_j)
 \end{align*}
-Note that $@Y_{x,k}$ is polynomial in size for fixed $k \in \<Nats>$, and
-has quantifier rank $1$.
+Note that $@Y_{x,k}$ is polynomial in size, and has fixed quantifier count,
+for fixed $k \in \<Nats>$.
 
 \begin{theorem}
   Let $x \in \set{stack, queue}$.

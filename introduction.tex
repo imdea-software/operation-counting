@@ -2,32 +2,27 @@
 \section{Introduction}
 
 Efficient implementations of concurrent objects such as semaphores, locks, and
-atomic collections including stacks and queues are essential to modern
-computing. Programming them is however error prone. In order to minimize
-synchronization overhead between concurrent object invocations, implementors
-avoid blocking operations like lock acquisition, allowing operations to be
-concurrently executed. However, concurrent execution risks unexpected
-interference between operations, and risks breaking conformance to reference
-implementations. Conformance is formally captured by the concept of
-\emph{observational refinement}: given two libraries $L_1$ and $L_2$
-implementing the operations of some concurrent object, we say $L_1$
-\emph{refines} $L_2$ if and only if every computation of every program $P$
-using $L_1$ would also be possible were $P$ using $L_2$ instead. The challenge
-we address in this work is to provide a tractable algorithmic approach for
-checking observational refinement.
+atomic collections including stacks and queues are vital to modern computer
+systems. Programming them is however error prone. To minimize synchronization
+overhead between concurrent object-method invocations, implementors avoid
+blocking operations like lock acquisition, allowing methods to execute
+concurrently. However, concurrency risks unintended inter-operation
+interference, and risks conformance to reference implementations. Conformance
+is formally captured by \emph{observational refinement}: given two libraries
+$L_1$ and $L_2$ implementing the methods of some concurrent object, we say
+$L_1$ \emph{refines} $L_2$ if and only if every computation of every program
+using $L_1$ would also be possible were $L_2$ used instead.
 
-Verifying observational refinement is an intrinsically hard problem, and is
-undecidable in general~\cite{conf/esop/BouajjaniEEH13}. Our contribution
-focuses on developing a tractable approach for detecting refinement violations,
-which we divide into two main parts.
+Verifying observational refinement is intrinsically hard, and generally
+undecidable~\cite{conf/esop/BouajjaniEEH13}. Here we develop a tractable
+algorithmic approach to detecting refinement violations, in two parts.
 
 The first part, outlined in Section~\ref{sec:intro:histories}, establishes a
-foundational characterization of observational refinement in terms of sets of
-so-called \emph{histories}. Histories abstract concurrent executions into the
-happens-before (partial-order) relation between object-method invocations. We
-show that refinement between libraries is equivalent to a history-set inclusion
-problem, and consequently each violation is captured by a negative instance of
-history-set membership.
+foundational characterization of refinement in terms of sets of so-called
+\emph{histories}. Histories abstract executions into the happens-before
+(partial) order between object-method invocations. We show that refinement
+between libraries is equivalent to a history-set inclusion problem.
+Consequently, violations correspond to excluded histories.
 
 Since refinement-violation detection for even a single execution is
 NP-hard~\cite{journals/siamcomp/GibbonsK97}, the second part, outlined in

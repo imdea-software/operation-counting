@@ -100,6 +100,7 @@ point.
     Second are the number of those histories violating refinement.
     Following are the
     numbers of those violations covered by $A_k$, for varying values of $k$.
+    In this experiment $A_0$ exposed no violations.
   }
   \label{fig:data:coverage}
 \end{figure}
@@ -111,12 +112,12 @@ Figure~\ref{fig:data:runtime} compares the runtime overhead of our $A_2$
 approximation versus a traditional linearizability checker\footnote{See
 footnote~\ref{fn:lineup}.} sampling executions with up to $20$ operations on
 Scal's nonblocking Michael-Scott queue. Since computing the set $\ker
-H(L_\mathrm{msq})$ of sequential histories over $n$ operations becomes
+H(L_\mathrm{queue})$ of sequential queue histories over $n$ operations becomes
 prohibitively expensive as $n$ increases, surpassing a timeout of $5$m for
-$n\!=\!7$, we bypass the computation of $\ker H(L_\mathrm{msq})$ entirely,
+$n\!=\!7$, we bypass the computation of $\ker H(L_\mathrm{queue})$ entirely,
 simply enumerating the linearizations of a given execution history without
-checking its inclusion. Despite our best-effort implementation, one observes
-the cost incurred by linearization: as the number of operations increases, the
+checking inclusion. Despite our best-effort implementation, one observes the
+cost incurred by linearization: as the number of operations increases, the
 number of linearizations increases exponentially, and performance plummets.
 With only 20 operations, instrumentation overhead is nearly $1000$x. Our
 counting-based implementation of $A_2$ avoids this dramatic overhead: though
